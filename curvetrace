@@ -1,0 +1,270 @@
+#!/usr/bin/env python3
+
+# Curve tracer program:
+# Use one PPS power supply to determine a single trace of a two-terminal DUT:
+# * Read configuration file (for PPS PSU connections)
+# * Ask for sample name and start a log file for the test
+# * Ask for the min. and max. voltage to be applied to the DUT
+# * Ask for number of voltage steps
+# * Ask for current limit (max. current allowed for the DUT)
+# * Ask for power limit (max. power allowed for the DUT)
+# * Apply specified voltages to to DUT and read the current
+# * Output the voltage / current data
+#
+# Hardware setup:
+# * Computer connected to programmable Voltcraft PPS power supply via USB cable (UART interface in PPS)
+# * DUT device connected to power supply output:
+#	PSU-POS -- DUT-1
+#	PSU-NEG -- DUT-2
+#
+# This file is part of curvetracePy, a toolbox for curve tracing using programmable Voltcraft PPS power supplies.
+#
+# curvetracePy is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+# 
+# curvetracePy is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+# 
+# You should have received a copy of the GNU General Public License
+# along with ruediPy.  If not, see <http://www.gnu.org/licenses/>.
+# 
+# curvetracePy: a toolbox for operation of PEM electrolysis cells.
+# Copyright 2020, Matthias Brennwald (mbrennwa@gmail.com)
+
+# make shure Python knows where to look for the curvetracePy Python code
+# http://stackoverflow.com/questions/4580101/python-add-pythonpath-during-command-line-module-run
+# Example (bash): export PYTHONPATH=~/curvetracePy
+
+# imports:
+### import argparse
+### import datetime
+import time
+import configparser
+import numpy as np
+from termcolor import colored
+import classes.powersupply_PPS
+
+############################
+# function to print output #
+############################
+
+def printit(text,f='',comm=''):
+	# print date/time followed by text either to stdout (if f is empty) or to file (if f is not empty)
+	# prepend date/time:
+	# now = datetime.datetime.now()
+	# text = now.strftime("%Y-%m-%d %H:%M:%S") + '\t' + text
+
+	#print text:
+	print(text)
+	if f:
+		if len(comm):
+			text = comm + ' ' + text
+		print(text,file=f)
+		f.flush()
+	return
+
+
+################
+# main program #
+################
+
+### # parse input arguments
+### parser = argparse.ArgumentParser(description='Curve tracer for electronic parts using Voltcraft PPS power supplies.')
+### parser.add_argument('configfile', help='configuration file (name/path)')
+### parser.add_argument('--logfile', nargs='?', default='pemcell.log', help='log file (name/path). Default: pemcell.log')
+### args = parser.parse_args()
+
+# read config file:
+config = configparser.ConfigParser()
+### config.read(args.configfile)
+config.read('curvetrace_config.txt')
+
+T_wait = float(config['PSU1']['SETTLE_SECONDS']) # number of seconds to wait after setting the voltage/current values at the PSU before taking the DUT reading
+
+# connect to PSU:
+PSU = classes.powersupply_PPS.PPS(port=config['PSU1']['COMPORT'], reset=False, prom=None)
+PSU.output(False) # make sure it is turned off
+print ('Checking PSU ' + PSU.MODEL + '...')
+
+# determine max voltage and current of the PSU:
+PSU_Vmax = PSU.VMAX
+PSU_Imax = PSU.IMAX
+
+# determine minimum voltage of the PSU:
+PSU.current(0.0) # make sure there's no current
+PSU.output(True)
+k = 0;
+while k <= PSU_Vmax*10:
+	try:
+		PSU_Vmin = float(k)/10
+		PSU.voltage(PSU_Vmin)
+		break
+	except:
+		k = k+1	
+PSU.output(False)	
+PSU.voltage(PSU_Vmin)
+if PSU_Vmin == PSU_Vmax:
+	print ('Could not determine the minimum voltage of the power supply')
+	exit()
+
+
+print ('* Min. voltage output: ' + str(PSU_Vmin) + ' V')
+print ('* Max. voltage output: ' + str(PSU_Vmax) + ' V')
+print ('* Max. current output: ' + str(PSU_Imax) + ' A')
+print ()
+
+# ask for sample name:
+samplename = ''
+while not samplename:
+    samplename = input('Enter sample name / label: ')
+    samplename = samplename.strip()
+
+# start logfile:
+logfilename = samplename + '.dat'
+
+logfile = open(logfilename,'w')
+if logfile:
+    print('\nLogging output to ' + logfilename + '...\n')
+else:
+    print('Could not open log file!')
+    exit()
+
+# ask for voltage values / current and power limits:
+try:
+
+	print ("Enter test voltages:")
+
+	try:
+		V1 = float(input('* Start value (V): '))
+	except ValueError:
+		print ('  Invalid input!')
+	if V1 < PSU_Vmin:
+		print ('  Adjusting Start voltage to min. value possible with the power supply (' + str(PSU_Vmin) + ' V).')
+		V1 = PSU_Vmin
+	if V1 > PSU_Vmax:
+		print ('  Adjusting Start voltage to max. value possible with the power supply (' + str(PSU_Vmax) + ' V).')
+		V1 = PSU_Vmax
+
+	try:
+		V2 = float(input('* End value (V): '))
+	except ValueError:
+		print ('  Invalid input!')
+	if V2 < PSU_Vmin:
+		print ('  Adjusting End voltage to min. value possible with the power supply (' + str(PSU_Vmin) + ' V).')
+		V2 = PSU_Vmin
+	if V2 > PSU_Vmax:
+		print ('  Adjusting End voltage to max. value possible with the power supply (' + str(PSU_Vmax) + ' V).')
+		V2 = PSU_Vmax
+
+	if V1 == V2:
+		print ('  Equal Start end End voltages! Running single-point test.')
+		N = 1;
+	else:
+		try:
+			N = int(input('* Number of voltage steps: '))
+		except ValueError:
+			print ('  Invalid input!')		
+		if N < 2:
+			print ('  Invalid number of voltage steps. Using N = 2...')
+			N = 2
+
+	print ("\nEnter DUT limits:")
+	try:
+		Imax = float(input('* Maximum allowed current (A): '))
+	except ValueError:
+		print ('  Invalid input!')
+	if Imax <= 0.0:
+		raise ValueError('Max. current must be positive.')
+	if Imax > PSU_Imax:
+		print ('  Adjusting current limit to max. output of the power supply (' + str(PSU_Imax) + ' A).')
+		Imax = PSU_Imax
+
+	try:
+		Pmax = float(input('* Maximum allowed power (W): '))
+	except ValueError:
+		print ('  Invalid input!')
+	if Pmax <= 0.0:
+		raise ValueError('Max. power must be positive.')
+	if Pmax > PSU_Vmax * PSU_Imax:
+		print ('  Adjusting power limit to max. output of the power supply (' + str(PSU_Vmax*PSU_Imax) + ' W).')
+		Pmax = PSU_Vmax * PSU_Imax
+	print ('\n')
+
+	try:
+		T_cool = float(input('OPTIONAL: Cool-off time between readings (s): '))
+	except ValueError:
+		print ('  Using default: no cool off.')
+		T_cool = 0.0
+	if T_cool < 0:
+		raise ValueError('Cool-off time must not be negative.')
+
+	try:
+		N_rep = int(input('OPTIONAL: Number of repeats per reading: '))
+	except ValueError:
+		print ('  Using default: single reading.')
+		N_rep = 1
+	if N_rep <= 0:
+		raise ValueError('Number of repeats must be positive.')
+
+
+# Error handling of user input:
+except ValueError as e:
+    print('Invalid input: ',e)
+    exit()
+
+# Print summary and ask if okay:
+printit('Sample: ' + samplename,logfile,'%')
+printit ('Test conditions:',logfile,'%')
+printit ('* Start voltage = ' + str(V1) + ' V',logfile,'%')
+printit ('* End voltage = ' + str(V2) + ' V',logfile,'%')
+printit ('* Max. allowed current = ' + str(Imax) + ' A',logfile,'%')
+printit ('* Max. allowed power = ' + str(Pmax) + ' W',logfile,'%')
+printit ('* Number of steps = ' + str(N),logfile,'%')
+printit ('* Cool-off time between steps = ' + str(T_cool),logfile,'%')
+printit ('* Repeats per reading = ' + str(N_rep),logfile,'%')
+
+input ('\nReady? Press ENTER to start testing...')
+
+# Run the test:
+print ('\nTest started...')
+
+# Turn on PPS, with V = I = 0:
+PSU.current(0.0)
+PSU.output(True)
+
+printit ('Column 1: test voltage applied to DUT (V), Column-2: DUT current (A)',logfile,'%')
+
+for V in np.linspace(V1,V2,N):
+
+	# Determine current limit:
+	if V > 0:
+		Ilim = min (Imax,Pmax/V)
+	else:
+		Ilim = Imax
+
+	# Run the test:
+	for i in range(N_rep):
+		PSU.current(Ilim) # set current limit at PSU
+		PSU.voltage(V) # set voltage at PSU
+		time.sleep(T_wait) # wait for stable conditions at PSU and DUT
+		r = PSU.reading() # read voltage and current at PSU terminals
+		VDUT = r[0];
+		IDUT = r[1];
+		PSU.current(0)
+
+		# Print results:
+		printit ( str(VDUT) + ' ' + str(IDUT) , logfile )
+
+		# Cool off before next reading:
+		if V < V2:
+			time.sleep(T_cool)
+
+# Turn off PSU:
+PSU.output(False)
+
+# Say goodbye:
+print ('Test completed.')
