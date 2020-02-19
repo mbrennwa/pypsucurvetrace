@@ -46,7 +46,7 @@ import time
 import configparser
 import numpy as np
 from termcolor import colored
-import classes.powersupply_PPS
+import powersupply_PPS
 
 ############################
 # function to print output #
@@ -86,7 +86,8 @@ config.read('curvetrace_config.txt')
 T_wait = float(config['PSU1']['SETTLE_SECONDS']) # number of seconds to wait after setting the voltage/current values at the PSU before taking the DUT reading
 
 # connect to PSU:
-PSU = classes.powersupply_PPS.PPS(port=config['PSU1']['COMPORT'], reset=False, prom=None)
+## PSU = classes.powersupply_PPS.PPS(port=config['PSU1']['COMPORT'], reset=False, prom=None)
+PSU = powersupply_PPS.PPS(port=config['PSU1']['COMPORT'], reset=False, prom=None)
 PSU.output(False) # make sure it is turned off
 print ('Checking PSU ' + PSU.MODEL + '...')
 
@@ -195,14 +196,6 @@ try:
 	print ('\n')
 
 	try:
-		T_cool = float(input('OPTIONAL: Cool-off time between readings (s): '))
-	except ValueError:
-		print ('  Using default: no cool off.')
-		T_cool = 0.0
-	if T_cool < 0:
-		raise ValueError('Cool-off time must not be negative.')
-
-	try:
 		N_rep = int(input('OPTIONAL: Number of repeats per reading: '))
 	except ValueError:
 		print ('  Using default: single reading.')
@@ -210,6 +203,42 @@ try:
 	if N_rep <= 0:
 		raise ValueError('Number of repeats must be positive.')
 
+	try:
+		T_idle = float(input('OPTIONAL: idle time between readings (s): '))
+	except ValueError:
+		print ('  Using default: no idle time.')
+		T_idle = 0.0
+	if T_idle < 0:
+		raise ValueError('Idle time must not be negative.')
+
+	if T_idle == 0.0:
+		V_idle = 0.0;
+		I_idle = 0.0
+	else:
+		try:
+			V_idle = float(input('OPTIONAL: voltage during idle (V, limit): '))
+		except ValueError:
+			print ('  Using default: idle voltage limit = ' + str(PSU_Vmin) + ' V.')
+			V_idle = PSU_Vmin
+		if V_idle < PSU_Vmin:
+			print ('  Adjusting idle voltage limit to min. value possible with the power supply (' + str(PSU_Vmin) + ' V).')
+			V_idle = PSU_Vmin			
+		if V_idle > PSU_Vmax:
+			print ('  Adjusting idle voltage limit to max. value possible with the power supply (' + str(PSU_Vmax) + ' V).')
+			V_idle = PSU_Vmax
+		if V_idle == 0.0:
+			I_idle = 0.0
+		else:
+			try:
+				I_idle = float(input('OPTIONAL: current during idle (A, limit): '))
+			except ValueError:
+				print ('  Using default: idle current limit = 0 A.')
+				I_idle = 0.0
+			if I_idle < 0:
+				raise ValueError('Idle current limit must not be negative.')
+			if I_idle > PSU_Imax:
+				print ('  Adjusting idle current limit to max. output of the power supply (' + str(PSU_Imax) + ' A).')
+				I_idle = PSU_Imax
 
 # Error handling of user input:
 except ValueError as e:
@@ -217,6 +246,7 @@ except ValueError as e:
     exit()
 
 # Print summary and ask if okay:
+print('\nTest setup:')
 printit('Sample: ' + samplename,logfile,'%')
 printit ('Test conditions:',logfile,'%')
 printit ('* Start voltage = ' + str(V1) + ' V',logfile,'%')
@@ -224,8 +254,10 @@ printit ('* End voltage = ' + str(V2) + ' V',logfile,'%')
 printit ('* Max. allowed current = ' + str(Imax) + ' A',logfile,'%')
 printit ('* Max. allowed power = ' + str(Pmax) + ' W',logfile,'%')
 printit ('* Number of steps = ' + str(N),logfile,'%')
-printit ('* Cool-off time between steps = ' + str(T_cool),logfile,'%')
 printit ('* Repeats per reading = ' + str(N_rep),logfile,'%')
+printit ('* Idle time between steps = ' + str(T_idle),logfile,'%')
+printit ('* Idle voltage limit = ' + str(V_idle),logfile,'%')
+printit ('* Idle current limit = ' + str(I_idle),logfile,'%')
 
 input ('\nReady? Press ENTER to start testing...')
 
@@ -247,24 +279,32 @@ for V in np.linspace(V1,V2,N):
 		Ilim = Imax
 
 	# Run the test:
+	VDUT = 0.0;
+	IDUT = 0.0;
 	for i in range(N_rep):
+		if T_idle > 0.0:
+			PSU.voltage(V_idle)
+			PSU.current(I_idle)
+			time.sleep(T_idle)
+
 		PSU.current(Ilim) # set current limit at PSU
 		PSU.voltage(V) # set voltage at PSU
 		time.sleep(T_wait) # wait for stable conditions at PSU and DUT
 		r = PSU.reading() # read voltage and current at PSU terminals
-		VDUT = r[0];
-		IDUT = r[1];
+		VDUT = VDUT + r[0];
+		IDUT = IDUT + r[1];
 		PSU.current(0)
 
-		# Print results:
-		printit ( str(VDUT) + ' ' + str(IDUT) , logfile )
+	# Determine mean of repeated readings:
+	VDUT = VDUT / N_rep;
+	IDUT = IDUT / N_rep;
 
-		# Cool off before next reading:
-		if V < V2:
-			time.sleep(T_cool)
+	# Print results:
+	printit ( str(VDUT) + ' ' + str(IDUT) , logfile )
 
-# Turn off PSU:
-PSU.output(False)
+# Set PSU output to zero:
+PSU.voltage(0)
+PSU.current(0)
 
 # Say goodbye:
 print ('Test completed.')
