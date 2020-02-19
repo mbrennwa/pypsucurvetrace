@@ -388,8 +388,10 @@ for Vc in np.linspace(Vc1,Vc2,Nc):
 		printit ( str(VCDUT) + ' ' + str(VDUT) + ' ' + str(IDUT) , logfile )
 
 # Set PSU output to zero:
-PSU1.voltage(0)
+PSU1.voltage(PSU1.VMIN)
 PSU1.current(0)
+PSU2.voltage(PSU2.VMIN)
+PSU2.current(0)
 
 # Say goodbye:
 print ('Test completed.')
