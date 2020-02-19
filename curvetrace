@@ -105,7 +105,9 @@ while k <= PSU_Vmax*10:
 		PSU.voltage(PSU_Vmin)
 		break
 	except:
-		k = k+1	
+		k = k+1
+	print ('**************************** NEED TO READ THE ACTUAL VOLTAGE AT THE PPS -- DOES IT REALLY CORRESPOND TO THE SET VALUE??? **************')
+
 PSU.output(False)	
 PSU.voltage(PSU_Vmin)
 if PSU_Vmin == PSU_Vmax:
