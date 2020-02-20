@@ -96,6 +96,11 @@ def get_PSU(config,label):
 		# determine settle time:
 		PSU.TSETTLE = float(config[label]['SETTLE_SECONDS'])
 
+		# turn on PSU with zero output:
+		PSU.voltage(PSU.VMIN)
+		PSU.current(0)
+		PSU.output(True)
+
 		PSU.configured = True
 
 		# show summary
@@ -335,9 +340,14 @@ print ('\nTest started...')
 PSU1.current(0.0)
 PSU1.output(True)
 
-printit ('Column 1: voltage applied to DUT control pin (V)',logfile,'%')
-printit ('Column 2: test voltage applied to DUT (V)',logfile,'%')
-printit ('Column 3: DUT current (A)',logfile,'%')
+printit ('Column 1: PSU1 voltage setting (V)',logfile,'%')
+printit ('Column 2: PSU2 voltage setting (V)',logfile,'%')
+printit ('Column 3: PSU1 voltage measurement (V)',logfile,'%')
+printit ('Column 4: PSU2 voltage measurement (V)',logfile,'%')
+printit ('Column 5: PSU1 current measurement (A)',logfile,'%')
+printit ('Column 6: PSU2 current measurement (A)',logfile,'%')
+printit ('Column 7: PSU1 current / power limit flag',logfile,'%')
+printit ('Column 8: PSU2 current / power limit flag',logfile,'%')
 
 for Vc in np.linspace(Vc1,Vc2,Nc):
 
@@ -360,12 +370,29 @@ for Vc in np.linspace(Vc1,Vc2,Nc):
 		IDUT  = 0.0
 		for i in range(N_rep):
 			if T_idle > 0.0:
+				# set output to zero (to avoid overshoot)
+				PSU1.current(0)
+				PSU1.voltage(PSU1.VMIN)
+
+				# set idle conditions:
+				PSU2.voltage(Ic_idle)				
 				PSU1.current(I_idle)
 				PSU1.voltage(V_idle)
-				PSU2.voltage(Ic_idle)
 				PSU2.voltage(Vc_idle)
+
+				# wait idle time:
 				time.sleep(T_idle)
 
+				# set output to zero (to avoid overshoot when starting next measurement)
+				PSU1.current(0)
+				PSU1.voltage(PSU1.VMIN)
+
+				# return to required control-pin voltage:
+				if PSU2.configured:
+					PSU2.voltage(Vc)
+					time.sleep(PSU2.TSETTLE) # wait for stable conditions
+
+			# set up measurement conditions:
 			PSU1.current(Ilim) # set current limit at PSU1
 			PSU1.voltage(V) # set voltage at PSU1
 			time.sleep(PSU1.TSETTLE) # wait for stable conditions at PSU and DUT
@@ -383,9 +410,24 @@ for Vc in np.linspace(Vc1,Vc2,Nc):
 			VCDUT = VCDUT / N_rep
 		else:
 			VCDUT = 'NA'
+			Vc = 'NA'
+
+		if IDUT > Ilim-0.02:
+			flag_PSU1_limit = 1
+		else:
+			flag_PSU1_limit = 0
 
 		# Print results:
-		printit ( str(VCDUT) + ' ' + str(VDUT) + ' ' + str(IDUT) , logfile )
+
+
+
+
+		printit ( str(V) + ' ' + str(Vc) + ' ' + str(VDUT) + ' ' + str(VCDUT) + ' ' + str(IDUT) + ' ' + str(ICDUT) + ' ' +  str(flag_PSU1_limit) , logfile )
+
+
+
+
+		### printit ( str(VCDUT) + ' ' + str(VDUT) + ' ' + str(IDUT) + ' ' + str(flag_IP_limit) , logfile )
 
 # Set PSU output to zero:
 PSU1.voltage(PSU1.VMIN)
