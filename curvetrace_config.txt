@@ -1,6 +1,6 @@
 [PSU1]
 COMPORT = /dev/serial/by-id/usb-Silicon_Labs_CP2102_USB_to_UART_Bridge_Controller_0001-if00-port0
-SETTLE_SECONDS = 1.5
+SETTLE_SECONDS = 5
 VOLTAGE_MIN = 0.85
 
 [PSU2]
