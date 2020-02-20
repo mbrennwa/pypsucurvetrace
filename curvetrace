@@ -1,30 +1,13 @@
 #!/usr/bin/env python3
 
-# Curve tracer program:
-# Use one PPS power supply to determine a single trace of a two-terminal DUT:
-# * Read configuration file (for PPS PSU connections)
-# * Ask for sample name and start a log file for the test
-# * Ask for the min. and max. voltage to be applied to the DUT
-# * Ask for number of voltage steps
-# * Ask for current limit (max. current allowed for the DUT)
-# * Ask for power limit (max. power allowed for the DUT)
-# * Apply specified voltages to to DUT and read the current
-# * Output the voltage / current data
+# This file is part of curvetracePPSPy, a toolbox for curve tracing using programmable Voltcraft PPS power supplies.
 #
-# Hardware setup:
-# * Computer connected to programmable Voltcraft PPS power supply via USB cable (UART interface in PPS)
-# * DUT device connected to power supply output:
-#	PSU-POS -- DUT-1
-#	PSU-NEG -- DUT-2
-#
-# This file is part of curvetracePy, a toolbox for curve tracing using programmable Voltcraft PPS power supplies.
-#
-# curvetracePy is free software: you can redistribute it and/or modify
+# curvetracePPSPy is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
 # 
-# curvetracePy is distributed in the hope that it will be useful,
+# curvetracePPSPy is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
@@ -35,13 +18,7 @@
 # curvetracePy: a toolbox for operation of PEM electrolysis cells.
 # Copyright 2020, Matthias Brennwald (mbrennwa@gmail.com)
 
-# make shure Python knows where to look for the curvetracePy Python code
-# http://stackoverflow.com/questions/4580101/python-add-pythonpath-during-command-line-module-run
-# Example (bash): export PYTHONPATH=~/curvetracePy
-
 # imports:
-### import argparse
-### import datetime
 import time
 import math
 import configparser
@@ -55,12 +32,6 @@ import powersupply_PPS
 #############################################################
 
 def printit(text,f='',comm=''):
-	# print date/time followed by text either to stdout (if f is empty) or to file (if f is not empty)
-	# prepend date/time:
-	# now = datetime.datetime.now()
-	# text = now.strftime("%Y-%m-%d %H:%M:%S") + '\t' + text
-
-	#print text:
 	print(text)
 	if f:
 		if len(comm):
@@ -124,13 +95,13 @@ def connect_PSU(config,label):
 # configure PSU test settings #
 ###############################
 
-def configure_PSU(PSU):
+def configure_test_PSU(PSU):
 	
 	if PSU.connected == False:
 		print ('\n' + PSU.label + ' is not connected (or connection is not configured).')
 		PSU.configured = False
 	else:
-		print ('\n' + 'Configure ' + PSU.label + ' settings:')
+		print ('\n' + 'Configure ' + PSU.label + ' test settings:')
 
 		try:
 			PSU.VSTART = float(input('* ' + PSU.label + ' start voltage (V): '))
@@ -192,10 +163,52 @@ def configure_PSU(PSU):
 
 
 
+###############################
+# configure PSU idle settings #
+###############################
+
+def configure_idle_PSU(PSU):
+	
+	if PSU.configured:
+		print ('\n' + 'Configure ' + PSU.label + ' idle settings:')
+
+		try:
+			PSU.VIDLE = float(input('* ' + PSU.label + ' idle voltage (V): '))
+		except ValueError:
+			print ('  Invalid input!')
+		if PSU.VIDLE < PSU.VMIN:
+			print ('  Adjusting idle voltage to min. value possible with the power supply (' + str(PSU.VMIN) + ' V).')
+			PSU.VIDLE = PSU.VMIN
+		if PSU.VIDLE > PSU.VMAX:
+			print ('  Adjusting idle voltage to max. value possible with the power supply (' + str(PSU.VMAX) + ' V).')
+			PSU.VIDLE = PSU.VMAX
+
+		try:
+			PSU.IIDLE = float(input('* ' + PSU.label + ' idle current (A): '))
+		except ValueError:
+			print ('  Invalid input!')
+		if PSU.IIDLE < 0.0:
+			raise ValueError('Max. current must not be negative.')
+		if PSU.IIDLE > PSU.IMAX:
+			print ('  Adjusting idle current to max. value possible with the power supply (' + str(PSU.IMAX) + ' V).')
+			PSU.IIDLE = PSU.IMAX
+
+	return PSU
+
+
+
 
 ################
 # main program #
 ################
+
+# Say Hello:
+print('\n')
+print('***** CurvetracePPS')
+print('***** Python program to use Voltcraft PPS power supplies for I-V curve tracing of electronic parts')
+print('***** Disclaimer: NO WARRANTIES OF ANY KIND!!!')
+print('***** Disclaimer: Users are advised to study the code in order to understand how this program works.')
+print('\n')
 
 # read config file:
 config = configparser.ConfigParser()
@@ -222,8 +235,8 @@ else:
     exit()
 
 # ask for voltage values / current and power limits:
-PSU1 = configure_PSU (PSU1)
-PSU2 = configure_PSU (PSU2)
+PSU1 = configure_test_PSU (PSU1)
+PSU2 = configure_test_PSU (PSU2)
 
 if PSU1.configured == False:
 	if PSU2.configured == False:
@@ -247,36 +260,10 @@ except ValueError:
 	T_idle = 0.0
 if T_idle < 0:
 	raise ValueError('Idle time must not be negative.')
-
-if T_idle == 0.0:
-	V_idle = 0.0;
-	I_idle = 0.0
-else:
-	try:
-		V_idle = float(input('OPTIONAL: voltage during idle (V, limit) [default=0]: '))
-	except ValueError:
-		print ('  Using default: idle voltage limit = ' + str(PSU1.VMIN) + ' V.')
-		V_idle = PSU1.VMIN
-	if V_idle < PSU1.VMIN:
-		print ('  Adjusting idle voltage limit to min. value possible with the power supply (' + str(PSU1.VMIN) + ' V).')
-		V_idle = PSU1.VMIN			
-	if V_idle > PSU1.VMAX:
-		print ('  Adjusting idle voltage limit to max. value possible with the power supply (' + str(PSU1.VMAX) + ' V).')
-		V_idle = PSU1.VMAX
-	if V_idle == 0.0:
-		I_idle = 0.0
-	else:
-		try:
-			I_idle = float(input('OPTIONAL: current during idle (A, limit) [default=1]: '))
-		except ValueError:
-			print ('  Using default: idle current limit = 0 A.')
-			I_idle = 0.0
-		if I_idle < 0:
-			raise ValueError('Idle current limit must not be negative.')
-		if I_idle > PSU1.IMAX:
-			print ('  Adjusting idle current limit to max. output of the power supply (' + str(PSU1.IMAX) + ' A).')
-			I_idle = PSU1.IMAX
-
+if T_idle > 0.0:
+	for p in [PSU1, PSU2]:
+		if p.configured:
+			p = configure_idle_PSU(p);
 
 # Print summary of test setup:
 print('\nTest setup:')
@@ -314,16 +301,18 @@ input ('\nReady? Press ENTER to start testing or CTRL+C to abort...')
 # Run the test:
 print ('\nTest started...\n')
 
-printit ('Column 1:  PSU1 voltage setting (V)',logfile,'%')
-printit ('Column 2:  PSU1 current setting (A)',logfile,'%')
+printit ('Column 1:  PSU1 nominalvoltage setting (V)',logfile,'%')
+printit ('Column 2:  PSU1 nominal current setting (A)',logfile,'%')
 printit ('Column 3:  PSU1 voltage measurement (V)',logfile,'%')
 printit ('Column 4:  PSU1 current measurement (I)',logfile,'%')
 printit ('Column 5:  PSU1 limiter flag',logfile,'%')
-printit ('Column 6:  PSU2 voltage setting (V)',logfile,'%')
-printit ('Column 7:  PSU2 current setting (A)',logfile,'%')
+printit ('Column 6:  PSU2 nominal voltage setting (V)',logfile,'%')
+printit ('Column 7:  PSU2 nominal current setting (A)',logfile,'%')
 printit ('Column 8:  PSU2 voltage measurement (V)',logfile,'%')
 printit ('Column 9:  PSU2 current measurement (I)',logfile,'%')
 printit ('Column 10: PSU2 limiter flag',logfile,'%')
+
+print('\n')
 
 for V2 in np.linspace(PSU2.VSTART,PSU2.VEND,PSU2.N):
 
