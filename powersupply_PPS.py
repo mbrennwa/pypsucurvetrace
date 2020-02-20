@@ -227,6 +227,3 @@ class PPS(object):
 		"""
 		V, I, _ = self.reading()
 		return V*I
-
-
-
