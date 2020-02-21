@@ -419,7 +419,7 @@ for V2 in np.linspace(PSU2.VSTART,PSU2.VEND,PSU2.N):
 			LIMIT2 = 0
 
 		# Print results:
-		printit ( str(V1) + ' ' + str(I1LIM) + ' ' + str(V1MEAS) + ' ' + str(I1MEAS) + ' ' + str(int(LIMIT1)) + ' ' + str(V2MEAS) + ' ' + str(I2MEAS) + ' ' + str(int(LIMIT2)) , logfile )
+		printit ( str(V1) + ' ' + str(I1LIM) + ' ' + str(V1MEAS) + ' ' + str(I1MEAS) + ' ' + str(int(LIMIT1)) + ' ' + str(V2) + ' ' + str(V2MEAS) + ' ' + str(I2MEAS) + ' ' + str(int(LIMIT2)) , logfile )
 
 
 # Set PSU output to zero:
