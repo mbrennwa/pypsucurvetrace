@@ -264,6 +264,14 @@ if T_idle > 0.0:
 	for p in [PSU1, PSU2]:
 		if p.configured:
 			p = configure_idle_PSU(p);
+	try:
+		T_preheat = float(input('\nOPTIONAL: pre-heat time before starting the test (s) [default=0]: '))
+	except ValueError:
+		print ('  Using default: no pre-heating.')
+		T_preheat = 0.0
+else:
+	T_preheat = 0.0
+
 
 # Print summary of test setup:
 print('\nTest setup:')
@@ -283,23 +291,25 @@ printit ('* Repeats per reading = ' + str(N_rep),logfile,'%')
 if T_idle == 0.0:
 	printit ('* No idle time between measurements',logfile,'%')
 else:
-	if T_idle == 0:
-		printit ('* No idle time between measurements',logfile,'%')
-	else:
-		printit ('* Idle time between measurements: ' + str(T_idle) + ' seconds',logfile,'%')
-		for p in [PSU1, PSU2]:
-			if p.configured == False:
-				printit ('* ' + p.label + '* Idle conditions not configured',logfile,'%')
-			else:
-				printit ('* ' + p.label + ' voltage = ' + str(p.VIDLE) + ' V',logfile,'%')
-				printit ('* ' + p.label + ' current = ' + str(p.IIDLE) + ' V',logfile,'%')
+	printit ('* Idle time between measurements: ' + str(T_idle) + ' seconds',logfile,'%')
+	for p in [PSU1, PSU2]:
+		if p.configured == False:
+			printit ('* ' + p.label + '* Idle conditions not configured',logfile,'%')
+		else:
+			printit ('* ' + p.label + ' voltage = ' + str(p.VIDLE) + ' V',logfile,'%')
+			printit ('* ' + p.label + ' current = ' + str(p.IIDLE) + ' V',logfile,'%')
+if T_preheat == 0.0:
+	printit ('* No pre-heating before measurements',logfile,'%')
+else:
+	printit ('* Pre-heat time before measurements (at idle conditions): ' + str(T_idle) + ' seconds',logfile,'%')
 
 
 # Ask if okay to start the test
 input ('\nReady? Press ENTER to start testing or CTRL+C to abort...')
 
 # Run the test:
-print ('\nTest started...\n')
+
+print('\n')
 
 printit ('Column 1:  PSU1 nominalvoltage setting (V)',logfile,'%')
 printit ('Column 2:  PSU1 nominal current setting (A)',logfile,'%')
@@ -315,6 +325,38 @@ printit ('Column 10: PSU2 limiter flag',logfile,'%')
 print('\n')
 
 try:
+
+	if T_preheat > 0.0:
+		
+		print ('Pre-heating...\n')
+
+		# set outputs to zero (to avoid overshoot)
+		for p in [PSU1, PSU2]:
+			if p.configured:
+				p.voltage(p.VMIN)
+				p.current(0)
+
+		# set idle conditions:
+		Tsettle = 0.0
+		for p in [PSU1, PSU2]:
+			if p.configured:
+				p.voltage(p.VIDLE)
+				p.current(p.IIDLE)
+				if p.TSETTLE > Tsettle:
+					Tsettle = p.TSETTLE
+		time.sleep(Tsettle) # wait for stable conditions
+
+		# wait pre-heat time:	
+		time.sleep(T_preheat)
+
+		# set outputs to zero (to avoid overshoot when starting next measurement)
+		for p in [PSU1, PSU2]:
+			if p.configured:
+				p.voltage(p.VMIN)
+				p.current(0)
+
+	print ('Test started...\n')
+
 	for V2 in np.linspace(PSU2.VSTART,PSU2.VEND,PSU2.N):
 
 		if PSU2.configured:
