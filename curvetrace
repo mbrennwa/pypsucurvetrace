@@ -296,12 +296,12 @@ else:
 		if p.configured == False:
 			printit ('* ' + p.label + '* Idle conditions not configured',logfile,'%')
 		else:
-			printit ('* ' + p.label + ' voltage = ' + str(p.VIDLE) + ' V',logfile,'%')
-			printit ('* ' + p.label + ' current = ' + str(p.IIDLE) + ' V',logfile,'%')
+			printit ('* ' + p.label + ' idle voltage limit = ' + str(p.VIDLE) + ' V',logfile,'%')
+			printit ('* ' + p.label + ' idle current limit = ' + str(p.IIDLE) + ' V',logfile,'%')
 if T_preheat == 0.0:
 	printit ('* No pre-heating before measurements',logfile,'%')
 else:
-	printit ('* Pre-heat time before measurements (at idle conditions): ' + str(T_idle) + ' seconds',logfile,'%')
+	printit ('* Pre-heat time before measurements (at idle conditions): ' + str(T_preheat) + ' seconds',logfile,'%')
 
 
 # Ask if okay to start the test
@@ -465,13 +465,16 @@ try:
 			printit ( str(V1) + ' ' + str(I1LIM) + ' ' + str(V1MEAS) + ' ' + str(I1MEAS) + ' ' + str(int(LIMIT1)) + ' ' + str(V2) + ' ' + str(V2MEAS) + ' ' + str(I2MEAS) + ' ' + str(int(LIMIT2)) , logfile )
 
 except:
-	print ('Oooops, something went wrong during testing! Trying to turn of the PSUs...')
+	print ('Oooops, something went wrong during testing! Trying to turn off the PSUs...')
 
 # Set PSU output to zero:
 for p in [PSU1, PSU2]:
 	if p.configured:
-		p.current(0)
-		p.voltage(PSU1.VMIN)
+		try:
+			p.current(0)
+			p.voltage(PSU1.VMIN)
+		except:
+			print('Could not turn off ' + PSU.label)
 
 # Say goodbye:
 print ('Test completed.')

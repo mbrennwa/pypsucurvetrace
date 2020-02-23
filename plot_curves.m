@@ -1,12 +1,14 @@
+function plot_curves (f)
+
 % GNU Octave m-file to plot curve traces
 
-x = load('IRFP150_EXAMPLE.dat');
+x = load(f);
 k = find (x(:,5) == 0); x = x(k,:); % remove values with current limiter on
 
 VG = unique(x(:,6));
 
 for i = 1:length(VG)
-	k = find (x(:,6) == VG(i))
+	k = find (x(:,6) == VG(i));
 	V = [0 ; x(k,3)];
 	I = [0 ; x(k,4)];
 	plot (V,I,sprintf('-;V_{GS} = %.3g V;',VG(i)),'marker','.','markersize',12);
