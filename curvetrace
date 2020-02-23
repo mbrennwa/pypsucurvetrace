@@ -314,119 +314,122 @@ printit ('Column 10: PSU2 limiter flag',logfile,'%')
 
 print('\n')
 
-for V2 in np.linspace(PSU2.VSTART,PSU2.VEND,PSU2.N):
+try:
+	for V2 in np.linspace(PSU2.VSTART,PSU2.VEND,PSU2.N):
 
-	if PSU2.configured:
-		# Determine PSU2 current limit:
-		if V2 > 0.0:
-			I2LIM = min (PSU2.ILIMIT,PSU2.PLIMIT/V2)
-		else:
-			I2LIM = PSU2.ILIMIT
-		
-		# set PSU2 current limit:
-		PSU2.current(I2LIM)
-		PSU2.voltage(V2)
-		time.sleep(PSU2.TSETTLE) # wait for stable conditions
-
-	for V1 in np.linspace(PSU1.VSTART,PSU1.VEND,PSU1.N):
-
-		# init measurement values		
-		V1MEAS = 0.0
-		I1MEAS = 0.0
-		LIMIT1 = 0
-		V2MEAS = 0.0
-		I2MEAS = 0.0
-		LIMIT2 = 0
-
-		# measurement loop:
-		for i in range(N_rep):
-
-			if T_idle > 0.0:
-				# set outputs to zero (to avoid overshoot)
-				for p in [PSU1, PSU2]:
-					if p.configured:
-						p.voltage(p.VMIN)
-						p.current(0)
-
-				# set idle conditions:
-				Tsettle = 0.0
-				for p in [PSU1, PSU2]:
-					if p.configured:
-						p.voltage(p.VIDLE)
-						p.current(p.IIDLE)
-						if p.TSETTLE > Tsettle:
-							Tsettle = p.TSETTLE
-				time.sleep(Tsettle) # wait for stable conditions
-
-				# wait idle time:	
-				time.sleep(T_idle)
-
-				# set outputs to zero (to avoid overshoot when starting next measurement)
-				for p in [PSU1, PSU2]:
-					if p.configured:
-						p.voltage(p.VMIN)
-						p.current(0)
-
-				# return to required PSU2 output:
-				if PSU2.configured:
-					PSU2.current(I2LIM)
-					PSU2.voltage(V2)
-					time.sleep(PSU2.TSETTLE) # wait for stable conditions
-
-			# Determine PSU1 current limit:
-			if V1 > 0.0:
-				I1LIM = min (PSU1.ILIMIT,PSU1.PLIMIT/V1)
+		if PSU2.configured:
+			# Determine PSU2 current limit:
+			if V2 > 0.0:
+				I2LIM = min (PSU2.ILIMIT,PSU2.PLIMIT/V2)
 			else:
-				I1LIM = PSU1.ILIMIT
+				I2LIM = PSU2.ILIMIT
+			
+			# set PSU2 current limit:
+			PSU2.current(I2LIM)
+			PSU2.voltage(V2)
+			time.sleep(PSU2.TSETTLE) # wait for stable conditions
 
-			# set up PSU1 measurement conditions:
-			if PSU1.configured:
-				PSU1.current(I1LIM) # set current limit at PSU1
-				PSU1.voltage(V1) # set voltage at PSU1
-				time.sleep(PSU1.TSETTLE) # wait for stable conditions at PSU and DUT
+		for V1 in np.linspace(PSU1.VSTART,PSU1.VEND,PSU1.N):
 
-			# read PSU output voltages and currents:
-			r = []
-			for p in [PSU1, PSU2]:
-				if p.configured:
-					r.append(p.reading())
-				else:
-					r.append([0.0,0.0,'NONE'])
-
-			V1MEAS = V1MEAS + r[0][0];
-			I1MEAS = I1MEAS + r[0][1];
-			V2MEAS = V2MEAS + r[1][0];
-			I2MEAS = I2MEAS + r[1][1];
-			if r[0][2] == 'CC':
-				LIMIT1 = LIMIT1 + 1
-			if r[1][2] == 'CC':
-				LIMIT2 = LIMIT2 + 1
-
-		# Determine mean of repeated readings:
-		V1MEAS = V1MEAS / N_rep
-		I1MEAS = I1MEAS / N_rep
-		V2MEAS = V2MEAS / N_rep
-		I2MEAS = I2MEAS / N_rep
-
-		# Parse limiter flags:
-		if LIMIT1 > 0:
-			LIMIT1 = 1
-		else:
+			# init measurement values		
+			V1MEAS = 0.0
+			I1MEAS = 0.0
 			LIMIT1 = 0
-		if LIMIT2 > 0:
-			LIMIT2 = 1
-		else:
+			V2MEAS = 0.0
+			I2MEAS = 0.0
 			LIMIT2 = 0
 
-		# Print results:
-		printit ( str(V1) + ' ' + str(I1LIM) + ' ' + str(V1MEAS) + ' ' + str(I1MEAS) + ' ' + str(int(LIMIT1)) + ' ' + str(V2) + ' ' + str(V2MEAS) + ' ' + str(I2MEAS) + ' ' + str(int(LIMIT2)) , logfile )
+			# measurement loop:
+			for i in range(N_rep):
 
+				if T_idle > 0.0:
+					# set outputs to zero (to avoid overshoot)
+					for p in [PSU1, PSU2]:
+						if p.configured:
+							p.voltage(p.VMIN)
+							p.current(0)
+
+					# set idle conditions:
+					Tsettle = 0.0
+					for p in [PSU1, PSU2]:
+						if p.configured:
+							p.voltage(p.VIDLE)
+							p.current(p.IIDLE)
+							if p.TSETTLE > Tsettle:
+								Tsettle = p.TSETTLE
+					time.sleep(Tsettle) # wait for stable conditions
+
+					# wait idle time:	
+					time.sleep(T_idle)
+
+					# set outputs to zero (to avoid overshoot when starting next measurement)
+					for p in [PSU1, PSU2]:
+						if p.configured:
+							p.voltage(p.VMIN)
+							p.current(0)
+
+					# return to required PSU2 output:
+					if PSU2.configured:
+						PSU2.current(I2LIM)
+						PSU2.voltage(V2)
+						time.sleep(PSU2.TSETTLE) # wait for stable conditions
+
+				# Determine PSU1 current limit:
+				if V1 > 0.0:
+					I1LIM = min (PSU1.ILIMIT,PSU1.PLIMIT/V1)
+				else:
+					I1LIM = PSU1.ILIMIT
+
+				# set up PSU1 measurement conditions:
+				if PSU1.configured:
+					PSU1.current(I1LIM) # set current limit at PSU1
+					PSU1.voltage(V1) # set voltage at PSU1
+					time.sleep(PSU1.TSETTLE) # wait for stable conditions at PSU and DUT
+
+				# read PSU output voltages and currents:
+				r = []
+				for p in [PSU1, PSU2]:
+					if p.configured:
+						r.append(p.reading())
+					else:
+						r.append([0.0,0.0,'NONE'])
+
+				V1MEAS = V1MEAS + r[0][0];
+				I1MEAS = I1MEAS + r[0][1];
+				V2MEAS = V2MEAS + r[1][0];
+				I2MEAS = I2MEAS + r[1][1];
+				if r[0][2] == 'CC':
+					LIMIT1 = LIMIT1 + 1
+				if r[1][2] == 'CC':
+					LIMIT2 = LIMIT2 + 1
+
+			# Determine mean of repeated readings:
+			V1MEAS = V1MEAS / N_rep
+			I1MEAS = I1MEAS / N_rep
+			V2MEAS = V2MEAS / N_rep
+			I2MEAS = I2MEAS / N_rep
+
+			# Parse limiter flags:
+			if LIMIT1 > 0:
+				LIMIT1 = 1
+			else:
+				LIMIT1 = 0
+			if LIMIT2 > 0:
+				LIMIT2 = 1
+			else:
+				LIMIT2 = 0
+
+			# Print results:
+			printit ( str(V1) + ' ' + str(I1LIM) + ' ' + str(V1MEAS) + ' ' + str(I1MEAS) + ' ' + str(int(LIMIT1)) + ' ' + str(V2) + ' ' + str(V2MEAS) + ' ' + str(I2MEAS) + ' ' + str(int(LIMIT2)) , logfile )
+
+except:
+	print ('Oooops, something went wrong during testing! Trying to turn of the PSUs...')
 
 # Set PSU output to zero:
-PSU1.voltage(PSU1.VMIN)
-PSU1.current(0)
-PSU2.voltage(PSU2.VMIN)
-PSU2.current(0)
+for p in [PSU1, PSU2]:
+	if p.configured:
+		p.current(0)
+		p.voltage(PSU1.VMIN)
 
 # Say goodbye:
 print ('Test completed.')
