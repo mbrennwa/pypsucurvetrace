@@ -32,6 +32,11 @@ svn co https://github.com/mbrennwa/curvetracePPSPy.git/trunk path/on/your/comput
   ```
   See "Notes" section for further information on test configuration files.
 
+## Examples
+
+### 2SK214 mosfet: drain current (I<sub>D</sub>) vs. drain-source voltage (V<sub>DS</sub>) at different gate-source voltages (V<sub>GS</sub>)
+...
+
 ## Notes
 
 ### Modify serial device IDs of the Voltcraft PPS power supplies
