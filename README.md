@@ -1,5 +1,5 @@
 # curvetracePPSPy
-*curvetracePPSPy* is a Python 3 program that makes use of Voltcraft PPS programmable power supplies to determine I/V curve traces of electronic parts. In short, it's a *curve tracer*.
+*curvetracePPSPy* is a Python 3 program that makes use of Voltcraft PPS programmable power supplies to determine I/V curve traces of electronic parts. In short, *curvetracePPSPy* is a *curve tracer*.
 
 ## Prerequisites
 * curvetracePPSPy is developed using Python 3 on Linux. Other software environments may (should) work, too, but have not been tested so far.
