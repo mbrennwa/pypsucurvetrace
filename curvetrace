@@ -297,7 +297,7 @@ else:
 			printit ('* ' + p.label + '* Idle conditions not configured',logfile,'%')
 		else:
 			printit ('* ' + p.label + ' idle voltage limit = ' + str(p.VIDLE) + ' V',logfile,'%')
-			printit ('* ' + p.label + ' idle current limit = ' + str(p.IIDLE) + ' V',logfile,'%')
+			printit ('* ' + p.label + ' idle current limit = ' + str(p.IIDLE) + ' A',logfile,'%')
 if T_preheat == 0.0:
 	printit ('* No pre-heating before measurements',logfile,'%')
 else:
