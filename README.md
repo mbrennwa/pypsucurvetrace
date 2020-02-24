@@ -23,14 +23,20 @@ I like SVN (subversion): svn co https://github.com/mbrennwa/curvetracePPSPy.git/
 In their stock condition, the Silabs CP2102 USB/serial interfaces of the Voltcraft PPF power supplies all use the same ID. The serial interfaces of multiple PPS units connected to the same computer therefore show up at the same file node under /dev/serial/by-id/ (usb-Silicon_Labs_CP2102_USB_to_UART_Bridge_Controller_0001-if00-port0 or similar). In order to simultaneously use more than one PPS unit, the serial interface IDs therefore need to be reconfigured to use unique IDs. This is achieved using the cp210x-cfg program:
 
 * Download cp210x-cfg code:
+```
 svn co https://github.com/DiUS/cp210x-cfg.git
+```
 
 * Install USB library stuff needed to compile the cp210x-cfg program:
+```
 sudo apt install libusb-1.0-0-dev 
+```
 
 * Compile the cp210x-cfg program:
+```
 cd path/to/cp210x-cfg/
 make
+```
 
 * Display HELP information for cp210x-cfg, and make *sure* you understand how the program works:
 ./cp210x-cfg -h
