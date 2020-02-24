@@ -1,7 +1,3 @@
 curvetrace PPS To Do
 
-* allow test configuration from external file (instead of interactive user input)
-
 * allow inverted polarity of PSU outputs. PPS output is always positive, but testing at negative voltages+currents is possible by inverting the connections to the DUT. This should be reflected by negative values in the test results.
-
-* catch failures in the serial communication with the PPS units, and retry the communication. Failed communication leads to interrupted test runs, which can be inconvenient.
