@@ -34,8 +34,8 @@ svn co https://github.com/mbrennwa/curvetracePPSPy.git/trunk path/on/your/comput
 
 ## Examples
 
-### IRFP mosfet: drain current (I<sub>D</sub>) vs. drain-source voltage (V<sub>DS</sub>) at different gate-source voltages (V<sub>GS</sub>)
-This example shows curve traces obtained from an IRFP150 power mosfet. The IRFP150 pins were connected as follows:
+### IRFP150 power mosfet
+This example shows curve traces obtained from an IRFP150 power mosfet: curves of drain current (I<sub>D</sub>) vs. drain-source voltage (V<sub>DS</sub>), measured at different gate-source voltages (V<sub>GS</sub>). The IRFP150 pins were connected as follows:
 * source pin to GND
 * drain pin to the positive terminal of PSU1
 * gate pin to the positive termianl of PSU2. A 100 Ohm gate stopper resistor was used to avoid oscillation.
