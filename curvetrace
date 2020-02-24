@@ -212,7 +212,7 @@ print('\n')
 
 # read config file:
 config = configparser.ConfigParser()
-config.read('curvetrace_config.txt')
+config.read('config_PPS.txt')
 
 # connect to PSUs:
 PSU1 = connect_PSU(config,'PSU1');
