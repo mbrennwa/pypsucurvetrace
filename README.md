@@ -8,14 +8,27 @@ Python code to use Voltcraft PPS power supplies as curve tracers
 
 ## Installation and configuration
 * Download the code from the GitHub repository, either using GIT, SVN or as a ZIP archive.
-I like SVN (subversion): svn co https://github.com/mbrennwa/curvetracePPSPy.git/trunk path/on/your/computer/to/curvetracePPSPy
+I like SVN (subversion):
+```
+svn co https://github.com/mbrennwa/curvetracePPSPy.git/trunk path/on/your/computer/to/curvetracePPSPy
+```
+
 * Connect your Voltcraft PPS power supplies to your computers USB.
-* Copy the config_PPS_TEMPLATE.txt file to config_PPS.txt, and modify the file to reflect the details of your USB/Serial PPS interfaces. NOTE: Most Voltcraft PPS power supplies use the same Serial device ID. If you want to use more than one PPS unit, you will need to modify the device IDs so they are not identical. See "Notes" section below for details.
+* Copy the `config_PPS_TEMPLATE.txt` file to `config_PPS.txt`, and modify the file to reflect the details of your USB/Serial PPS interfaces. NOTE: By default, most Voltcraft PPS power supplies use the same Serial device ID. Therefore, it is not possible to access more than one PPS unit via `/dev/serial/by-id/`. If you want to use more than one PPS unit, you will need to modify the device IDs so they are not identical. See "Notes" section below for details.
 * Make sure your user account has permissions to access the serial ports of the PPS units. See "Notes" section below.
 
 ## Usage
 * Connect the DUT to the output terminals of the PPS power supplies.
-* Open a terminal window and execute the curvetrace program. Follow the on-screen instructions.
+* Open a terminal window and execute the `curvetrace` program.
+  * The easiest method is to run the program without any arguments and just follow thew the on-screen instructions for fully interactive user input:
+  ```
+  curvetrace
+  ```
+  * You can also use provide a configuration file containing the test parameters (see example files provided). For example:
+  ```
+  curvetrace -c test_config_examples/2SK214_config.txt
+  ```
+  See "Notes" section for further information on test configuration files.
 
 ## Notes
 
@@ -39,23 +52,29 @@ make
 ```
 
 * Display HELP information for cp210x-cfg, and make *sure* you understand how the program works:
+```
 ./cp210x-cfg -h
-
-* List all Silabs CP210x devices connected to the computer:
-./cp210x-cfg -l
-ID 10c4:ea60 @ bus 002, dev 031: CP2102 USB to UART Bridge Controller
+```
 
 * Make sure only one Silabs CP210x interface is connected (the PPS unit one you want to reconfigure), then show its information:
+```
 ./cp210x-cfg
+```
 
 * Change the Serial ID of the device:
+```
 ./cp210x-cfg -S 0002
+```
 
 * Plug in the other PPS device and make sure that both serial interfaces now show up separately at /dev/serial/by_id:
-ls /dev/serial/by-id
-
-PSU1: /dev/serial/by-id/usb-Silicon_Labs_CP2102_USB_to_UART_Bridge_Controller_0001-if00-port0
-PSU2: /dev/serial/by-id/usb-Silicon_Labs_CP2102_USB_to_UART_Bridge_Controller_0002-if00-port0
+```
+ls /dev/serial/by-id/
+usb-Silicon_Labs_CP2102_USB_to_UART_Bridge_Controller_0001-if00-port0
+usb-Silicon_Labs_CP2102_USB_to_UART_Bridge_Controller_0002-if00-port0
+```
 
 ### Set user permissions to access serial ports
+...
+
+### Test configuration files
 ...
