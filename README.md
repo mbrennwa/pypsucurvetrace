@@ -14,7 +14,7 @@ svn co https://github.com/mbrennwa/curvetracePPSPy.git/trunk path/on/your/comput
 ```
 
 * Connect your Voltcraft PPS power supplies to your computers USB.
-* Copy the `config_PPS_TEMPLATE.txt` file to `config_PPS.txt`, and modify the file to reflect the details of your USB/Serial PPS interfaces. NOTE: By default, most Voltcraft PPS power supplies use the same Serial device ID. Therefore, it is not possible to access more than one PPS unit via `/dev/serial/by-id/`. If you want to use more than one PPS unit, you will need to modify the device IDs so they are not identical. See "Notes" section below for details.
+* Copy the `config_PPS_TEMPLATE.txt` file to `config_PPS.txt`, and modify the file to reflect the details of your USB/serial PPS interfaces. NOTE: By default, most Voltcraft PPS power supplies use the same serial device ID. Therefore, it is not possible to access more than one PPS unit via `/dev/serial/by-id/`. If you want to use more than one PPS unit, you will need to modify the device IDs so they are not identical. See "Notes" section below for details.
 * Make sure your user account has permissions to access the serial ports of the PPS units. See "Notes" section below.
 
 ## Usage
@@ -61,7 +61,7 @@ make
 ./cp210x-cfg
 ```
 
-* Change the Serial ID of the device:
+* Change the serial ID of the device (don't mess this up!):
 ```
 ./cp210x-cfg -S 0002
 ```
