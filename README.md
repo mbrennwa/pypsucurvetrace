@@ -44,25 +44,25 @@ This example shows curve traces obtained from an IRFP150 power mosfet (drain cur
 ## Notes
 
 ### Modify serial device IDs of the Voltcraft PPS power supplies
-In their stock condition, the Silabs CP2102 USB/serial interfaces of the Voltcraft PPF power supplies all use the same ID. The serial interfaces of multiple PPS units connected to the same computer therefore show up at the same file node under /dev/serial/by-id/ (usb-Silicon_Labs_CP2102_USB_to_UART_Bridge_Controller_0001-if00-port0 or similar). In order to simultaneously use more than one PPS unit, the serial interface IDs therefore need to be reconfigured to use unique IDs. This is achieved using the cp210x-cfg program:
+In their stock condition, the Silabs CP2102 USB/serial interfaces of the Voltcraft PPF power supplies all use the same ID. The serial interfaces of multiple PPS units connected to the same computer therefore show up at the same file node under /dev/serial/by-id/ (usb-Silicon_Labs_CP2102_USB_to_UART_Bridge_Controller_0001-if00-port0 or similar). In order to simultaneously use more than one PPS unit, the serial interface IDs therefore need to be reconfigured to use unique IDs. This is achieved using the `cp210x-cfg` program:
 
-* Download cp210x-cfg code:
+* Download `cp210x-cfg` code:
 ```
 svn co https://github.com/DiUS/cp210x-cfg.git
 ```
 
-* Install USB library stuff needed to compile the cp210x-cfg program:
+* Install USB library stuff needed to compile the `cp210x-cfg` program:
 ```
 sudo apt install libusb-1.0-0-dev 
 ```
 
-* Compile the cp210x-cfg program:
+* Compile the `cp210x-cfg` program:
 ```
 cd path/to/cp210x-cfg/
 make
 ```
 
-* Display HELP information for cp210x-cfg, and make *sure* you understand how the program works:
+* Display HELP information for `cp210x-cfg`, and make *sure* you understand how the program works:
 ```
 ./cp210x-cfg -h
 ```
@@ -77,7 +77,7 @@ make
 ./cp210x-cfg -S 0002
 ```
 
-* Plug in the other PPS device and make sure that both serial interfaces now show up separately at /dev/serial/by_id:
+* Plug in the other PPS device and make sure that both serial interfaces now show up separately at `/dev/serial/by_id`:
 ```
 ls /dev/serial/by-id/
 usb-Silicon_Labs_CP2102_USB_to_UART_Bridge_Controller_0001-if00-port0
@@ -94,8 +94,8 @@ Then log out and log in again to the user account `johndoe` for this to take eff
 ### PPS configuration file
 The configuration file `config_PPS.txt` contains the configuration details of your power supplies (PSUs). There are separate sections for PSU1 and PSU2. Each section contains the following fields
 * `COMPORT`: virtual file corresponding to the serial port of the PSU
-* `SETTLE_SECONDS`: time required to attain stable output after setting a new voltag or current value (seconds)
-* `VOLTAGE_MIN`: minium voltage value supported by the PSU (most Voltcraft PPS units have trouble to reliable set voltages lower than 0.85 V or so)
+* `SETTLE_SECONDS`: time required to attain stable output after setting a new voltage or current value at the PSU (seconds)
+* `VOLTAGE_MIN`: minium voltage value supported by the PSU (most Voltcraft PPS units have trouble to reliably set voltages lower than 0.85 V)
 
 ### Test configuration files
 ...(under constrution)...
