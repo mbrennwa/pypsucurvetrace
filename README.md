@@ -18,7 +18,9 @@ svn co https://github.com/mbrennwa/curvetracePPSPy.git/trunk path/on/your/comput
 * Make sure your user account has permissions to access the serial ports of the PPS units. See "Notes" section below.
 
 ## Usage
-* Connect the DUT to the output terminals of the PPS power supplies.
+* Connect the DUT to the output terminals of the PPS power supplies like this:
+![alt text](https://github.com/mbrennwa/curvetracePPSPy/blob/master/figures/test_setup.png "Basic test setup")
+
 * Open a terminal window and execute the `curvetrace` program.
   * The easiest method is to run the program without any arguments and just follow thew the on-screen instructions for fully interactive user input:
   ```
