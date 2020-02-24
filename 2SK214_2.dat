@@ -1,0 +1,28 @@
+% * Sample: 2SK214_2
+% * PSU1 voltage output = 0.85 V ... 20.0 V (20 steps)
+% * PSU1 current limit = 0.55 A
+% * PSU1 power limit = 22.0 W
+% * PSU2 voltage output = 3.5 V ... 4.0 V (2 steps)
+% * PSU2 current limit = 1.0 A
+% * PSU2 power limit = 1.0 W
+% * Repeats per reading = 3
+% * Idle time between measurements: 5.0 seconds
+% * PSU1 idle voltage limit = 15.0 V
+% * PSU1 idle current limit = 0.25 V
+% * PSU2 idle voltage limit = 2.7 V
+% * PSU2 idle current limit = 1.0 V
+% * Pre-heat time before measurements (at idle conditions): 30.0 seconds
+% Column 1:  PSU1 nominalvoltage setting (V)
+% Column 2:  PSU1 nominal current setting (A)
+% Column 3:  PSU1 voltage measurement (V)
+% Column 4:  PSU1 current measurement (I)
+% Column 5:  PSU1 limiter flag
+% Column 6:  PSU2 nominal voltage setting (V)
+% Column 7:  PSU2 nominal current setting (A)
+% Column 8:  PSU2 voltage measurement (V)
+% Column 9:  PSU2 current measurement (I)
+% Column 10: PSU2 limiter flag
+0.85 0.55 0.8833333333333333 0.10000000000000002 0 3.5 3.57 0.0 0
+1.85789473684 0.55 1.87 0.21 0 3.5 3.57 0.0 0
+2.86578947368 0.55 2.8633333333333333 0.29 0 3.5 3.5666666666666664 0.0 0
+3.87368421053 0.55 3.8766666666666665 0.34 0 3.5 3.57 0.0 0
