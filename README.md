@@ -1,4 +1,4 @@
-# curvetracePPSPy
+# curvetracePy
 *curvetracePy* is a Python 3 program that makes use of programmable power supplies to determine I/V curve traces of electronic parts. In short, *curvetracePy* is a *curve tracer*.
 
 For two-terminal devices under test (DUTs) like resistors or diodes you need only one power supply unit (PSU). For three-terminal DUTs like transistors you need two PSUs.
