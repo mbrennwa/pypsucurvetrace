@@ -14,9 +14,7 @@
 # 
 # You should have received a copy of the GNU General Public License
 # along with ruediPy.  If not, see <http://www.gnu.org/licenses/>.
-# 
-# curvetracePy: a toolbox for operation of PEM electrolysis cells.
-# Copyright 2020, Matthias Brennwald (mbrennwa@gmail.com)
+
 
 # imports:
 import time
@@ -25,7 +23,7 @@ import configparser
 import argparse
 import numpy as np
 from termcolor import colored
-import powersupply_PPS
+import lib.powersupply_PPS as powersupply_PPS
 
 
 #############################################################
@@ -185,6 +183,18 @@ def configure_idle_PSU(PSU,configDUT):
 	return PSU
 
 
+################
+# turn off PSU #
+################
+
+def turn_off_PSU(PSU):
+	if PSU.configured:
+		try:
+			PSU.current(0)
+			PSU.voltage(PSU.VMIN)
+			print(PSU.label + ' turned off.')
+		except:
+			print('Could not turn off ' + PSU.label + '!')
 
 
 ################
@@ -206,7 +216,7 @@ print('\n')
 
 # read PSU config file:
 configPSU = configparser.ConfigParser()
-configPSU.read('config_PPS.txt')
+configPSU.read('config_PSU.txt')
 
 # read DUT configPSU file (if any):
 configDUT = []
@@ -526,18 +536,11 @@ try:
 			printit ( str(V1*PSU1.POLARITY) + ' ' + str(I1LIM*PSU1.POLARITY) + ' ' + str(V1MEAS*PSU1.POLARITY) + ' ' + str(I1MEAS*PSU1.POLARITY) + ' ' + str(int(LIMIT1)) + ' ' + str(V2*PSU2.POLARITY) + ' ' + str(V2MEAS*PSU2.POLARITY) + ' ' + str(I2MEAS*PSU2.POLARITY) + ' ' + str(int(LIMIT2)) , logfile )
 
 	print ('Test completed.')
+	for p in [PSU1, PSU2]:
+		turn_off_PSU(p)
 
 except:
 	print ('\nOooops, something went wrong during testing! Trying to turn off the PSUs...\n')
-
-# Set PSU output to zero:
-for p in [PSU1, PSU2]:
-	if p.configured:
-		try:
-			p.current(0)
-			p.voltage(PSU1.VMIN)
-		except:
-			print('Could not turn off ' + PSU.label + '!')
-
-# Say goodbye:
-print ('Power supply outputs turned off.')
+	for p in [PSU1, PSU2]:
+		turn_off_PSU(p)
+	raise
