@@ -19,7 +19,8 @@ PPS_MODELS = { (18.0, 10.0) : "PPS11810", # not confirmed yet
 		       (18.2,  12.0): "PPS11810"  # added MB 2019-01-10
 		     }
 
-PPS_TIMEOUT = 2.00
+# PPS_TIMEOUT = 2.00
+PPS_TIMEOUT = None
 
 def _pps_debug(s):
 	sys.stdout.write(s)
