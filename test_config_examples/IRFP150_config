@@ -1,7 +1,7 @@
 [PSU1]
 VSTART = 0.85
 VEND   = 36
-N      = 5
+N      = 36
 IMAX   = 29
 PMAX   = 500
 VIDLE  = 24
@@ -10,7 +10,7 @@ IIDLE  = 2
 [PSU2]
 VSTART = 3
 VEND   = 10
-N      = 13
+N      = 15
 IMAX   = 1
 PMAX   = 1
 VIDLE  = 3.9
@@ -18,5 +18,5 @@ IIDLE  = 0.1
 
 [EXTRA]
 IDLESECS    = 3
-PREHEATSECS = 6
+PREHEATSECS = 60
 NREP        = 1
