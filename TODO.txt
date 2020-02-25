@@ -1,3 +1,0 @@
-curvetrace PPS To Do
-
-* allow inverted polarity of PSU outputs. PPS output is always positive, but testing at negative voltages+currents is possible by inverting the connections to the DUT. This should be reflected by negative values in the test results.
