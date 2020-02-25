@@ -1,4 +1,4 @@
-function plot_curves (f)
+function plot_curves_FET (f)
 
 % GNU Octave m-file to plot curve traces
 
@@ -15,6 +15,14 @@ for i = 1:length(VG)
 	hold on
 end
 hold off
+
+if(median(x(:,3) < 0 ))
+	set (gca,'xdir','reverse')
+end
+
+if(median(x(:,4) < 0 ))
+	set (gca,'ydir','reverse')
+end
 
 xlabel ('V_{DS} (V)')
 ylabel ('I_D (A)')

@@ -110,6 +110,7 @@ def configure_test_PSU(PSU,configDUT):
 			PSU.N      = int(configDUT['N'])
 			PSU.ILIMIT = float(configDUT['IMAX'])
 			PSU.PLIMIT = float(configDUT['PMAX'])
+			PSU.POLARITY = float(configDUT['POLARITY'])
 
 		else:
 
@@ -139,6 +140,17 @@ def configure_test_PSU(PSU,configDUT):
 				PSU.PLIMIT = float(input('* ' + PSU.label + ' maximum allowed power (W): '))
 			except ValueError:
 				print ('  Invalid input!')
+
+
+			try:
+				pol = (input('* OPTIONAL: ' + PSU.label + ' polarity of outputs -- N: normal / I: inverted [default=N]: '))
+			except ValueError:
+				print ('  Using default: normal polarity.')
+				pol = 'N'
+			if pol.upper() == 'I':
+				PSU.POLARITY = -1
+			else:
+				PSU.POLARITY = 1;
 
 		PSU.configured = True
 
@@ -320,15 +332,20 @@ for p in [PSU1,PSU2]:
 print('\nTest setup:')
 printit('* Sample: ' + samplename,logfile,'%')
 for p in [PSU1, PSU2]:
+	printit ('* ' + p.label + ':',logfile,'%')
 	if p.configured == False:
-		printit ('* ' + p.label + ' not configured',logfile,'%')
+		printit ('   not configured',logfile,'%')
 	else:
 		if p.N == 1:
-			printit ('* ' + p.label + ' voltage output = ' + str(p.VSTART) + ' V',logfile,'%')
+			printit ('   voltage output = ' + str(p.VSTART) + ' V',logfile,'%')
 		else:
-			printit ('* ' + p.label + ' voltage output = ' + str(p.VSTART) + ' V ... ' + str(p.VEND) + ' V (' + str(p.N) + ' steps)',logfile,'%')
-		printit ('* ' + p.label + ' current limit = ' + str(p.ILIMIT) + ' A',logfile,'%')
-		printit ('* ' + p.label + ' power limit = ' + str(p.PLIMIT) + ' W',logfile,'%')
+			printit ('   voltage output = ' + str(p.VSTART) + ' V ... ' + str(p.VEND) + ' V (' + str(p.N) + ' steps)',logfile,'%')
+		printit ('   current limit = ' + str(p.ILIMIT) + ' A',logfile,'%')
+		printit ('   power limit = ' + str(p.PLIMIT) + ' W',logfile,'%')
+		if p.POLARITY == 1:
+			printit ('   polarity: normal',logfile,'%')
+		else:
+			printit ('   polarity: inverted',logfile,'%')
 
 printit ('* Repeats per reading = ' + str(N_rep),logfile,'%')
 if T_idle == 0.0:
@@ -506,7 +523,7 @@ try:
 				LIMIT2 = 0
 
 			# Print results:
-			printit ( str(V1) + ' ' + str(I1LIM) + ' ' + str(V1MEAS) + ' ' + str(I1MEAS) + ' ' + str(int(LIMIT1)) + ' ' + str(V2) + ' ' + str(V2MEAS) + ' ' + str(I2MEAS) + ' ' + str(int(LIMIT2)) , logfile )
+			printit ( str(V1*PSU1.POLARITY) + ' ' + str(I1LIM*PSU1.POLARITY) + ' ' + str(V1MEAS*PSU1.POLARITY) + ' ' + str(I1MEAS*PSU1.POLARITY) + ' ' + str(int(LIMIT1)) + ' ' + str(V2*PSU2.POLARITY) + ' ' + str(V2MEAS*PSU2.POLARITY) + ' ' + str(I2MEAS*PSU2.POLARITY) + ' ' + str(int(LIMIT2)) , logfile )
 
 	print ('Test completed.')
 

@@ -8,13 +8,13 @@ VIDLE  = 24
 IIDLE  = 2
 
 [PSU2]
-VSTART = 3
-VEND   = 10
-N      = 15
+VSTART = 2.0
+VEND   = 6.0
+N      = 17
 IMAX   = 1
 PMAX   = 1
 VIDLE  = 3.9
-IIDLE  = 0.1
+IIDLE  = 1
 
 [EXTRA]
 IDLESECS    = 3
