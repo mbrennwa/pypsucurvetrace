@@ -520,7 +520,7 @@ try:
 					LIMIT2 = LIMIT2 + 1
 
 			# Determine median or mean of repeated readings:
-			if AVGFUNCTION = 'MEDIAN':
+			if AVGFUNCTION == 'MEDIAN':
 				V1MEAS = np.median(V1MEAS)
 				I1MEAS = np.median(I1MEAS)
 				V2MEAS = np.median(V2MEAS)
