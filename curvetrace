@@ -380,8 +380,6 @@ input ('\nReady? Press ENTER to start testing or CTRL+C to abort...')
 
 # Run the test:
 
-print('\n')
-
 printit ('Column 1:  PSU1 nominal voltage setting (V)',logfile,'%')
 printit ('Column 2:  PSU1 nominal current setting (A)',logfile,'%')
 printit ('Column 3:  PSU1 voltage measurement (V)',logfile,'%')
@@ -392,8 +390,6 @@ printit ('Column 7:  PSU2 nominal current setting (A)',logfile,'%')
 printit ('Column 8:  PSU2 voltage measurement (V)',logfile,'%')
 printit ('Column 9:  PSU2 current measurement (I)',logfile,'%')
 printit ('Column 10: PSU2 limiter flag',logfile,'%')
-
-print('\n')
 
 AVGFUNCTION = 'MEDIAN'
 
