@@ -445,7 +445,7 @@ try:
 		for V1 in np.linspace(PSU1.VSTART,PSU1.VEND,PSU1.N):
 
 			# init measurement values		
-			V1MEAS = 0.0
+			V1MEAS = []
 			I1MEAS = 0.0
 			LIMIT1 = 0
 			V2MEAS = 0.0
@@ -506,8 +506,9 @@ try:
 						r.append(p.reading())
 					else:
 						r.append([0.0,0.0,'NONE'])
-
-				V1MEAS = V1MEAS + r[0][0];
+				
+				V1MEAS.append(r[0][0])
+				# V1MEAS = V1MEAS + r[0][0];
 				I1MEAS = I1MEAS + r[0][1];
 				V2MEAS = V2MEAS + r[1][0];
 				I2MEAS = I2MEAS + r[1][1];
@@ -516,8 +517,9 @@ try:
 				if r[1][2] == 'CC':
 					LIMIT2 = LIMIT2 + 1
 
-			# Determine mean of repeated readings:
-			V1MEAS = V1MEAS / N_rep
+			# Determine median or mean of repeated readings:
+			V1MEAS = numpy.median(V1MEAS)
+			# V1MEAS = V1MEAS / N_rep
 			I1MEAS = I1MEAS / N_rep
 			V2MEAS = V2MEAS / N_rep
 			I2MEAS = I2MEAS / N_rep
