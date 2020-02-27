@@ -391,6 +391,9 @@ printit ('Column 8:  PSU2 voltage measurement (V)',logfile,'%')
 printit ('Column 9:  PSU2 current measurement (I)',logfile,'%')
 printit ('Column 10: PSU2 limiter flag',logfile,'%')
 
+print ('\n')
+
+# AVGFUNCTION = 'MEAN'
 AVGFUNCTION = 'MEDIAN'
 
 try:
