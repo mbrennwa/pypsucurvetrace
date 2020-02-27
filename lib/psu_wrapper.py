@@ -4,10 +4,6 @@ Python class for abstract power supply objects. for interfacing specific real-wo
 
 import powersupply_PPS 
 
-def _pps_debug(s):
-	sys.stdout.write(s)
-	sys.stdout.flush()
-
 # PSU object:
 #    .setVoltage(voltage)   set voltage
 #    .setCurrent(current)   set current

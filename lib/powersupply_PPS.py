@@ -1,5 +1,6 @@
 """
 Python class to control Voltcraft PPS power supplies
+(This file was forked from https://github.com/strawlab/phidgets/tree/master/VoltCraft) 
 """
 
 import serial
@@ -20,7 +21,7 @@ PPS_MODELS = { (18.0, 10.0) : "PPS11810", # not confirmed yet
 		     }
 
 # PPS_TIMEOUT = 2.00
-PPS_TIMEOUT = None
+PPS_TIMEOUT = 10.0
 
 def _pps_debug(s):
 	sys.stdout.write(s)
