@@ -395,6 +395,8 @@ printit ('Column 10: PSU2 limiter flag',logfile,'%')
 
 print('\n')
 
+AVGFUNCTION = 'MEDIAN'
+
 try:
 
 	if T_preheat > 0.0:
@@ -518,11 +520,16 @@ try:
 					LIMIT2 = LIMIT2 + 1
 
 			# Determine median or mean of repeated readings:
-			V1MEAS = numpy.median(V1MEAS)
-			# V1MEAS = V1MEAS / N_rep
-			I1MEAS = I1MEAS / N_rep
-			V2MEAS = V2MEAS / N_rep
-			I2MEAS = I2MEAS / N_rep
+			if AVGFUNCTION = 'MEDIAN':
+				V1MEAS = np.median(V1MEAS)
+				I1MEAS = np.median(I1MEAS)
+				V2MEAS = np.median(V2MEAS)
+				I2MEAS = np.median(I2MEAS)
+			else:
+				V1MEAS = np.mean(V1MEAS)
+				I1MEAS = np.mean(I1MEAS)
+				V2MEAS = np.mean(V2MEAS)
+				I2MEAS = np.mean(I2MEAS)
 
 			# Parse limiter flags:
 			if LIMIT1 > 0:
