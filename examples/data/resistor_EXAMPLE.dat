@@ -1,0 +1,34 @@
+% * Sample: resistor
+% * PSU1 voltage output = 1.0 V ... 10.0 V (10 steps)
+% * PSU1 current limit = 5.0 A
+% * PSU1 power limit = 20.0 W
+% * PSU2 voltage output = 1.0 V
+% * PSU2 current limit = 1.0 A
+% * PSU2 power limit = 1.0 W
+% * Repeats per reading = 1
+% * Idle time between measurements: 3 seconds
+% * No pre-heating before measurements
+% * PSU1 idle / pre-heat voltage limit = 0.0 V
+% * PSU1 idle / pre-heat current limit = 0.0 A
+% * PSU2 idle / pre-heat voltage limit = 0.0 V
+% * PSU2 idle / pre-heat current limit = 0.0 A
+% Column 1:  PSU1 nominal voltage setting (V)
+% Column 2:  PSU1 nominal current setting (A)
+% Column 3:  PSU1 voltage measurement (V)
+% Column 4:  PSU1 current measurement (I)
+% Column 5:  PSU1 limiter flag
+% Column 6:  PSU2 nominal voltage setting (V)
+% Column 7:  PSU2 nominal current setting (A)
+% Column 8:  PSU2 voltage measurement (V)
+% Column 9:  PSU2 current measurement (I)
+% Column 10: PSU2 limiter flag
+1.0 5.0 1.08 0.12 0 1.0 1.08 0.0 0
+2.0 5.0 2.07 0.24 0 1.0 1.08 0.0 0
+3.0 5.0 3.06 0.37 0 1.0 1.08 0.0 0
+4.0 5.0 4.08 0.49 0 1.0 1.08 0.0 0
+5.0 4.0 5.07 0.61 0 1.0 1.08 0.0 0
+6.0 3.33333333333 6.06 0.73 0 1.0 1.09 0.0 0
+7.0 2.85714285714 7.05 0.86 0 1.0 1.08 0.0 0
+8.0 2.5 7.94 0.98 0 1.0 1.08 0.0 0
+9.0 2.22222222222 9.05 1.1 0 1.0 1.08 0.0 0
+10.0 2.0 10.05 1.22 0 1.0 1.09 0.0 0
