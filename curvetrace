@@ -22,8 +22,36 @@ import math
 import configparser
 import argparse
 import numpy as np
-from termcolor import colored
-import lib.powersupply_PPS as powersupply_PPS
+### from termcolor import colored
+import lib.powersupply as powersupply
+
+
+##########################################
+# function to get number input from user #
+##########################################
+
+def __get_number(text,allowNegative = False,allowZero = True,typ='float'):
+	input_ok = False
+	while not input_ok:
+		try:
+			if typ.upper()=='FLOAT':
+				val = float(input(text))
+			elif typ.upper()=='INT':
+				val = int(input(text))
+
+			if not allowNegative:
+				if val < 0.0:
+					raise ValueError
+			if not allowZero:
+				if val == 0.0:
+					raise ValueError
+
+			input_ok = True
+
+		except ValueError:
+			print ('  Invalid input! Try again...')
+	
+	return val
 
 
 #############################################################
@@ -45,48 +73,37 @@ def printit(text,f='',comm=''):
 ###########################
 
 def connect_PSU(configPSU,label):
-	
-	if len(configPSU[label]['COMPORT']) == 0:
-		print('COM port for power supply ' + label + 'empty. Leaving ' + label + ' uN2onfigured.')
-		PSU.VMAX = 0.0
-		PSU.VMIN = 0.0
-		PSU.IMAX = 0.0
-		PSU.TSETTLE = 0.0
-		PSU.MODEL = 'NONE'
-		PSU.connected = False
+
+	if not (label in configPSU):
+		# print(label + ' not specified in configuration file. Leaving ' + label + ' unconfigured.')
+		P = powersupply.PSU(label=label) # init empty PSU object
 
 	else:
+		if 'COMPORT' in configPSU[label]:
+			port=configPSU[label]['COMPORT']
+
+		if 'TYPE' in configPSU[label]:
+			commandset = configPSU[label]['TYPE']
+
 		# connect to PSU:
 		print ('Connecting to power supply ' + label + '...')
-		PSU = powersupply_PPS.PPS(port=configPSU[label]['COMPORT'], reset=False, prom=None)
-		PSU.output(False) # make sure it is turned off
+		P = powersupply.PSU(port,commandset,label)
+			
+		if P.CONNECTED:
 
-		# determine minimum voltage of the PSU:
-		PSU.VMIN = float(configPSU[label]['VOLTAGE_MIN'])
+			# make sure the PSU output is turned off:
+			P.turnOff()
 
-		# determine settle time:
-		PSU.TSETTLE = float(configPSU[label]['SETTLE_SECONDS'])
+			# show summary
+			print ('* Command set: ' + P.COMMANDSET)
+			print ('* Model: ' + P.MODEL)
+			print ('* Min. voltage: ' + str(P.VMIN) + ' V')
+			print ('* Max. voltage: ' + str(P.VMAX) + ' V')
+			print ('* Max. current: ' + str(P.IMAX) + ' A')
+			print ('* Max. power: ' + str(P.PMAX) + ' A')
+			### print ('* Settle time: ' + str(PSU.settletime()) + ' s')
 
-		# turn on PSU with zero output:
-		PSU.voltage(PSU.VMIN)
-		PSU.current(0)
-		PSU.output(True)
-
-		PSU.label = label		
-
-		PSU.connected = True
-
-		# show summary
-		print ('* Type: ' + PSU.MODEL)
-		print ('* Min. voltage output: ' + str(PSU.VMIN) + ' V')
-		print ('* Max. voltage output: ' + str(PSU.VMAX) + ' V')
-		print ('* Max. current output: ' + str(PSU.IMAX) + ' A')
-		print ('* Settle time: ' + str(PSU.TSETTLE) + ' s')
-		print ()
-
-	PSU.PMAX = math.floor(PSU.VMAX*PSU.IMAX)
-
-	return PSU
+	return P
 
 
 
@@ -96,61 +113,39 @@ def connect_PSU(configPSU,label):
 
 def configure_test_PSU(PSU,configDUT):
 	
-	if PSU.connected == False:
-		print ('\n' + PSU.label + ' is not connected (or connection is not configured).')
-		PSU.configured = False
+	if not PSU.CONNECTED:
+		print ('\n' + PSU.LABEL + ' is not connected (or connection is not configured).')
+		PSU.CONFIGURED = False
 	else:
 	
 		if configDUT:
 			# take configuration from DUT config file:
-			PSU.VSTART = float(configDUT['VSTART'])
-			PSU.VEND   = float(configDUT['VEND'])
-			PSU.N      = int(configDUT['N'])
-			PSU.ILIMIT = float(configDUT['IMAX'])
-			PSU.PLIMIT = float(configDUT['PMAX'])
-			PSU.POLARITY = float(configDUT['POLARITY'])
+			PSU.TEST_VSTART = float(configDUT['VSTART'])
+			PSU.TEST_VEND   = float(configDUT['VEND'])
+			PSU.TEST_N      = int(configDUT['N'])
+			PSU.TEST_ILIMIT = float(configDUT['IMAX'])
+			PSU.TEST_PLIMIT = float(configDUT['PMAX'])
+			PSU.TEST_POLARITY = int(configDUT['POLARITY'])
 
 		else:
 
-			print ('\n' + 'configure ' + PSU.label + ' test settings:')
-
+			print ('\n' + 'configure ' + PSU.LABEL + ' test settings:')
+			PSU.TEST_VSTART = __get_number('* ' + PSU.LABEL + ' start voltage (V): ',allowZero=True,allowNegative=False,typ='float')
+			PSU.TEST_VEND   = __get_number('* ' + PSU.LABEL + ' end voltage (V): ',allowZero=True,allowNegative=False,typ='float')
+			PSU.TEST_N      = __get_number('* ' + PSU.LABEL + ' number of voltage steps: ',allowZero=False,allowNegative=False,typ='int')
+			PSU.TEST_ILIMIT = __get_number('* ' + PSU.LABEL + ' maximum allowed current (A): ',allowZero=False,allowNegative=False,typ='float')
+			PSU.TEST_PLIMIT = __get_number('* ' + PSU.LABEL + ' maximum allowed power (W): ',allowZero=False,allowNegative=False,typ='float')
 			try:
-				PSU.VSTART = float(input('* ' + PSU.label + ' start voltage (V): '))
-			except ValueError:
-				print ('  Invalid input!')
-
-			try:
-				PSU.VEND = float(input('* ' + PSU.label + ' end voltage (V): '))
-			except ValueError:
-				print ('  Invalid input!')
-
-			try:
-				PSU.N = int(input('* ' + PSU.label + ' number of voltage steps: '))
-			except ValueError:
-				print ('  Invalid input!')		
-
-			try:
-				PSU.ILIMIT = float(input('* ' + PSU.label + ' maximum allowed current (A): '))
-			except ValueError:
-				print ('  Invalid input!')
-
-			try:
-				PSU.PLIMIT = float(input('* ' + PSU.label + ' maximum allowed power (W): '))
-			except ValueError:
-				print ('  Invalid input!')
-
-
-			try:
-				pol = (input('* OPTIONAL: ' + PSU.label + ' polarity of outputs -- N: normal / I: inverted [default=N]: '))
+				pol = (input('* OPTIONAL: ' + PSU.LABEL + ' polarity of outputs -- N: normal / I: inverted [default=N]: '))
 			except ValueError:
 				print ('  Using default: normal polarity.')
 				pol = 'N'
 			if pol.upper() == 'I':
-				PSU.POLARITY = -1
+				PSU.TEST_POLARITY = -1
 			else:
-				PSU.POLARITY = 1;
+				PSU.TEST_POLARITY = 1;
 
-		PSU.configured = True
+		PSU.CONFIGURED = True
 
 	return PSU
 
@@ -162,39 +157,19 @@ def configure_test_PSU(PSU,configDUT):
 
 def configure_idle_PSU(PSU,configDUT):
 	
-	if PSU.configured:
+	if PSU.CONFIGURED:
 
 		if configDUT:
 			# take configuration from DUT config file:
-			PSU.VIDLE = float(configDUT['VIDLE'])
-			PSU.IIDLE = float(configDUT['IIDLE'])
+			PSU.TEST_VIDLE = float(configDUT['VIDLE'])
+			PSU.TEST_IIDLE = float(configDUT['IIDLE'])
 
 		else:
-			print ('\n' + 'configure ' + PSU.label + ' idle settings:')
-			try:
-				PSU.VIDLE = float(input('* ' + PSU.label + ' idle voltage (V): '))
-			except ValueError:
-				print ('  Invalid input!')
-			try:
-				PSU.IIDLE = float(input('* ' + PSU.label + ' idle current (A): '))
-			except ValueError:
-				print ('  Invalid input!')
+			print ('\n' + 'configure ' + PSU.LABEL + ' idle settings:')
+			PSU.TEST_VIDLE = __get_number('* ' + PSU.LABEL + ' idle voltage (V): ',allowZero=True,allowNegative=False,typ='float')
+			PSU.TEST_IIDLE = __get_number('* ' + PSU.LABEL + ' idle current (A): ',allowZero=True,allowNegative=False,typ='float')
 
 	return PSU
-
-
-################
-# turn off PSU #
-################
-
-def turn_off_PSU(PSU):
-	if PSU.configured:
-		try:
-			PSU.current(0)
-			PSU.voltage(PSU.VMIN)
-			print(PSU.label + ' turned off.')
-		except:
-			print('Could not turn off ' + PSU.label + '!')
 
 
 ################
@@ -256,9 +231,9 @@ else:
 	PSU2 = configure_test_PSU (PSU2,None)
 
 # check if at least one of the power supplies is configured:	
-if PSU1.configured == False:
-	if PSU2.configured == False:
-		print('No power suplly configured. Good bye.')
+if not PSU1.CONFIGURED:
+	if not PSU2.CONFIGURED:
+		print('No power supply configured. Good bye.')
 		exit()
 
 # set up repeats:
@@ -299,12 +274,12 @@ if T_preheat < 0:
 
 # set up idle conditions (for pre-heat or idle between readings)
 if (T_idle > 0.0) or (T_preheat > 0.0):
-	if PSU1.configured:
+	if PSU1.CONFIGURED:
 		if 'PSU1' in configDUT:
 			PSU1 = configure_idle_PSU (PSU1,configDUT['PSU1'])
 		else:
 			PSU1 = configure_idle_PSU (PSU1,None)
-	if PSU2.configured:
+	if PSU2.CONFIGURED:
 		if 'PSU2' in configDUT:
 			PSU2 = configure_idle_PSU (PSU2,configDUT['PSU2'])
 		else:
@@ -313,49 +288,66 @@ if (T_idle > 0.0) or (T_preheat > 0.0):
 # check voltage / power / current limits (and fix where possible and necessary):
 print ('\nChecking voltage / current / power limits...')
 for p in [PSU1,PSU2]:
-	if p.VSTART < p.VMIN:
-		print ('  ' + p.label + ': Adjusting start voltage to min. value possible with the power supply (' + str(p.VMIN) + ' V).')
-		p.VSTART = p.VMIN
-	if p.VSTART > p.VMAX:
-		print ('  ' + p.label + ': Adjusting start voltage to max. value possible with the power supply (' + str(p.VMAX) + ' V).')
-		p.VSTART = p.VMAX
-	if p.VEND < p.VMIN:
-		print ('  ' + p.label + ': Adjusting end voltage to min. value possible with the power supply (' + str(p.VMIN) + ' V).')
-		p.VEND = p.VMIN
-	if p.VEND > p.VMAX:
-		print ('  ' + p.label + ': Adjusting end voltage to max. value possible with the power supply (' + str(p.VMAX) + ' V).')
-		p.VEND = p.VMAX
-	if p.VEND == p.VSTART:
-		print ('  ' + p.label + ': Same start and end voltage! Using single step (N = 1).')
-		p.N = 1
-	if p.ILIMIT > p.IMAX:
-		print ('  ' + p.label + ': Adjusting current limit to max. value possible with the power supply (' + str(p.IMAX) + ' A).')
-		p.ILIMIT = p.IMAX
-	if p.PLIMIT > p.PMAX:
-		print ('  ' + p.label + ': Adjusting power limit to max. value possible with the power supply (' + str(p.PMAX) + ' W).')
-		p.PLIMIT = p.PMAX
-	if p.N < 1:
-		print ('  ' + p.label + ': Number of voltage steps with power supply (' + str(p.VMAX) + ' must be positive. Adjusting to N = 1.')
-		p.N = 1
+	if p.CONNECTED:
+		if p.TEST_VSTART < p.VMIN:
+			print ('  ' + p.LABEL + ': Adjusting start voltage to min. value possible with the power supply (' + str(p.VMIN) + ' V).')
+			p.TEST_VSTART = p.VMIN
+		if p.TEST_VSTART > p.VMAX:
+			print ('  ' + p.LABEL + ': Adjusting start voltage to max. value possible with the power supply (' + str(p.VMAX) + ' V).')
+			p.TEST_VSTART = p.VMAX
+		if p.TEST_VEND < p.VMIN:
+			print ('  ' + p.LABEL + ': Adjusting end voltage to min. value possible with the power supply (' + str(p.VMIN) + ' V).')
+			p.TEST_VEND = p.VMIN
+		if p.TEST_VEND > p.VMAX:
+			print ('  ' + p.LABEL + ': Adjusting end voltage to max. value possible with the power supply (' + str(p.VMAX) + ' V).')
+			p.TEST_VEND = p.VMAX
+		if p.TEST_VEND == p.TEST_VSTART:
+			print ('  ' + p.LABEL + ': Same start and end voltage! Using single step (N = 1).')
+			p.TEST_N = 1
+		if p.TEST_ILIMIT > p.IMAX:
+			print ('  ' + p.LABEL + ': Adjusting current limit to max. value possible with the power supply (' + str(p.IMAX) + ' A).')
+			p.TEST_ILIMIT = p.IMAX
+		if p.TEST_PLIMIT > p.PMAX:
+			print ('  ' + p.LABEL + ': Adjusting power limit to max. value possible with the power supply (' + str(p.PMAX) + ' W).')
+			p.TEST_PLIMIT = p.PMAX
+		if p.TEST_N < 1:
+			print ('  ' + p.LABEL + ': Number of voltage steps with power supply (' + str(p.VMAX) + ' must be positive. Adjusting to N = 1.')
+			p.TEST_N = 1
+		if p.TEST_VIDLE > p.VMAX:
+			print ('  ' + p.LABEL + ': Adjusting idle voltage to max. value possible with the power supply (' + str(p.VMAX) + ' V).')
+			p.TEST_VIDLE = p.VMAX
+		if p.TEST_VIDLE < p.VMIN:
+			print ('  ' + p.LABEL + ': Adjusting idle voltage to min. value possible with the power supply (' + str(p.VMIN) + ' V).')
+			p.TEST_VIDLE = p.VMIN
+		if p.TEST_IIDLE > p.IMAX:
+			print ('  ' + p.LABEL + ': Adjusting idle current to max. value possible with the power supply (' + str(p.IMAX) + ' V).')
+			p.TEST_IIDLE = p.IMIN
+		if p.TEST_VIDLE * p.TEST_IIDLE > p.PMAX:
+			p.TEST_IIDLE = p.PMAX / p.TEST_VIDLE
+			print ('  ' + p.LABEL + ': Idle current limit is higher than PSU power limit (' + str(p.PMAX) + ' W). Adjusting idle current limit to ' + str(p.TEST_IIDLE) + ' A.' )
+
 
 # Print summary of test setup:
 print('\nTest setup:')
 printit('* Sample: ' + samplename,logfile,'%')
 for p in [PSU1, PSU2]:
-	printit ('* ' + p.label + ':',logfile,'%')
-	if p.configured == False:
-		printit ('   not configured',logfile,'%')
+	
+	if not p.CONNECTED:
+		printit ('* ' + p.LABEL + ': Not connected',logfile,'%')
+	elif not p.CONFIGURED:
+		printit ('* ' + p.LABEL + ': Test parameters not configured',logfile,'%')
 	else:
-		if p.N == 1:
-			printit ('   voltage output = ' + str(p.VSTART) + ' V',logfile,'%')
+		printit ('* ' + p.LABEL + ':',logfile,'%')
+		if p.TEST_N == 1:
+			printit ('  - voltage output = ' + str(p.TEST_VSTART) + ' V',logfile,'%')
 		else:
-			printit ('   voltage output = ' + str(p.VSTART) + ' V ... ' + str(p.VEND) + ' V (' + str(p.N) + ' steps)',logfile,'%')
-		printit ('   current limit = ' + str(p.ILIMIT) + ' A',logfile,'%')
-		printit ('   power limit = ' + str(p.PLIMIT) + ' W',logfile,'%')
-		if p.POLARITY == 1:
-			printit ('   polarity: normal',logfile,'%')
+			printit ('  - voltage output = ' + str(p.TEST_VSTART) + ' V ... ' + str(p.TEST_VEND) + ' V (' + str(p.TEST_N) + ' steps)',logfile,'%')
+		printit ('  - current limit = ' + str(p.TEST_ILIMIT) + ' A',logfile,'%')
+		printit ('  - power limit = ' + str(p.TEST_PLIMIT) + ' W',logfile,'%')
+		if p.TEST_POLARITY == 1:
+			printit ('  - polarity: normal',logfile,'%')
 		else:
-			printit ('   polarity: inverted',logfile,'%')
+			printit ('  - polarity: inverted',logfile,'%')
 
 printit ('* Repeats per reading = ' + str(N_rep),logfile,'%')
 if T_idle == 0.0:
@@ -368,11 +360,11 @@ else:
 	printit ('* Pre-heat time before measurements (at idle conditions): ' + str(T_preheat) + ' seconds',logfile,'%')
 if (T_idle > 0.0) or (T_preheat > 0.0):
 	for p in [PSU1, PSU2]:
-		if p.configured == False:
-			printit ('* ' + p.label + '* Idle / pre-heat conditions not configured',logfile,'%')
+		if p.CONNECTED == False:
+			printit ('* ' + p.LABEL + ' Idle / pre-heat conditions not configured',logfile,'%')
 		else:
-			printit ('* ' + p.label + ' idle / pre-heat voltage limit = ' + str(p.VIDLE) + ' V',logfile,'%')
-			printit ('* ' + p.label + ' idle / pre-heat current limit = ' + str(p.IIDLE) + ' A',logfile,'%')
+			printit ('* ' + p.LABEL + ' idle / pre-heat voltage limit = ' + str(p.TEST_VIDLE) + ' V',logfile,'%')
+			printit ('* ' + p.LABEL + ' idle / pre-heat current limit = ' + str(p.TEST_IIDLE) + ' A',logfile,'%')
 
 
 # Ask if okay to start the test
@@ -393,10 +385,20 @@ printit ('Column 10: PSU2 limiter flag',logfile,'%')
 
 print ('\n')
 
-# AVGFUNCTION = 'MEAN'
-AVGFUNCTION = 'MEDIAN'
+AVGFUNCTION = 'MEAN'
+# AVGFUNCTION = 'MEDIAN'
+
+V1_steps = np.linspace(PSU1.TEST_VSTART,PSU1.TEST_VEND,PSU1.TEST_N)
+V2_steps = np.linspace(PSU2.TEST_VSTART,PSU2.TEST_VEND,PSU2.TEST_N)
 
 try:
+
+	# turn on PSU outputs:
+	for p in [PSU1, PSU2]:
+		if p.CONFIGURED:
+			p.setVoltage(p.VMIN)
+			p.setCurrent(0)
+			p.turnOn()
 
 	if T_preheat > 0.0:
 		
@@ -404,18 +406,18 @@ try:
 
 		# set outputs to zero (to avoid overshoot)
 		for p in [PSU1, PSU2]:
-			if p.configured:
-				p.voltage(p.VMIN)
-				p.current(0)
+			if p.CONFIGURED:
+				p.setVoltage(p.VMIN)
+				p.setCurrent(0)
 
 		# set idle conditions:
 		Tsettle = 0.0
 		for p in [PSU1, PSU2]:
-			if p.configured:
-				p.voltage(p.VIDLE)
-				p.current(p.IIDLE)
-				if p.TSETTLE > Tsettle:
-					Tsettle = p.TSETTLE
+			if p.CONFIGURED:
+				p.setVoltage(p.TEST_VIDLE)
+				p.setCurrent(p.TEST_IIDLE)
+				if p.settletime()() > Tsettle:
+					Tsettle = p.settletime()()
 		time.sleep(Tsettle) # wait for stable conditions
 
 		# wait pre-heat time:	
@@ -423,27 +425,32 @@ try:
 
 		# set outputs to zero (to avoid overshoot when starting next measurement)
 		for p in [PSU1, PSU2]:
-			if p.configured:
-				p.voltage(p.VMIN)
-				p.current(0)
+			if p.CONFIGURED:
+				p.setVoltage(p.VMIN)
+				p.setCurrent(0)
 
 	print ('Test started...\n')
 
-	for V2 in np.linspace(PSU2.VSTART,PSU2.VEND,PSU2.N):
+	for V2 in V2_steps:
 
-		if PSU2.configured:
-			# Determine PSU2 current limit:
+		if PSU2.CONFIGURED:
+
+			# Determine PSU2 current limit (based on DUT limits):
 			if V2 > 0.0:
-				I2LIM = min (PSU2.ILIMIT,PSU2.PLIMIT/V2)
+				I2LIM = min (PSU2.TEST_ILIMIT,PSU2.TEST_PLIMIT/V2)
 			else:
-				I2LIM = PSU2.ILIMIT
-			
-			# set PSU2 current limit:
-			PSU2.current(I2LIM)
-			PSU2.voltage(V2)
-			time.sleep(PSU2.TSETTLE) # wait for stable conditions
+				I2LIM = PSU2.TEST_ILIMIT
 
-		for V1 in np.linspace(PSU1.VSTART,PSU1.VEND,PSU1.N):
+			# Check if current limit is within power capability of PSU2 (and adjust if necessary):
+			if (V2*I2LIM) > PSU2.PMAX:
+				I2LIM = PSU2.PMAX / V2
+			
+			# set PSU2 voltage + current:
+			PSU2.setVoltage(V2)
+			PSU2.setCurrent(I2LIM)
+			time.sleep(PSU2.settletime()) # wait for stable conditions
+
+		for V1 in V1_steps:
 
 			# init measurement values		
 			V1MEAS = []
@@ -459,18 +466,18 @@ try:
 				if T_idle > 0.0:
 					# set outputs to zero (to avoid overshoot)
 					for p in [PSU1, PSU2]:
-						if p.configured:
-							p.voltage(p.VMIN)
-							p.current(0)
+						if p.CONFIGURED:
+							p.setVoltage(p.VMIN)
+							p.setCurrent(0)
 
 					# set idle conditions:
 					Tsettle = 0.0
 					for p in [PSU1, PSU2]:
-						if p.configured:
-							p.voltage(p.VIDLE)
-							p.current(p.IIDLE)
-							if p.TSETTLE > Tsettle:
-								Tsettle = p.TSETTLE
+						if p.CONFIGURED:
+							p.setVoltage(p.TEST_VIDLE)
+							p.setCurrent(p.TEST_IIDLE)
+							if p.settletime() > Tsettle:
+								Tsettle = p.settletime()
 					time.sleep(Tsettle) # wait for stable conditions
 
 					# wait idle time:	
@@ -478,33 +485,37 @@ try:
 
 					# set outputs to zero (to avoid overshoot when starting next measurement)
 					for p in [PSU1, PSU2]:
-						if p.configured:
-							p.voltage(p.VMIN)
-							p.current(0)
+						if p.CONFIGURED:
+							p.setVoltage(p.VMIN)
+							p.setCurrent(0)
 
 					# return to required PSU2 output:
-					if PSU2.configured:
-						PSU2.current(I2LIM)
-						PSU2.voltage(V2)
-						time.sleep(PSU2.TSETTLE) # wait for stable conditions
+					if PSU2.CONFIGURED:
+						PSU2.setCurrent(I2LIM)
+						PSU2.setVoltage(V2)
+						time.sleep(PSU2.settletime()) # wait for stable conditions
 
 				# Determine PSU1 current limit:
 				if V1 > 0.0:
-					I1LIM = min (PSU1.ILIMIT,PSU1.PLIMIT/V1)
+					I1LIM = min (PSU1.TEST_ILIMIT,PSU1.TEST_PLIMIT/V1)
 				else:
-					I1LIM = PSU1.ILIMIT
+					I1LIM = PSU1.TEST_ILIMIT
+
+				# Check if current limit is within power capability of PSU1 (and adjust if necessary):
+				if (V1*I1LIM) > PSU1.PMAX:
+					I1LIM = PSU1.PMAX / V1
 
 				# set up PSU1 measurement conditions:
-				if PSU1.configured:
-					PSU1.current(I1LIM) # set current limit at PSU1
-					PSU1.voltage(V1) # set voltage at PSU1
-					time.sleep(PSU1.TSETTLE) # wait for stable conditions at PSU and DUT
+				if PSU1.CONFIGURED:
+					PSU1.setVoltage(V1) # set voltage at PSU1
+					PSU1.setCurrent(I1LIM) # set current limit at PSU1
+					time.sleep(PSU1.settletime()) # wait for stable conditions at PSU and DUT
 
 				# read PSU output voltages and currents:
 				r = []
 				for p in [PSU1, PSU2]:
-					if p.configured:
-						r.append(p.reading())
+					if p.CONFIGURED:
+						r.append(p.read())
 					else:
 						r.append([0.0,0.0,'NONE'])
 				
@@ -541,14 +552,16 @@ try:
 				LIMIT2 = 0
 
 			# Print results:
-			printit ( str(V1*PSU1.POLARITY) + ' ' + str(I1LIM*PSU1.POLARITY) + ' ' + str(V1MEAS*PSU1.POLARITY) + ' ' + str(I1MEAS*PSU1.POLARITY) + ' ' + str(int(LIMIT1)) + ' ' + str(V2*PSU2.POLARITY) + ' ' + str(V2MEAS*PSU2.POLARITY) + ' ' + str(I2MEAS*PSU2.POLARITY) + ' ' + str(int(LIMIT2)) , logfile )
+			printit ( str(V1*PSU1.TEST_POLARITY) + ' ' + str(I1LIM*PSU1.TEST_POLARITY) + ' ' + str(V1MEAS*PSU1.TEST_POLARITY) + ' ' + str(I1MEAS*PSU1.TEST_POLARITY) + ' ' + str(int(LIMIT1)) + ' ' + str(V2*PSU2.TEST_POLARITY) + ' ' + str(V2MEAS*PSU2.TEST_POLARITY) + ' ' + str(I2MEAS*PSU2.TEST_POLARITY) + ' ' + str(int(LIMIT2)) , logfile )
 
 	print ('Test completed.')
 	for p in [PSU1, PSU2]:
-		turn_off_PSU(p)
+		if p.CONNECTED:
+			p.turnOff()
 
 except:
 	print ('\nOooops, something went wrong during testing! Trying to turn off the PSUs...\n')
 	for p in [PSU1, PSU2]:
-		turn_off_PSU(p)
+		if p.CONNECTED:
+			p.turnOff()
 	raise

@@ -18,8 +18,17 @@ I like SVN (subversion):
 ```
 svn co https://github.com/mbrennwa/curvetracePy.git/trunk path/on/your/computer/to/curvetracePy
 ```
-* Connect your PSUs to the USB pots of your computer.
-* Copy the `config_PSU_TEMPLATE.txt` file to `config_PSU.txt`, and modify the file to reflect the details of the USB/serial interfaces of your your PSUs. See "Notes" section for further information on the PSU configuration file.
+* Install the Python-3 Serial package.
+On Debian / Ubuntu or similar Linux systems:
+```
+sudo apt install python3-serial
+```
+* Connect your PSUs to the USB ports of your computer and determine their serial port interfaces on your system.
+On Linux:
+```
+ls /dev/serial/by-id
+```
+* Copy the `config_PSU_TEMPLATE.txt` file to `config_PSU.txt`. Modify the file to reflect the details of the USB/serial interfaces of your your PSUs. See "Notes" section for further information on the PSU configuration file.
 * *NOTE:* By default, most Voltcraft units use the same serial device ID. Therefore, it is not possible to access more than one PSU unit via `/dev/serial/by-id/`. If you want to use more than one PSU unit, you will need to modify the device IDs of the serial interfaces so that they are different from each other. See "Notes" section below for details.
 * Make sure your user account has permissions to access the serial ports of the PSU units. See "Notes" section below.
 
