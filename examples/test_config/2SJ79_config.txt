@@ -1,0 +1,24 @@
+[PSU1]
+VSTART = 0.85
+VEND   = 20
+N      = 20
+IMAX   = 0.51
+PMAX   = 11
+VIDLE  = 15
+IIDLE  = 0.25
+POLARITY = -1
+
+[PSU2]
+VSTART = 1
+VEND   = 4
+N      = 7
+IMAX   = 1
+PMAX   = 1
+VIDLE  = 2.7
+IIDLE  = 1
+POLARITY = -1
+
+[EXTRA]
+IDLESECS    = 5
+PREHEATSECS = 60
+NREP        = 3
