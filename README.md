@@ -6,11 +6,11 @@ For two-terminal devices under test (DUTs) like resistors or diodes you need onl
 *curvetracePy* is developed using Python 3 on Linux. Other software environments may (should) work, too, but have not been tested so far.
 
 Currently supported power supply types:
-* Voltcraft PPS
+* Voltcraft PPS [currently broken due to transition to abstract power supply wrapper]
+* Korad / RND (confirmed: model KWR103, other models not tested)
 
 Devices on the radar for future support:
 * Units with a SCPI interface 
-* RND / Korad programmable power supplies (using either py-korad-serial or kd3005p Python libraries)
 
 ## Software installation and configuration
 * Download the code from the GitHub repository, either using GIT, SVN or as a ZIP archive.
@@ -44,7 +44,7 @@ To run the software, execute the `curvetrace` program from a console terminal.
   ```
   * You can also use provide a configuration file containing the test parameters (see example files provided). For example:
   ```
-  curvetrace -c test_config_examples/2SK214_config.txt
+  curvetrace -c examples/test_config/2SK214_config.txt
   ```
   See "Notes" section for further information on test configuration files.
 
