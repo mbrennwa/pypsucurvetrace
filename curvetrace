@@ -100,7 +100,7 @@ def connect_PSU(configPSU,label):
 			print ('* Min. voltage: ' + str(P.VMIN) + ' V')
 			print ('* Max. voltage: ' + str(P.VMAX) + ' V')
 			print ('* Max. current: ' + str(P.IMAX) + ' A')
-			print ('* Max. power: ' + str(P.PMAX) + ' A')
+			print ('* Max. power: ' + str(P.PMAX) + ' W')
 			### print ('* Settle time: ' + str(PSU.settletime()) + ' s')
 
 	return P
@@ -338,6 +338,7 @@ for p in [PSU1, PSU2]:
 		printit ('* ' + p.LABEL + ': Test parameters not configured',logfile,'%')
 	else:
 		printit ('* ' + p.LABEL + ':',logfile,'%')
+		printit ('  - Type: ' + str(p.COMMANDSET) + ' / ' + p.MODEL,logfile,'%')
 		if p.TEST_N == 1:
 			printit ('  - voltage output = ' + str(p.TEST_VSTART) + ' V',logfile,'%')
 		else:
@@ -353,7 +354,7 @@ printit ('* Repeats per reading = ' + str(N_rep),logfile,'%')
 if T_idle == 0.0:
 	printit ('* No idle time between measurements',logfile,'%')
 else:
-	printit ('* Idle time between measurements: ' + str(T_idle) + ' seconds',logfile,'%')
+	printit ('* Idle time between measurements: ' + str(T_idle) + ' s',logfile,'%')
 if T_preheat == 0.0:
 	printit ('* No pre-heating before measurements',logfile,'%')
 else:
@@ -396,8 +397,8 @@ try:
 	# turn on PSU outputs:
 	for p in [PSU1, PSU2]:
 		if p.CONFIGURED:
-			p.setVoltage(p.VMIN)
-			p.setCurrent(0)
+			p.setCurrent(0,False)
+			p.setVoltage(p.VMIN,False)
 			p.turnOn()
 
 	if T_preheat > 0.0:
@@ -405,29 +406,26 @@ try:
 		print ('Pre-heating...\n')
 
 		# set outputs to zero (to avoid overshoot)
-		for p in [PSU1, PSU2]:
-			if p.CONFIGURED:
-				p.setVoltage(p.VMIN)
-				p.setCurrent(0)
+		# for p in [PSU1, PSU2]:
+		# 	if p.CONFIGURED:
+		# 		p.turnOff()
 
 		# set idle conditions:
-		Tsettle = 0.0
+		### Tsettle = 0.0
 		for p in [PSU1, PSU2]:
 			if p.CONFIGURED:
-				p.setVoltage(p.TEST_VIDLE)
-				p.setCurrent(p.TEST_IIDLE)
-				if p.settletime()() > Tsettle:
-					Tsettle = p.settletime()()
-		time.sleep(Tsettle) # wait for stable conditions
+				p.setCurrent(p.TEST_IIDLE,False)
+				p.setVoltage(p.TEST_VIDLE,True)
+				### Tsettle = max(p.settletime(),Tsettle)
+		### time.sleep(Tsettle) # wait for stable conditions
 
 		# wait pre-heat time:	
 		time.sleep(T_preheat)
 
 		# set outputs to zero (to avoid overshoot when starting next measurement)
-		for p in [PSU1, PSU2]:
-			if p.CONFIGURED:
-				p.setVoltage(p.VMIN)
-				p.setCurrent(0)
+		# for p in [PSU1, PSU2]:
+		# 	if p.CONFIGURED:
+		# 		p.turnOff()
 
 	print ('Test started...\n')
 
@@ -446,9 +444,9 @@ try:
 				I2LIM = PSU2.PMAX / V2
 			
 			# set PSU2 voltage + current:
-			PSU2.setVoltage(V2)
-			PSU2.setCurrent(I2LIM)
-			time.sleep(PSU2.settletime()) # wait for stable conditions
+			PSU2.setCurrent(I2LIM,False)
+			PSU2.setVoltage(V2,True)
+			### time.sleep(PSU2.settletime()) # wait for stable conditions
 
 		for V1 in V1_steps:
 
@@ -465,35 +463,32 @@ try:
 
 				if T_idle > 0.0:
 					# set outputs to zero (to avoid overshoot)
-					for p in [PSU1, PSU2]:
-						if p.CONFIGURED:
-							p.setVoltage(p.VMIN)
-							p.setCurrent(0)
+					# for p in [PSU1, PSU2]:
+					# 	if p.CONFIGURED:
+					# 		p.setCurrent(0.0)
 
 					# set idle conditions:
-					Tsettle = 0.0
+					### Tsettle = 0.0
 					for p in [PSU1, PSU2]:
 						if p.CONFIGURED:
-							p.setVoltage(p.TEST_VIDLE)
-							p.setCurrent(p.TEST_IIDLE)
-							if p.settletime() > Tsettle:
-								Tsettle = p.settletime()
-					time.sleep(Tsettle) # wait for stable conditions
+							p.setCurrent(p.TEST_IIDLE,False)
+							p.setVoltage(p.TEST_VIDLE,True)
+							## Tsettle = max(p.settletime(),Tsettle)
+					### time.sleep(Tsettle) # wait for stable conditions
 
 					# wait idle time:	
 					time.sleep(T_idle)
 
-					# set outputs to zero (to avoid overshoot when starting next measurement)
+					# set outputs to zero (to avoid running hot before starting next measurement)
 					for p in [PSU1, PSU2]:
 						if p.CONFIGURED:
-							p.setVoltage(p.VMIN)
-							p.setCurrent(0)
+							p.setCurrent(0,False)
 
 					# return to required PSU2 output:
 					if PSU2.CONFIGURED:
-						PSU2.setCurrent(I2LIM)
-						PSU2.setVoltage(V2)
-						time.sleep(PSU2.settletime()) # wait for stable conditions
+						PSU2.setCurrent(I2LIM,False)
+						PSU2.setVoltage(V2,True)
+						# time.sleep(PSU2.settletime()) # wait for stable conditions
 
 				# Determine PSU1 current limit:
 				if V1 > 0.0:
@@ -507,9 +502,9 @@ try:
 
 				# set up PSU1 measurement conditions:
 				if PSU1.CONFIGURED:
-					PSU1.setVoltage(V1) # set voltage at PSU1
-					PSU1.setCurrent(I1LIM) # set current limit at PSU1
-					time.sleep(PSU1.settletime()) # wait for stable conditions at PSU and DUT
+					PSU1.setCurrent(I1LIM,False) # set current limit at PSU1
+					PSU1.setVoltage(V1,True) # set voltage at PSU1
+					### time.sleep(PSU1.settletime()) # wait for stable conditions at PSU and DUT
 
 				# read PSU output voltages and currents:
 				r = []

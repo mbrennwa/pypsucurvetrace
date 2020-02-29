@@ -3,7 +3,8 @@ Python class for abstract power supply objects.
 Classes of specific real-world power supplies will derive from this class.
 """
 
-import lib.powersupply_PPS as powersupply_PPS
+import time
+import lib.powersupply_VOLTCRAFT as powersupply_VOLTCRAFT
 import lib.powersupply_KORAD as powersupply_KORAD
 
 # PSU object:
@@ -12,13 +13,15 @@ import lib.powersupply_KORAD as powersupply_KORAD
 #    .turnOff()   	    turn PSU output off
 #    .turnOn()   	    turn PSU output on
 #    .read()                read current voltage, current, and limiter mode (voltage or current limiter active)
-#    .settletime()             estimated settle time to attain stable voltage + current at PSU output after changing the setpoint (s)
+#    #### .settletime()             estimated settle time to attain stable voltage + current at PSU output after changing the setpoint (s)
 #    .VMAX                  max. supported voltage (V)
 #    .VMIN                  min. supported voltage (V)
 #    .IMAX                  max. supported current (V)
 #    .PMAX                  max. supported power (W)
 #    .VRES                  resolution of voltage readings (V)
 #    .IRES                  resolution of current readings (A)
+#    .MAXSETTLETIME         max. time allowed to attain stable output values (will complain if output not stable after this time) (s)
+#    .SETTLEPOLLTIME        time between readings for checking if output values of newly set voltage/current values are at set point (s)
 #    .TEST_VSTART           start value for test (V)
 #    .TEST_VEND             end value for test (V)
 #    .TEST_ILIMIT           current limit for test (A)
@@ -55,6 +58,7 @@ class PSU:
 		self.PMAX = 0.0
 		self.VRES = 0.0
 		self.IRES = 0.0
+		self.MAXSETTLETIME = 0.0
 		self.TEST_VSTART = 0.0
 		self.TEST_VEND = 0.0
 		self.TEST_ILIMIT = 0.0
@@ -83,16 +87,28 @@ class PSU:
 		else:
 			self.COMMANDSET == self.COMMANDSET.upper()
 			if self.COMMANDSET == 'VOLTCRAFT':
-				print ('NOT YET IMPLEMENTED: Connect to Voltcraft / Mason PPS')
-
-			elif self.COMMANDSET == 'KORAD':
-				self._PSU = powersupply_KORAD.KORAD(port)
+				self._PSU = powersupply_VOLTCRAFT.VOLTCRAFT(port,debug=False)
 				self.VMIN = self._PSU.VMIN
 				self.VMAX = self._PSU.VMAX
 				self.IMAX = self._PSU.IMAX
 				self.PMAX = self._PSU.PMAX
 				self.VRES = self._PSU.VRES
 				self.IRES = self._PSU.IRES
+				self.MAXSETTLETIME = self._PSU.MAXSETTLETIME
+				self.SETTLEPOLLTIME = self._PSU.SETTLEPOLLTIME
+				self.MODEL = self._PSU.MODEL
+				self.CONNECTED = True
+
+			elif self.COMMANDSET == 'KORAD':
+				self._PSU = powersupply_KORAD.KORAD(port,debug=False)
+				self.VMIN = self._PSU.VMIN
+				self.VMAX = self._PSU.VMAX
+				self.IMAX = self._PSU.IMAX
+				self.PMAX = self._PSU.PMAX
+				self.VRES = self._PSU.VRES
+				self.IRES = self._PSU.IRES
+				self.MAXSETTLETIME = self._PSU.MAXSETTLETIME
+				self.SETTLEPOLLTIME = self._PSU.SETTLEPOLLTIME
 				self.MODEL = self._PSU.MODEL
 				self.CONNECTED = True
 
@@ -105,14 +121,15 @@ class PSU:
 	########################################################################################################
 	
 
-	def setVoltage(self,value):
+	def setVoltage(self,value,wait_stable):
 		"""
-		PSU.setVoltage(value)
+		PSU.setVoltage(value,wait_stable)
 		
 		Set PSU voltage.
 		
 		INPUT:
-		value: voltage value (float)
+		value: voltage set-point value (float)
+		wait_stable: wait until output voltage reaches the set-point value (bool)
 		
 		OUTPUT:
 		(none)
@@ -125,18 +142,33 @@ class PSU:
 		else:
 			raise RuntimeError('Cannot set voltage on power supply with ' + self.COMMANDSET + ' command set.')
 
+		# wait for stable output voltage:
+		if wait_stable:
+			stable = False
+			t0 = time.time() # start time (now)
+			while not time.time() > t0+self.MAXSETTLETIME:
+				v = self.read()[0]
+				if abs( v - value) <= 1.3*self.VRES/2:
+					stable = True
+					break
+				else:
+					time.sleep(self.SETTLEPOLLTIME)
+			if not stable:
+				print (self.LABEL + ' warning: voltage setpoint not reached after ' + str(self.MAXSETTLETIME) + ' s!')
+
 
 	########################################################################################################
 	
 
-	def setCurrent(self,value):
+	def setCurrent(self,value,wait_stable):
 		"""
-		PSU.setCurrent(value)
+		PSU.setCurrent(value,wait_stable)
 		
 		Set PSU current.
 		
 		INPUT:
-		value: current value (float)
+		value: current set-point value (float)
+		wait_stable: wait until output current reaches the set-point value (bool)
 		
 		OUTPUT:
 		(none)
@@ -149,6 +181,20 @@ class PSU:
 		else:
 			raise RuntimeError('Cannot set current on power supply with ' + self.COMMANDSET + ' command set.')
 
+		# wait for stable output current:
+		if wait_stable:
+			stable = False
+			t0 = time.time() # start time (now)
+			while not time.time() - t0 > self.MAXSETTLETIME:
+				v = self.read()[1]
+				if abs( v - value) <= 1.3*self.IRES:
+					stable = True
+					break
+				else:
+					time.sleep(self.SETTLEPOLLTIME)
+			if not stable:
+				print (self.LABEL + ' warning: current setpoint not reached after ' + str(self.MAXSETTLETIME) + ' s!')
+		
 
 
 	########################################################################################################
@@ -232,26 +278,3 @@ class PSU:
 			raise RuntimeError('Cannot read values from power supply with ' + self.COMMANDSET + ' command set.')
 
 		return (V,I,L)
-
-
-
-	########################################################################################################
-	
-
-	def settletime(self):
-		"""
-		Estimate settle time to attain stable output at PSU terminals in seconds. The time is determined by the charging process of the built-in capacitor at the PSU output, which is controlled by the current limit and the size of amplitude of the change in the voltage setting. This function assumes the "worst case", wher the voltage setting is changed from 0.0 V to the max. voltage.
-
-		INPUT:
-		(none)
-
-		OUTPUT:
-		T: settle time in seconds (float)
-		"""
-		
-		if self.COMMANDSET == 'KORAD':
-			T = self._PSU.settletime()
-		else:
-			raise RuntimeError('Cannot estimate settle time for power supply with ' + self.COMMANDSET + ' command set.')
-
-		return T
