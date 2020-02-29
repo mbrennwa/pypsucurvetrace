@@ -90,7 +90,7 @@ class VOLTCRAFT(object):
 		# Determined experimentally with Voltcraft PPS-16005:
 		self.VMIN = 0.9
 		self.VRES = 0.12
-		self.IRES = 0.02
+		self.IRES = 0.01
 		self.MAXSETTLETIME = 5
 		self.SETTLEPOLLTIME = 0.2
 		self.PMAX = math.floor(self.VMAX * self.IMAX)
