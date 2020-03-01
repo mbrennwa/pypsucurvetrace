@@ -564,7 +564,7 @@ try:
 				LIMIT2 = 0
 
 			# Print results:
-			printit ( str(V1*PSU1.TEST_POLARITY) + ' ' + str(I1LIM*PSU1.TEST_POLARITY) + ' ' + str(V1MEAS*PSU1.TEST_POLARITY) + ' ' + str(I1MEAS*PSU1.TEST_POLARITY) + ' ' + str(int(LIMIT1)) + ' ' + str(V2*PSU2.TEST_POLARITY) + ' ' + str(V2MEAS*PSU2.TEST_POLARITY) + ' ' + str(I2MEAS*PSU2.TEST_POLARITY) + ' ' + str(int(LIMIT2)) , logfile )
+			printit ( str(V1*PSU1.TEST_POLARITY) + ' ' + str(I1LIM*PSU1.TEST_POLARITY) + ' ' + str(V1MEAS*PSU1.TEST_POLARITY) + ' ' + str(I1MEAS*PSU1.TEST_POLARITY) + ' ' + str(int(LIMIT1)) + ' ' + str(V2*PSU2.TEST_POLARITY) + ' ' + str(I2LIM*PSU2.TEST_POLARITY) + ' ' + str(V2MEAS*PSU2.TEST_POLARITY) + ' ' + str(I2MEAS*PSU2.TEST_POLARITY) + ' ' + str(int(LIMIT2)) , logfile )
 
 	print ('Test completed.')
 	for p in [PSU1, PSU2]:
