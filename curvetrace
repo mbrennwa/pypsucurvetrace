@@ -452,10 +452,10 @@ try:
 
 			# init measurement values		
 			V1MEAS = []
-			I1MEAS = 0.0
+			I1MEAS = []
 			LIMIT1 = 0
-			V2MEAS = 0.0
-			I2MEAS = 0.0
+			V2MEAS = []
+			I2MEAS = []
 			LIMIT2 = 0
 
 			# measurement loop:
@@ -507,23 +507,6 @@ try:
 					### time.sleep(PSU1.settletime()) # wait for stable conditions at PSU and DUT
 
 				# read PSU output voltages and currents:
-
-
-
-
-
-
-
-				print ('EXTRA WAIT BEOFRE READING THE DATA...')
-				time.sleep(1)
-
-
-
-
-
-
-
-
 				r = []
 				for p in [PSU1, PSU2]:
 					if p.CONFIGURED:
@@ -532,10 +515,9 @@ try:
 						r.append([0.0,0.0,'NONE'])
 				
 				V1MEAS.append(r[0][0])
-				# V1MEAS = V1MEAS + r[0][0];
-				I1MEAS = I1MEAS + r[0][1];
-				V2MEAS = V2MEAS + r[1][0];
-				I2MEAS = I2MEAS + r[1][1];
+				I1MEAS.append(r[0][1])
+				V2MEAS.append(r[1][0])
+				I2MEAS.append(r[1][1])
 				if r[0][2] == 'CC':
 					LIMIT1 = LIMIT1 + 1
 				if r[1][2] == 'CC':
