@@ -507,6 +507,23 @@ try:
 					### time.sleep(PSU1.settletime()) # wait for stable conditions at PSU and DUT
 
 				# read PSU output voltages and currents:
+
+
+
+
+
+
+
+				print ('EXTRA WAIT BEOFRE READING THE DATA...')
+				time.sleep(1)
+
+
+
+
+
+
+
+
 				r = []
 				for p in [PSU1, PSU2]:
 					if p.CONFIGURED:
