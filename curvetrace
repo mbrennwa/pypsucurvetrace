@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
 
-# This file is part of curvetracePPSPy, a toolbox for curve tracing using programmable Voltcraft PPS power supplies.
+# This file is part of PyPSUcurvetrace, a toolbox for I/V curve tracing of electronic parts using programmable power supplies.
 #
-# curvetracePPSPy is free software: you can redistribute it and/or modify
+# PyPSUcurvetrace is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
 # 
-# curvetracePPSPy is distributed in the hope that it will be useful,
+# PyPSUcurvetrace is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
@@ -19,6 +19,7 @@
 # imports:
 import time
 import math
+import datetime
 import configparser
 import argparse
 import numpy as np
@@ -177,14 +178,14 @@ def configure_idle_PSU(PSU,configDUT):
 ################
 
 # parse input arguments (if any):
-parser = argparse.ArgumentParser(description='Use programmable Voltcraft PPS power supplies for I/V curve tracing of electronic devices.')
+parser = argparse.ArgumentParser(description='PyPSUcurvetrace is Python program for I-V curve tracing of electronic parts using programmable power supplies.')
 parser.add_argument('-c', help='configuration file with test parameters (name/path)')
 args = parser.parse_args()
 
 # Say Hello:
 print('\n')
-print('***** CurvetracePPS')
-print('***** Python program to use Voltcraft PPS power supplies for I-V curve tracing of electronic parts')
+print('***** PyPSUcurvetrace')
+print('***** Python program for I-V curve tracing of electronic parts using programmable power supplies')
 print('***** Disclaimer: NO WARRANTIES OF ANY KIND!!!')
 print('***** Disclaimer: Users are advised to study the code in order to understand how this program works.')
 print('\n')
@@ -330,6 +331,7 @@ for p in [PSU1,PSU2]:
 # Print summary of test setup:
 print('\nTest setup:')
 printit('* Sample: ' + samplename,logfile,'%')
+printit('* Date / time: ' + datetime.datetime.now(),logfile,'%')
 for p in [PSU1, PSU2]:
 	
 	if not p.CONNECTED:

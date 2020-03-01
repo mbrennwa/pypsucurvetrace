@@ -1,12 +1,12 @@
 # curvetracePy
-*curvetracePy* is a Python 3 program that makes use of programmable power supplies to determine I/V curve traces of electronic parts. In short, *curvetracePy* is a *curve tracer*.
+*PyPSUcurvetrace* is a Python 3 program that makes use of programmable power supplies to determine I/V curve traces of electronic parts. In short, *PyPSUcurvetrace* is a *curve tracer*.
 
 For two-terminal devices under test (DUTs) like resistors or diodes you need only one power supply unit (PSU). For three-terminal DUTs like transistors you need two PSUs.
 
-*curvetracePy* is developed using Python 3 on Linux. Other software environments may (should) work, too, but have not been tested so far.
+*PyPSUcurvetrace* is developed using Python 3 on Linux. Other software environments may (should) work, too, but have not been tested so far.
 
 Currently supported power supply types:
-* Voltcraft PPS [currently broken due to transition to abstract power supply wrapper]
+* Voltcraft PPS
 * Korad / RND (confirmed: model KWR103, other models not tested)
 
 Devices on the radar for future support:
@@ -16,7 +16,7 @@ Devices on the radar for future support:
 * Download the code from the GitHub repository, either using GIT, SVN or as a ZIP archive.
 I like SVN (subversion):
 ```
-svn co https://github.com/mbrennwa/curvetracePy.git/trunk path/on/your/computer/to/curvetracePy
+svn co https://github.com/mbrennwa/PyPSUcurvetrace.git/trunk path/on/your/computer/to/PyPSUcurvetrace
 ```
 * Install the Python-3 Serial package.
 On Debian / Ubuntu or similar Linux systems:
@@ -34,7 +34,7 @@ ls /dev/serial/by-id
 
 ## Usage
 The following figure shows the basic test setup for a three-terminal DUT with two PSUs:
-![alt text](https://github.com/mbrennwa/curvetracePy/blob/master/figures/test_setup.png "Basic test setup")
+![alt text](https://github.com/mbrennwa/PyPSUcurvetrace/blob/master/figures/test_setup.png "Basic test setup")
 For two-terminal DUTs, only PSU1 is needed and PSU2 can be ignored. If negative voltages are required to test the DUT terminals, the respective PSU terminals need to be connected with inverted polarity.
 
 To run the software, execute the `curvetrace` program from a console terminal.
@@ -55,7 +55,7 @@ This example shows curve traces obtained from an IRFP150 power mosfet (drain cur
 * DUT source pin to GND
 * DUT drain pin to the positive terminal of PSU1
 * DUT gate pin to the positive termianl of PSU2. A 100 Ohm gate stopper resistor was used to avoid oscillation.
-![alt text](https://github.com/mbrennwa/curvetracePy/blob/master/figures/IRFP150_curves.png "IRFP150 curves")
+![alt text](https://github.com/mbrennwa/PyPSUcurvetrace/blob/master/figures/IRFP150_curves.png "IRFP150 curves")
 
 ## Notes
 
