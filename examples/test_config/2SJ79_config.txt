@@ -19,6 +19,6 @@ IIDLE  = 1
 POLARITY = -1
 
 [EXTRA]
-IDLESECS    = 5
-PREHEATSECS = 60
-NREP        = 3
+IDLESECS    = 0
+PREHEATSECS = 6
+NREP        = 1
