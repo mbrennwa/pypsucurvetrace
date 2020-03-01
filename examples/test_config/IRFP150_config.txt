@@ -6,6 +6,7 @@ IMAX   = 29
 PMAX   = 500
 VIDLE  = 24
 IIDLE  = 2
+POLARITY = 1
 
 [PSU2]
 VSTART = 2.0
@@ -15,6 +16,7 @@ IMAX   = 1
 PMAX   = 1
 VIDLE  = 3.9
 IIDLE  = 1
+POLARITY = 1
 
 [EXTRA]
 IDLESECS    = 3

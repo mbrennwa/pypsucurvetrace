@@ -14,7 +14,7 @@ VEND   = 4
 N      = 7
 IMAX   = 1
 PMAX   = 1
-VIDLE  = 2.7
+VIDLE  = 3.0
 IIDLE  = 1
 POLARITY = -1
 
