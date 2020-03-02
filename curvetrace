@@ -82,9 +82,15 @@ def connect_PSU(configPSU,label):
 	else:
 		if 'COMPORT' in configPSU[label]:
 			port=configPSU[label]['COMPORT']
+		else:
+			print ('No COMPORT field in the PSU configuration file! Cannot continue.')
+			exit()
 
 		if 'TYPE' in configPSU[label]:
 			commandset = configPSU[label]['TYPE']
+		else:
+			print ('No TYPE field in the PSU configuration file! Cannot continue.')
+			exit()
 
 		# connect to PSU:
 		print ('Connecting to power supply ' + label + '...')
@@ -331,7 +337,7 @@ for p in [PSU1,PSU2]:
 # Print summary of test setup:
 print('\nTest setup:')
 printit('* Sample: ' + samplename,logfile,'%')
-printit('* Date / time: ' + datetime.datetime.now(),logfile,'%')
+printit('* Date / time: ' + str(datetime.datetime.now()),logfile,'%')
 for p in [PSU1, PSU2]:
 	
 	if not p.CONNECTED:
