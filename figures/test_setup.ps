@@ -1,9 +1,9 @@
 %!PS-Adobe-3.0 EPSF-3.0
 %%Title: test_setup.ps
 %%Creator: XCircuit v3.9 rev73
-%%CreationDate: Mon Feb 24 17:33:47 2020
+%%CreationDate: Mon Mar  2 08:26:11 2020
 %%Pages: 1
-%%BoundingBox: 68 68 355 247
+%%BoundingBox: 68 68 355 210
 %%DocumentNeededResources: font Helvetica Times-Roman Symbol 
 %%EndComments
 %%BeginProlog
@@ -213,18 +213,6 @@ begingate
 endgate
 } def
 
-/analog::gnd {
-% trivial
-begingate
-1 1.000 0 0 0 -32 2 polygon
-1 1.000 -32 -32 32 -32 2 polygon
-1 1.000 -18 -46 18 -46 2 polygon
-1 1.000 -4 -60 4 -60 2 polygon
-0.933 0.604 0.000 scb
-(GND) {/Times-Roman cf} 2 1 0.000 1.000 0 0 pinglobal
-endgate
-} def
-
 /generic::arrowhead {
 % nonetwork
 begingate
@@ -252,28 +240,31 @@ endgate
 %%PageOrientation: Portrait
 /pgsave save def bop
 1.0000 inchscale
-2.6000 setlinewidth 880 380 translate
+2.6000 setlinewidth 880 326 translate
 
 1.000 0.000 -544 0 analog::vsource
 1.000 0.000 -96 0 analog::vsource
-1 1.000 -256 128 -96 128 -96 64 3 polygon
-1 1.000 -320 96 -320 -128 2 polygon
+1 1.000 -256 144 -96 144 -96 64 3 polygon
+1 1.000 -320 112 -320 -128 2 polygon
 1 1.000 -96 -64 -96 -128 -544 -128 -544 -64 4 polygon
 (PSU1) {/Helvetica cf} 2 16 0.000 1.000 -688 -16 label
 (PSU2) {/Helvetica cf} 2 16 0.000 1.000 -48 -16 label
-(DUT) {/Helvetica cf} 2 17 0.000 1.000 -320 112 label
+(DUT) {/Helvetica cf} 2 17 0.000 1.000 -320 128 label
 1.000 0.000 -320 -128 generic::dot
-1.000 0.000 -320 -128 analog::gnd
 1.000 360.000 -576 112 generic::arrow
 (I1) {/Helvetica cf} 2 16 0.000 1.000 -624 96 label
-(U1) {/Helvetica cf} 2 16 0.000 1.000 -512 240 label
+(U1) {/Helvetica cf} 2 16 0.000 1.000 -432 -16 label
 1 1.000 -320 224 -544 224 -544 224 3 polygon
-(U2) {/Helvetica cf} 2 16 0.000 1.000 -176 144 label
-(I2) {/Helvetica cf} 2 16 0.000 1.000 -48 64 label
-1.000 360.000 -64 80 generic::arrow
-1 1.000 -384 160 -256 160 -256 96 -384 96 -384 160 5 polygon
-1 1.000 -320 224 -320 160 2 polygon
+(U2) {/Helvetica cf} 2 16 0.000 1.000 -256 -16 label
+(I2) {/Helvetica cf} 2 16 0.000 1.000 -48 80 label
+1.000 360.000 -64 96 generic::arrow
+1 1.000 -384 176 -256 176 -256 112 -384 112 -384 176 5 polygon
+1 1.000 -320 224 -320 176 2 polygon
 1 1.000 -544 224 -544 64 2 polygon
+1.000 0.000 -448 208 generic::arrowhead
+1.000 0.000 -192 128 generic::arrowhead
+1 1.000 -448 192 -448 -112 2 polygon
+1 1.000 -192 -112 -192 112 2 polygon
 pgsave restore showpage
 
 %%Trailer
