@@ -30,7 +30,7 @@ The procedure implemented in the `curvetrace` program is as follows:
 * Polarity of how the PSU terminals are connected to the DUT terminals
 * Optional: number of readings at each voltage step (results will be averaged)
 * Optional: idle time and pre-heat time
-* If idle or pre-heat times are not zero: idle volage / current conditions for the PSUs
+* If idle or pre-heat times are not zero: idle voltage a current conditions for the PSUs
 4. Check the test configuration versus the limits of the PSUs, and adjust the configuration where needed.
 5. Show a summary of the test configuration and ask the user if it's okay to start the test.
 6. Run the test. The voltages are stepped in two nested loops. Voltage V1 is varied in the inner loop, V2 is varied in the outer loop. The measured data are shown on the screen and saved to the data file.
@@ -79,6 +79,23 @@ This example shows curve traces obtained from an IRFP150 power mosfet (drain cur
 
 ## Notes
 
+### PSU configuration file
+The configuration file `config_PSU.txt` contains the configuration details of your power supplies (PSUs). Take a look at the `config_PSU.txt` for details of the file format. There are separate sections for PSU1 and PSU2. Each section contains the following fields:
+* `COMPORT`: virtual file corresponding to the serial port of the PSU
+* `COMMANDSET`: the "language" for communication with the PSU. Currently supported COMMANDSETs are "VOLTCRAFT" (for Voltcraft, Manson, etc.) and "KORAD" (for Korad, RND, etc.)
+If only one PSU is used (PSU1), the PSU2 section can be deleted.
+
+
+### Test configuration file
+...(under constrution -- take a look at the example files in the `examples` directory.)...
+
+### Set user permissions to access serial ports (Linux)
+To allow accessing the serial ports, add your username to the `dialout` group. For example, if your user account is `johndoe`, execute the following command:
+```
+sudo adduser johndoe dialout
+```
+Then log out and log in again to the user account `johndoe` for this to take effect.
+
 ### Modify serial device IDs of the Voltcraft PPS power supplies
 In their stock condition, the Silabs CP2102 USB/serial interfaces of the Voltcraft PPF power supplies all use the same ID. The serial interfaces of multiple PPS units connected to the same computer therefore show up at the same file node under /dev/serial/by-id/ (usb-Silicon_Labs_CP2102_USB_to_UART_Bridge_Controller_0001-if00-port0 or similar). In order to simultaneously use more than one PPS unit, the serial interface IDs therefore need to be reconfigured to use unique IDs. This is achieved using the `cp210x-cfg` program:
 
@@ -119,22 +136,3 @@ ls /dev/serial/by-id/
 usb-Silicon_Labs_CP2102_USB_to_UART_Bridge_Controller_0001-if00-port0
 usb-Silicon_Labs_CP2102_USB_to_UART_Bridge_Controller_0002-if00-port0
 ```
-
-### Set user permissions to access serial ports
-To allow accessing the serial ports, add your username to the `dialout` group. For example, if your user account is `johndoe`, execute the following command:
-```
-sudo adduser johndoe dialout
-```
-Then log out and log in again to the user account `johndoe` for this to take effect.
-
-### PSU configuration file
-The configuration file `config_PSU.txt` contains the configuration details of your power supplies (PSUs). There are separate sections for PSU1 and PSU2. Each section contains the following fields
-* `COMPORT`: virtual file corresponding to the serial port of the PSU
-* `SETTLE_SECONDS`: time required to attain stable output after setting a new voltage or current value at the PSU (seconds)
-* `VOLTAGE_MIN`: minium voltage value supported by the PSU (most Voltcraft PPS units have trouble to reliably set voltages lower than 0.85 V)
-
-### PSU configuration file
-...(under constrution)...
-
-### Test configuration file
-...(under constrution)...
