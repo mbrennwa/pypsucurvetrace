@@ -13,7 +13,7 @@
 # GNU General Public License for more details.
 # 
 # You should have received a copy of the GNU General Public License
-# along with ruediPy.  If not, see <http://www.gnu.org/licenses/>.
+# along with PyPSUcurvetrace.  If not, see <http://www.gnu.org/licenses/>.
 
 
 # imports:
@@ -178,7 +178,7 @@ def configure_idle_PSU(PSU,configDUT):
 ################
 
 # parse input arguments (if any):
-parser = argparse.ArgumentParser(description='PyPSUcurvetrace is Python program for I-V curve tracing of electronic parts using programmable power supplies.')
+parser = argparse.ArgumentParser(description='PyPSUcurvetrace is a Python program for I-V curve tracing of electronic parts using programmable power supplies.')
 parser.add_argument('-c', help='configuration file with test parameters (name/path)')
 args = parser.parse_args()
 

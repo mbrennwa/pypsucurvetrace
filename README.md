@@ -1,5 +1,5 @@
 # PyPSUcurvetrace
-*PyPSUcurvetrace* is a Python 3 program that makes use of programmable power supplies to determine I/V curve traces of electronic parts. In short, *PyPSUcurvetrace* is a *curve tracer*.
+*PyPSUcurvetrace* is a software toolbox for I/V curve tracing of electronic parts using programmable power supplies. In short, *PyPSUcurvetrace* is a *curve tracer*.
 
 For two-terminal devices under test (DUTs) like resistors or diodes you need only one power supply unit (PSU). For three-terminal DUTs like transistors you need two PSUs.
 
@@ -10,7 +10,31 @@ Currently supported power supply types:
 * Korad / RND (confirmed: model KWR103, other models not tested)
 
 Devices on the radar for future support:
-* Units with a SCPI interface 
+* Units with a SCPI interface
+
+*PyPSUcurvetrace* is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version. *PyPSUcurvetrace* is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details. You should have received a copy of the GNU General Public License along with *PyPSUcurvetrace*. If not, see [http://www.gnu.org/licenses/](http://www.gnu.org/licenses/).
+
+## How does it work?
+The following figure shows the basic test setup for a three-terminal DUT with two PSUs:
+![alt text](https://github.com/mbrennwa/PyPSUcurvetrace/blob/master/figures/test_setup.png "Basic test setup")
+For two-terminal DUTs, only PSU1 is needed and PSU2 can be ignored. If negative voltages are required at the DUT terminals, the respective PSU terminals are connected with inverted polarity.
+
+The `curvetrace` program tests the DUT by varying the voltages V1 and V2 at the DUT terminals, and by reading the corresponding currents I1 and I2. The results are shown on the screen and saved in an ASCII data file for further processing. The software optionally isnerts idle periods in between the individual readings and a "pre-heat" period before starting the test, where the voltages (V1, V2) and currents (I1, I2) applied to the DUT are set to predefined ``idle'' values (this can be useful to control the temperature of the DUT during the test).
+
+The procedure implemented in the `curvetrace` program is as follows:
+1. Read a configuration file with the types and serial ports of the programmable PSUs, and then establish the serial connection to the PSUs.
+2. Interactively ask the user for a name or label of the test data, and then open an ASCII data file with that name (an existing file with the same name gets overwritten!).
+3. Determine the test conditions, either by interactively asking for user input, or by reading a configuration file with the test parameters:
+* Start voltages, end voltages, and number of steps for each PSU
+* Max. allowed current and power applied from each PSU to the DUT
+* Polarity of how the PSU terminals are connected to the DUT terminals
+* Optional: number of readings at each voltage step (results will be averaged)
+* Optional: idle time and pre-heat time
+* If idle or pre-heat times are not zero: idle volage / current conditions for the PSUs
+4. Check the test configuration versus the limits of the PSUs, and adjust the configuration where needed.
+5. Show a summary of the test configuration and ask the user if it's okay to start the test.
+6. Run the test. The voltages are stepped in two nested loops. Voltage V1 is varied in the inner loop, V2 is varied in the outer loop. The measured data are shown on the screen and saved to the data file.
+7. Once the test is completed, turn off the PSUs.
 
 ## Software installation and configuration
 * Download the code from the GitHub repository, either using GIT, SVN or as a ZIP archive.
@@ -23,7 +47,7 @@ On Debian / Ubuntu or similar Linux systems:
 ```
 sudo apt install python3-serial
 ```
-* Connect your PSUs to the USB ports of your computer and determine their serial port interfaces on your system.
+* Connect your PSUs to the USB or serial ports of your computer and determine their serial port interfaces on your system.
 On Linux:
 ```
 ls /dev/serial/by-id
@@ -33,10 +57,6 @@ ls /dev/serial/by-id
 * Make sure your user account has permissions to access the serial ports of the PSU units. See "Notes" section below.
 
 ## Usage
-The following figure shows the basic test setup for a three-terminal DUT with two PSUs:
-![alt text](https://github.com/mbrennwa/PyPSUcurvetrace/blob/master/figures/test_setup.png "Basic test setup")
-For two-terminal DUTs, only PSU1 is needed and PSU2 can be ignored. If negative voltages are required to test the DUT terminals, the respective PSU terminals need to be connected with inverted polarity.
-
 To run the software, execute the `curvetrace` program from a console terminal.
   * The easiest method is to run the program without any arguments and just follow thew the on-screen instructions for fully interactive user input:
   ```
@@ -44,7 +64,7 @@ To run the software, execute the `curvetrace` program from a console terminal.
   ```
   * You can also use provide a configuration file containing the test parameters (see example files provided). For example:
   ```
-  curvetrace -c examples/test_config/2SK214_config.txt
+  curvetrace -c examples/test_config/2SK216_config.txt
   ```
   See "Notes" section for further information on test configuration files.
 
@@ -113,5 +133,8 @@ The configuration file `config_PSU.txt` contains the configuration details of yo
 * `SETTLE_SECONDS`: time required to attain stable output after setting a new voltage or current value at the PSU (seconds)
 * `VOLTAGE_MIN`: minium voltage value supported by the PSU (most Voltcraft PPS units have trouble to reliably set voltages lower than 0.85 V)
 
-### Test configuration files
+### PSU configuration file
+...(under constrution)...
+
+### Test configuration file
 ...(under constrution)...
