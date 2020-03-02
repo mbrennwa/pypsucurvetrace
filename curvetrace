@@ -95,6 +95,13 @@ def connect_PSU(configPSU,label):
 		# connect to PSU:
 		print ('Connecting to power supply ' + label + '...')
 		P = powersupply.PSU(port,commandset,label)
+
+		# set number of consistent readings for measurements:
+		if 'NUMMEAS' in configPSU[label]:
+			P.NSTABLEREADINGS = int(configPSU[label]['NUMMEAS'])
+		else:
+			print ('Number of consistent measurement readings not configured! Using N = 1...')
+			P.NSTABLEREADINGS = 1
 			
 		if P.CONNECTED:
 
@@ -108,6 +115,7 @@ def connect_PSU(configPSU,label):
 			print ('* Max. voltage: ' + str(P.VMAX) + ' V')
 			print ('* Max. current: ' + str(P.IMAX) + ' A')
 			print ('* Max. power: ' + str(P.PMAX) + ' W')
+			print ('* Number of consistent readings for measurements: ' + str(P.NSTABLEREADINGS))
 			### print ('* Settle time: ' + str(PSU.settletime()) + ' s')
 
 	return P
@@ -521,7 +529,7 @@ try:
 				r = []
 				for p in [PSU1, PSU2]:
 					if p.CONFIGURED:
-						r.append(p.read())
+						r.append(p.read(p.NSTABLEREADINGS))
 					else:
 						r.append([0.0,0.0,'NONE'])
 				

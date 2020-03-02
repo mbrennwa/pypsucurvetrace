@@ -21,4 +21,4 @@ POLARITY = -1
 [EXTRA]
 IDLESECS    = 0
 PREHEATSECS = 0
-NREP        = 1
+NREP        = 3

@@ -4,6 +4,7 @@ Classes of specific real-world power supplies will derive from this class.
 """
 
 import time
+import numpy as np
 import lib.powersupply_VOLTCRAFT as powersupply_VOLTCRAFT
 import lib.powersupply_KORAD as powersupply_KORAD
 
@@ -274,6 +275,9 @@ class PSU:
 		V = []
 		I = []
 		L = []
+
+		if N < 1:
+			raise RuntimeError ('Number of consistent readings in a row must be larger than 1!')
 		
 		t0 = time.time()
 		while True:
@@ -300,7 +304,7 @@ class PSU:
 			else:
 				V.append(v)
 				I.append(i)
-				if l = "CC":
+				if l == "CC":
 					L.append(1.0)
 				else:
 					L.append(0.0)
@@ -316,14 +320,14 @@ class PSU:
                                         I = I[-(N-1):]
                                         L = L[-(N-1):]
 
-                                if time.time() - t0 > self.MAXSETTLETIME:
+				if time.time() - t0 > self.MAXSETTLETIME:
 					# getting consistent readings is taking too long; give up
-                                        print(self.LABEL + ': Could not get ' + str(N) + ' consistent readings in a row after ' + str(self.MAXSETTLETIME) + ' s!')
-						break
-
-                V = np.mean(V)
-                I = np.mean(I)
+					print(self.LABEL + ': Could not get ' + str(N) + ' consistent readings in a row after ' + str(self.MAXSETTLETIME) + ' s!')
+					break
+		
 		if N > 1:
+			V = np.mean(V)
+			I = np.mean(I)
 			if np.mean(L) > 0.5:
 				L = "CC"
 			else:
