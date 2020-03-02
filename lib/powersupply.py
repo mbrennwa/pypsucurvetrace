@@ -4,6 +4,7 @@ Classes of specific real-world power supplies will derive from this class.
 """
 
 import time
+import numpy as np
 import lib.powersupply_VOLTCRAFT as powersupply_VOLTCRAFT
 import lib.powersupply_KORAD as powersupply_KORAD
 
@@ -270,10 +271,35 @@ class PSU:
 		L: limiter mode, 'CV' = voltage limit, 'CC' = current limit (string)
 		"""
 
+		V = []
+		I = []
+		L = []
 		if self.COMMANDSET == 'KORAD':
 			V,I,L = self._PSU.reading()
 		elif self.COMMANDSET == 'VOLTCRAFT':
-			V,I,L = self._PSU.reading()
+			t0 = time.time()
+			while True:
+				v,i,l = self._PSU.reading()
+				V.append(v)
+				I.append(i)
+				L.append(l)
+				# print(V)
+				# print(I)
+				if len(V) >= 5:
+					if max(V)-min(V) <= self.VRES:
+						if max(I)-min(I) <= self.IRES:
+							break
+					V = V[-5:]
+					I = I[-5:]
+					L = L[-5:]
+				if time.time() - t0 > 5.0:
+					print('Could not get stable readings after 5 seconds!')
+			V = np.mean(V)
+			I = np.mean(I)
+			if "CC" in L:
+				L = "CC"
+			else:
+				L = "CV"
 		else:
 			raise RuntimeError('Cannot read values from power supply with ' + self.COMMANDSET + ' command set.')
 

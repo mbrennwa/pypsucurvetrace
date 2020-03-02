@@ -28,6 +28,7 @@ if(median(x(:,4) < 0 ))
 	set (gca,'ydir','reverse')
 end
 
+title (f)
 xlabel ('V_1 (V)')
-ylabel ('I_2 (A)')
+ylabel ('I_1 (A)')
 legend('location','northeastoutside');
