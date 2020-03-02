@@ -4,7 +4,6 @@ Classes of specific real-world power supplies will derive from this class.
 """
 
 import time
-import numpy as np
 import lib.powersupply_VOLTCRAFT as powersupply_VOLTCRAFT
 import lib.powersupply_KORAD as powersupply_KORAD
 
@@ -256,14 +255,15 @@ class PSU:
 	########################################################################################################
 	
 
-	def read(self):
+	def read(self,N=1):
 		"""
-		PSU.read()
+		PSU.read(N=1)
 		
 		Read current output: voltage, current, limiting mode (CV or CC) 
-		
+		Optional (if N > 1): keep on reading voltage and current until N consecutive readings are stable to within the voltage and current resolution of the PSU, and return the mean of thos N last readings.
+
 		INPUT:
-		(none)
+		N (optional): number of consecutive readings that are stable to within the voltage and current resolution of the PSU (default: N = 1)
 
 		OUTPUT:
 		V: voltage in Volts (float)
@@ -274,33 +274,59 @@ class PSU:
 		V = []
 		I = []
 		L = []
-		if self.COMMANDSET == 'KORAD':
-			V,I,L = self._PSU.reading()
-		elif self.COMMANDSET == 'VOLTCRAFT':
-			t0 = time.time()
-			while True:
+		
+		t0 = time.time()
+		while True:
+
+			if self.COMMANDSET == 'KORAD':
+				# KORAD PSU:
 				v,i,l = self._PSU.reading()
+
+			elif self.COMMANDSET == 'VOLTCRAFT':
+				# VOLTCRAFT PSU:
+				v,i,l = self._PSU.reading()
+
+			else:
+				raise RuntimeError('Cannot read values from power supply with ' + self.COMMANDSET + ' command set.')
+				break
+
+			if N == 1:
+				# just single readings, no need to match repeated readings to within the resolution of the PSU
+				V = v;
+				I = i;
+				L = l;
+				break
+
+			else:
 				V.append(v)
 				I.append(i)
-				L.append(l)
-				# print(V)
-				# print(I)
-				if len(V) >= 5:
-					if max(V)-min(V) <= self.VRES:
-						if max(I)-min(I) <= self.IRES:
-							break
-					V = V[-5:]
-					I = I[-5:]
-					L = L[-5:]
-				if time.time() - t0 > 5.0:
-					print('Could not get stable readings after 5 seconds!')
-			V = np.mean(V)
-			I = np.mean(I)
-			if "CC" in L:
+				if l = "CC":
+					L.append(1.0)
+				else:
+					L.append(0.0)
+				if len(V) >= N:
+
+					# we have enough readings, so let's check if they are consistent:
+                                        if max(V)-min(V) <= self.VRES:
+                                                if max(I)-min(I) <= self.IRES:
+                                                        break
+
+					# the readings are not yet consistent, so let's only keep the last N-1 readings and try again:
+                                        V = V[-(N-1):]
+                                        I = I[-(N-1):]
+                                        L = L[-(N-1):]
+
+                                if time.time() - t0 > self.MAXSETTLETIME:
+					# getting consistent readings is taking too long; give up
+                                        print(self.LABEL + ': Could not get ' + str(N) + ' consistent readings in a row after ' + str(self.MAXSETTLETIME) + ' s!')
+						break
+
+                V = np.mean(V)
+                I = np.mean(I)
+		if N > 1:
+			if np.mean(L) > 0.5:
 				L = "CC"
 			else:
 				L = "CV"
-		else:
-			raise RuntimeError('Cannot read values from power supply with ' + self.COMMANDSET + ' command set.')
 
 		return (V,I,L)
