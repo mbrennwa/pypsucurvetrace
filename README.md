@@ -17,6 +17,7 @@ Devices on the radar for future support:
 ## How does it work?
 The following figure shows the basic test setup for a three-terminal DUT with two PSUs:
 ![alt text](https://github.com/mbrennwa/PyPSUcurvetrace/blob/master/figures/test_setup.png "Basic test setup")
+
 For two-terminal DUTs, only PSU1 is needed and PSU2 can be ignored. If negative voltages are required at the DUT terminals, the respective PSU terminals are connected with inverted polarity.
 
 The `curvetrace` program tests the DUT by varying the voltages V1 and V2 at the DUT terminals, and by reading the corresponding currents I1 and I2. The results are shown on the screen and saved in an ASCII data file for further processing. The software optionally isnerts idle periods in between the individual readings and a "pre-heat" period before starting the test, where the voltages (V1, V2) and currents (I1, I2) applied to the DUT are set to predefined ``idle'' values (this can be useful to control the temperature of the DUT during the test).
