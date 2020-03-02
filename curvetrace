@@ -514,6 +514,9 @@ try:
 					PSU1.setVoltage(V1,True) # set voltage at PSU1
 					### time.sleep(PSU1.settletime()) # wait for stable conditions at PSU and DUT
 
+				# wait a short moment to get everything stable:
+				time.sleep(0.1)
+
 				# read PSU output voltages and currents:
 				r = []
 				for p in [PSU1, PSU2]:
