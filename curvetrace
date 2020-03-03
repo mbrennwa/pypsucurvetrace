@@ -115,6 +115,11 @@ def connect_PSU(configPSU,label):
 			print ('* Max. voltage: ' + str(P.VMAX) + ' V')
 			print ('* Max. current: ' + str(P.IMAX) + ' A')
 			print ('* Max. power: ' + str(P.PMAX) + ' W')
+			print ('* Resolution of voltage readings: ' + str(P.VRESREAD) + ' V')
+			print ('* Resolution of current readings: ' + str(P.IRESREAD) + ' A')
+			print ('* Resolution of voltage setting: ' + str(P.VRESSET) + ' V')
+			print ('* Resolution of current setting: ' + str(P.IRESSET) + ' A')
+			print ('* Max. power: ' + str(P.PMAX) + ' W')
 			print ('* Number of consistent readings for measurements: ' + str(P.NSTABLEREADINGS))
 			### print ('* Settle time: ' + str(PSU.settletime()) + ' s')
 
@@ -232,8 +237,8 @@ if args.c:
 	configDUT.read(args.c)
 
 # connect to PSUs:
-PSU1 = connect_PSU(configPSU,'PSU1');
-PSU2 = connect_PSU(configPSU,'PSU2');
+PSU1 = connect_PSU(configPSU,'PSU1'); print( )
+PSU2 = connect_PSU(configPSU,'PSU2'); print( )
 
 # ask for sample name:
 samplename = ''
@@ -335,6 +340,9 @@ for p in [PSU1,PSU2]:
 		if p.TEST_VEND == p.TEST_VSTART:
 			print ('  ' + p.LABEL + ': Same start and end voltage! Using single step (N = 1).')
 			p.TEST_N = 1
+		if abs(p.TEST_VEND-p.TEST_VSTART)/p.TEST_N < p.VRESSET:
+			p.TEST_N = max( 1, round(abs(p.TEST_VEND-p.TEST_VSTART)/p.VRESSET) )
+			print ('  ' + p.LABEL + ': Voltage steps are smaller than PSU resolution of voltage setting. Adjust number of steps to N = ' + str(p.TEST_N) + '.')
 		if p.TEST_ILIMIT > p.IMAX:
 			print ('  ' + p.LABEL + ': Adjusting current limit to max. value possible with the power supply (' + str(p.IMAX) + ' A).')
 			p.TEST_ILIMIT = p.IMAX
@@ -356,6 +364,7 @@ for p in [PSU1,PSU2]:
 		if p.TEST_VIDLE * p.TEST_IIDLE > p.PMAX:
 			p.TEST_IIDLE = p.PMAX / p.TEST_VIDLE
 			print ('  ' + p.LABEL + ': Idle current limit is higher than PSU power limit (' + str(p.PMAX) + ' W). Adjusting idle current limit to ' + str(p.TEST_IIDLE) + ' A.' )
+		
 
 
 # Print summary of test setup:

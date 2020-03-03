@@ -10,8 +10,8 @@ Python class to control KORAD (RND) power supplies
 import serial
 import sys
 
-# Python dictionary of known KORAD (RND) power supply models (Vmin,Vmax,Imax,Pmax,Vresolution,Iresolution,MaxSettleTime)
-KORAD_MODELS = { "KWR103": (0.0,60.5,15.0,300,0.001,0.001,3.0) 
+# Python dictionary of known KORAD (RND) power supply models (Vmin,Vmax,Imax,Pmax,VresolutionSet,IresolutionSet,VresolutionRead,IresolutionRead,MaxSettleTime)
+KORAD_MODELS = { "KWR103": (0.0,60.5,15.0,300,0.001,0.001,0.001,0.001,3.0) 
 		}
 
 KORAD_TIMEOUT = 10.0
@@ -28,8 +28,10 @@ def _KORAD_debug(s):
 #    .VMIN
 #    .VMAX
 #    .IMAX
-#    .VRES
-#    .IRES
+#    .VRESSET
+#    .IRESSET
+#    .VRESREAD
+#    .IRESREAD
 #    .MAXSETTLETIME
 #    .SETTLEPOLLTIME
 #    .MODEL
@@ -71,9 +73,11 @@ class KORAD(object):
 			self.VMAX = v[1]
 			self.IMAX = v[2]
 			self.PMAX = v[3]
-			self.VRES = v[4]
-			self.IRES = v[5]
-			self.MAXSETTLETIME = v[6]
+			self.VRESSET = v[4]
+			self.IRESSET = v[5]
+			self.VRESREAD = v[6]
+			self.IRESREAD = v[7]
+			self.MAXSETTLETIME = v[8]
 			self.SETTLEPOLLTIME = self.MAXSETTLETIME/50
 
 		except serial.SerialTimeoutException:

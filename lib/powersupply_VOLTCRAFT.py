@@ -36,8 +36,10 @@ def _pps_debug(s):
 #    .VMIN
 #    .VMAX
 #    .IMAX
-#    .VRES
-#    .IRES
+#    .VRESSET
+#    .IRESSET
+#    .VRESREAD
+#    .IRESREAD
 #    .MAXSETTLETIME
 #    .SETTLEPOLLTIME
 #    .MODEL
@@ -89,8 +91,11 @@ class VOLTCRAFT(object):
 
 		# Determined experimentally with Voltcraft PPS-16005:
 		self.VMIN = 0.9
-		self.VRES = 0.12
-		self.IRES = 0.01
+		self.VRESSET = 0.1
+		self.IRESSET = 0.1
+		# self.VRESREAD = 0.12
+		self.VRESREAD = 0.1
+		self.IRESREAD = 0.01
 		self.MAXSETTLETIME = 5
 		self.SETTLEPOLLTIME = 0.2
 		self.PMAX = math.floor(self.VMAX * self.IMAX)
@@ -169,6 +174,7 @@ class VOLTCRAFT(object):
 		set voltage: silently saturates at VMIN and VMAX
 		"""
 		voltage = max(min(int(float(voltage) * 10), int(self.VMAX*10)), self.VMIN)
+		voltage = round(voltage/self.VRESSET) * self.VRESSET
 		self._query("VOLT%03d" % voltage)
 
 	def current(self, current):
@@ -176,6 +182,7 @@ class VOLTCRAFT(object):
 		set current: silently saturates at 0 and IMAX
 		"""
 		current = max(min(int(float(current) * self.IMULT), int(self.IMAX * self.IMULT)), 0)
+		current = round(current/self.IRESSET) * self.IRESSET
 		self._query("CURR%03d" % current)
 
 	def reading(self):

@@ -19,8 +19,10 @@ import lib.powersupply_KORAD as powersupply_KORAD
 #    .VMIN                  min. supported voltage (V)
 #    .IMAX                  max. supported current (V)
 #    .PMAX                  max. supported power (W)
-#    .VRES                  resolution of voltage readings (V)
-#    .IRES                  resolution of current readings (A)
+#    .VRESSET               resolution of voltage setting (V)
+#    .IRESSET               resolution of current setting (A)
+#    .VRESREAD              resolution of voltage readings (V)
+#    .IRESREAD              resolution of current readings (A)
 #    .MAXSETTLETIME         max. time allowed to attain stable output values (will complain if output not stable after this time) (s)
 #    .SETTLEPOLLTIME        time between readings for checking if output values of newly set voltage/current values are at set point (s)
 #    .TEST_VSTART           start value for test (V)
@@ -57,8 +59,8 @@ class PSU:
 		self.VMAX = 0.0
 		self.IMAX = 0.0
 		self.PMAX = 0.0
-		self.VRES = 0.0
-		self.IRES = 0.0
+		self.VRESREAD = 0.0
+		self.IRESREAD = 0.0
 		self.MAXSETTLETIME = 0.0
 		self.TEST_VSTART = 0.0
 		self.TEST_VEND = 0.0
@@ -93,8 +95,10 @@ class PSU:
 				self.VMAX = self._PSU.VMAX
 				self.IMAX = self._PSU.IMAX
 				self.PMAX = self._PSU.PMAX
-				self.VRES = self._PSU.VRES
-				self.IRES = self._PSU.IRES
+				self.VRESSET = self._PSU.VRESSET
+				self.IRESSET = self._PSU.IRESSET
+				self.VRESREAD = self._PSU.VRESREAD
+				self.IRESREAD = self._PSU.IRESREAD
 				self.MAXSETTLETIME = self._PSU.MAXSETTLETIME
 				self.SETTLEPOLLTIME = self._PSU.SETTLEPOLLTIME
 				self.MODEL = self._PSU.MODEL
@@ -106,8 +110,10 @@ class PSU:
 				self.VMAX = self._PSU.VMAX
 				self.IMAX = self._PSU.IMAX
 				self.PMAX = self._PSU.PMAX
-				self.VRES = self._PSU.VRES
-				self.IRES = self._PSU.IRES
+				self.VRESSET = self._PSU.VRESSET
+				self.IRESSET = self._PSU.IRESSET
+				self.VRESREAD = self._PSU.VRESREAD
+				self.IRESREAD = self._PSU.IRESREAD
 				self.MAXSETTLETIME = self._PSU.MAXSETTLETIME
 				self.SETTLEPOLLTIME = self._PSU.SETTLEPOLLTIME
 				self.MODEL = self._PSU.MODEL
@@ -135,6 +141,10 @@ class PSU:
 		OUTPUT:
 		(none)
 		"""
+
+		# make sure we're not trying to set a value that is not resolved by the setting resolution of the PSU,
+		# which will never give a stable output at the unresolved value		
+		value = round(value/self.VRESSET) * self.VRESSET
 		
 		if self.COMMANDSET == 'KORAD':
 			self._PSU.voltage(value)
@@ -149,7 +159,7 @@ class PSU:
 			t0 = time.time() # start time (now)
 			while not time.time() > t0+self.MAXSETTLETIME:
 				v = self.read()[0]
-				if abs( v - value) <= 1.3*self.VRES/2:
+				if abs( v - value) <= 1.3*self.VRESREAD/2:
 					stable = True
 					break
 				else:
@@ -175,6 +185,10 @@ class PSU:
 		(none)
 		"""
 		
+		# make sure we're not trying to set a value that is not resolved by the setting resolution of the PSU,
+		# which will never give a stable output at the unresolved value		
+		value = round(value/self.VRESSET) * self.VRESSET
+
 		if self.COMMANDSET == 'KORAD':
 			self._PSU.current(value)
 		elif self.COMMANDSET == 'VOLTCRAFT':
@@ -188,7 +202,7 @@ class PSU:
 			t0 = time.time() # start time (now)
 			while not time.time() - t0 > self.MAXSETTLETIME:
 				v = self.read()[1]
-				if abs( v - value) <= 1.3*self.IRES:
+				if abs( v - value) <= 1.3*self.IRESREAD:
 					stable = True
 					break
 				else:
@@ -311,8 +325,8 @@ class PSU:
 				if len(V) >= N:
 
 					# we have enough readings, so let's check if they are consistent:
-                                        if max(V)-min(V) <= self.VRES:
-                                                if max(I)-min(I) <= self.IRES:
+                                        if max(V)-min(V) <= self.VRESREAD:
+                                                if max(I)-min(I) <= self.IRESREAD:
                                                         break
 
 					# the readings are not yet consistent, so let's only keep the last N-1 readings and try again:
