@@ -20,7 +20,7 @@ The following figure shows the basic test setup for a three-terminal DUT with tw
 
 For two-terminal DUTs, only PSU1 is needed and PSU2 can be ignored. If negative voltages are required at the DUT terminals, the respective PSU terminals are connected with inverted polarity.
 
-The `curvetrace` program tests the DUT by varying the voltages V1 and V2 at the DUT terminals, and by reading the corresponding currents I1 and I2. The results are shown on the screen and saved in an ASCII data file for further processing. The software optionally isnerts idle periods in between the individual readings and a "pre-heat" period before starting the test, where the voltages (V1, V2) and currents (I1, I2) applied to the DUT are set to predefined ``idle'' values (this can be useful to control the temperature of the DUT during the test).
+The `curvetrace` program tests the DUT by varying the voltages V1 and V2 at the DUT terminals, and by reading the corresponding currents I1 and I2. The results are shown on the screen and saved in an ASCII data file for further processing. The software optionally inserts idle periods in between the individual readings, or a "pre-heat" period before starting the test, where the voltages (V1, V2) and currents (I1, I2) applied to the DUT are set to predefined ``idle'' values (this can be useful to control the temperature of the DUT during the test).
 
 The procedure implemented in the `curvetrace` program is as follows:
 1. Read a configuration file with the types and serial ports of the programmable PSUs, and then establish the serial connection to the PSUs.
@@ -31,7 +31,7 @@ The procedure implemented in the `curvetrace` program is as follows:
 * Polarity of how the PSU terminals are connected to the DUT terminals
 * Optional: number of readings at each voltage step (results will be averaged)
 * Optional: idle time and pre-heat time
-* If idle or pre-heat times are not zero: idle voltage a current conditions for the PSUs
+* If idle or pre-heat times are not zero: idle voltage and current conditions for the PSUs
 4. Check the test configuration versus the limits of the PSUs, and adjust the configuration where needed.
 5. Show a summary of the test configuration and ask the user if it's okay to start the test.
 6. Run the test. The voltages are stepped in two nested loops. Voltage V1 is varied in the inner loop, V2 is varied in the outer loop. The measured data are shown on the screen and saved to the data file.
@@ -39,10 +39,10 @@ The procedure implemented in the `curvetrace` program is as follows:
 
 ### Notes
 Some notes on how the `curvetrace` program sets and reads the voltage and current values at the PSUs:
-* For each step of the test procedure (measurement, idle, or pre-heat), `curvetrace` sets the voltages at the PSUs according to voltage values requested for this step. The current values of the PSUs are set to the minima of the current and power limits of the DUT and the PSUs at the given test voltages. If the currents established by the DUT are less than the current limits set at the PSUs, the PSUs will operate in "voltage limiting" mode, so that the voltage values set at the PSUs will be present at the DUT terminals. If the currents established by the DUT reach the current limits set at the PSUs, it is the task of the PSUs to avoid the currents from exceeding the limits by switching to "current limiting" mode, lowering the voltage values applied to the DUT. `curvetrace` reports the occurrence of "current limiting" mode in the data output using the "Current Limit" flags.
+* For each step of the test procedure (measurement, idle, or pre-heat), `curvetrace` sets the voltages at the PSUs according to voltage values requested for this step. The current values of the PSUs are set to the minima of the current and power limits of the DUT and the PSUs at the given test voltages. If the currents established by the DUT are less than the current limits set at the PSUs, the PSUs will operate in "voltage limiting" mode, so that the voltage values required for this test step will be present at the DUT terminals. If the currents established by the DUT reach the current limits set at the PSUs, it is the task of the PSUs to avoid the currents from exceeding the limits by switching to "current limiting" mode, lowering the voltage values applied to the DUT. `curvetrace` reports the occurrence of "current limiting" mode in the data output using "Current Limit" flags.
 * Once the inner loop (iteration of V1 steps) reaches a point where either I1 or I2 run into the current or power limits of the DUT or the PSUs, `curvetrace` stops the V1 iterations of the inner loop and returns to the next V2 iteration of the outer loop.
-* Once a test voltage has been programmed at a PSU for a DUT measurement, `curvetrace` reads the voltage at the PSU terminals and waits until the set voltage is reached before continuing. This makes sure that the program does not continue with a measurement before the correct test conditions have been attained.
-* Some PSU types provide unreliable readings of the voltage or current values if the readings are taken too early after programming a new set point. To obtain reliable data, `curvetrace` can be configured to take repeated readings with short idle periods in between. The readings are completed only after a specified number of consecutive readings agree to each other within the readback resolution of the PSU, and the mean of those readings is returned as the measurement result. This method helps to achieve stable, low-noise readings. For configuration of this feature, see the "PSU configuration file" section below.
+* Once a test voltage has been programmed at a PSU for a DUT measurement, `curvetrace` reads the voltage at the PSU terminals and waits for stabilisation of the read-back output voltage at the set point before continuing. This ensures that measurements are taken only after the voltages applied to the DUT have stabilised at the requested values.
+* Some PSU types provide unreliable readings of the voltage or current values if the readings are taken too early after programming a new set point. To improve the reliability of the data obtains from such PSUs, `curvetrace` can be configured to take repeated readings with short idle periods in between. Readings are taken continuously until a specified number of consecutive readings are consistent within the readback resolution of the PSU, and the mean of those readings is returned as the measurement result. This method helps to achieve stable, low-noise readings. For configuration of this feature, see the "PSU configuration file" section below.
 
 ## Software installation and configuration
 * Download the code from the GitHub repository, either using GIT, SVN or as a ZIP archive.
@@ -50,8 +50,7 @@ I like SVN (subversion):
 ```
 svn co https://github.com/mbrennwa/PyPSUcurvetrace.git/trunk path/on/your/computer/to/PyPSUcurvetrace
 ```
-* Install the Python-3 Serial package.
-On Debian / Ubuntu or similar Linux systems:
+* Install the Python-3 Serial package. On Debian, Ubuntu or similar APT-based Linux systems:
 ```
 sudo apt install python3-serial
 ```
