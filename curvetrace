@@ -255,11 +255,11 @@ else:
 if 'PSU1' in configDUT:
 	PSU1 = configure_test_PSU (PSU1,configDUT['PSU1'])
 else:
-	PSU1 = configure_test_PSU (PSU1,None)
+	PSU1 = configure_test_PSU (PSU1)
 if 'PSU2' in configDUT:
 	PSU2 = configure_test_PSU (PSU2,configDUT['PSU2'])
 else:
-	PSU2 = configure_test_PSU (PSU2,None)
+	PSU2 = configure_test_PSU (PSU2)
 
 # check if at least one of the power supplies is configured:	
 if not PSU1.CONFIGURED:
