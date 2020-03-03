@@ -37,6 +37,11 @@ The procedure implemented in the `curvetrace` program is as follows:
 6. Run the test. The voltages are stepped in two nested loops. Voltage V1 is varied in the inner loop, V2 is varied in the outer loop. The measured data are shown on the screen and saved to the data file.
 7. Once the test is completed, turn off the PSUs.
 
+Some notes on how the `curvetrace` program sets and reads the voltage and current values at the PSUs:
+* Current values (limits) are set as high as allowed by the current and power limits of the DUT and the PSU for a given test voltage.
+* Once a test voltage has been programmed at a PSU for a DUT measurement, `curvetrace` reads the voltage at the PSU terminals and waits until the set voltage is reached before continuing. This makes sure that the program does not continue with a measurement before the correct test conditions have been attained.
+* Some PSU types provide unreliable readings of the voltage or current values if the readings are taken too early or too quickly. To avoid this, `curvetrace` can be configured to take repeated measurement readings with short idle periods in between. The readings are completed only afteer a specified number of consecutive readings agree to each other to within the readback resolution of the PSU, and the mean of those readings is returned as the measurement result. This greatly helps to achieve stable, low-noise readings. For configuration of this feature, see the "PSU configuration file" section below.
+
 ## Software installation and configuration
 * Download the code from the GitHub repository, either using GIT, SVN or as a ZIP archive.
 I like SVN (subversion):
@@ -85,7 +90,7 @@ The configuration file `config_PSU.txt` contains the configuration details of yo
 * `COMPORT`: virtual file corresponding to the serial port of the PSU
 * `COMMANDSET`: the "language" for communication with the PSU. Currently supported COMMANDSETs are "VOLTCRAFT" (for Voltcraft, Manson, etc.) and "KORAD" (for Korad, RND, etc.)
 If only one PSU is used (PSU1), the PSU2 section can be deleted.
-
+* `NUMMEAS` (optional): number of consecutive measurement readings that must agree to within the measurement resolution in order to achieve stable and low-noise readings
 
 ### Test configuration file
 ...(under constrution -- take a look at the example files in the `examples` directory.)...
