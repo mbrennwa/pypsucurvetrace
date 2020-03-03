@@ -62,9 +62,9 @@ class KORAD(object):
 		try:
 			typestring = self._query('*IDN?').split(" ")
 			if len(typestring) < 2:
-				raise RuntimeError ('No KORAD/RND power supply connected to ' + port)
+				raise RuntimeError ('No KORAD power supply connected to ' + port)
 			if not ( typestring[0].upper() == 'KORAD' ):
-				raise RuntimeError ('No KORAD/RND power supply connected to ' + port)
+				raise RuntimeError ('No KORAD power supply connected to ' + port)
 			self.MODEL = typestring[1]
 			v = KORAD_MODELS[self.MODEL]
 			self.VMIN = v[0]
@@ -77,9 +77,9 @@ class KORAD(object):
 			self.SETTLEPOLLTIME = self.MAXSETTLETIME/50
 
 		except serial.SerialTimeoutException:
-		    raise RuntimeError('No KORAD/RND powersupply connected to ' + port)
+		    raise RuntimeError('No KORAD powersupply connected to ' + port)
 		except KeyError:
-		    raise RuntimeError('Unknown KORAD/RND model ' + self.MODEL)
+		    raise RuntimeError('Unknown KORAD model ' + self.MODEL)
 	
 	def _query(self, cmd, answer=True):
 		"""

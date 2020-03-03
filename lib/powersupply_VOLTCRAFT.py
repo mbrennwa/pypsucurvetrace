@@ -96,15 +96,16 @@ class VOLTCRAFT(object):
 		self.PMAX = math.floor(self.VMAX * self.IMAX)
 
 
-	def _query(self, cmd, attempt = 0):
+	def _query(self, cmd, attempt = 1):
 		"""
 		tx/rx to/from PS
 		"""
-		attempt = attempt + 1
-		if attempt > 1:
-			print ('*** Retrying (attempt ' + str(attempt) + ')...')
+
 		if attempt > 10:
-			raise RuntimeError('Voltcraft PSU does not respond to ' + cmd + '. Giving up...')
+			raise RuntimeError('Voltcraft PSU does not respond to ' + cmd + ' command after 10 attempts. Giving up...')
+		elif attempt > 1:
+			if self._debug:
+				_pps_debug('*** Retrying (attempt ' + str(attempt) + ')...')
 
 		if self._debug: _pps_debug("PPS <- %s<CR>\n" % cmd)
 		self._Serial.write((cmd + '\r').encode())
@@ -122,8 +123,8 @@ class VOLTCRAFT(object):
 
 			# if there was no answer:
 			if b[-1] == "":
-				### raise serial.SerialTimeoutException()
-				print('*** No response from Voltcraft PSU! Command: ' + cmd)
+				if self._debug:
+					_pps_debug('*** No response from Voltcraft PSU! Command: ' + cmd)
 				break
 
 			# if last three entries are OK\r, the answer is complete:
@@ -138,7 +139,7 @@ class VOLTCRAFT(object):
 			time.sleep(0.2)
 			self._Serial.flushInput()
 			time.sleep(0.2)			
-			b = self._query(cmd,attempt)
+			b = self._query(cmd,attempt+1)
 
 		else:
 			b = "".join(b[:-4])

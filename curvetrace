@@ -126,30 +126,46 @@ def connect_PSU(configPSU,label):
 # configure PSU test settings #
 ###############################
 
-def configure_test_PSU(PSU,configDUT):
+def configure_test_PSU(PSU,configDUT = []):
 	
 	if not PSU.CONNECTED:
 		print ('\n' + PSU.LABEL + ' is not connected (or connection is not configured).')
 		PSU.CONFIGURED = False
 	else:
-	
-		if configDUT:
-			# take configuration from DUT config file:
+
+		print ('\n' + 'Configuring ' + PSU.LABEL + ' test settings...')
+
+		# take parameters from DUT config file where available, otherwise ask user:
+
+		if 'VSTART' in configDUT:
 			PSU.TEST_VSTART = float(configDUT['VSTART'])
-			PSU.TEST_VEND   = float(configDUT['VEND'])
-			PSU.TEST_N      = int(configDUT['N'])
-			PSU.TEST_ILIMIT = float(configDUT['IMAX'])
-			PSU.TEST_PLIMIT = float(configDUT['PMAX'])
-			PSU.TEST_POLARITY = int(configDUT['POLARITY'])
-
 		else:
-
-			print ('\n' + 'configure ' + PSU.LABEL + ' test settings:')
 			PSU.TEST_VSTART = __get_number('* ' + PSU.LABEL + ' start voltage (V): ',allowZero=True,allowNegative=False,typ='float')
+
+		if 'VEND' in configDUT:
+			PSU.TEST_VEND   = float(configDUT['VEND'])
+		else:
 			PSU.TEST_VEND   = __get_number('* ' + PSU.LABEL + ' end voltage (V): ',allowZero=True,allowNegative=False,typ='float')
+
+		if 'N' in configDUT:
+			PSU.TEST_N      = int(configDUT['N'])
+		else:
 			PSU.TEST_N      = __get_number('* ' + PSU.LABEL + ' number of voltage steps: ',allowZero=False,allowNegative=False,typ='int')
+
+		if 'IMAX' in configDUT:
+			PSU.TEST_ILIMIT = float(configDUT['IMAX'])
+		else:
 			PSU.TEST_ILIMIT = __get_number('* ' + PSU.LABEL + ' maximum allowed current (A): ',allowZero=False,allowNegative=False,typ='float')
+
+		if 'PMAX' in configDUT:
+			PSU.TEST_PLIMIT = float(configDUT['PMAX'])
+		else:
 			PSU.TEST_PLIMIT = __get_number('* ' + PSU.LABEL + ' maximum allowed power (W): ',allowZero=False,allowNegative=False,typ='float')
+
+			
+		if 'POLARITY' in configDUT:
+			PSU.TEST_POLARITY = int(configDUT['POLARITY'])
+		else:
 			try:
 				pol = (input('* OPTIONAL: ' + PSU.LABEL + ' polarity of outputs -- N: normal / I: inverted [default=N]: '))
 			except ValueError:
@@ -159,7 +175,7 @@ def configure_test_PSU(PSU,configDUT):
 				PSU.TEST_POLARITY = -1
 			else:
 				PSU.TEST_POLARITY = 1;
-
+			
 		PSU.CONFIGURED = True
 
 	return PSU
@@ -421,31 +437,19 @@ try:
 		
 		print ('Pre-heating...\n')
 
-		# set outputs to zero (to avoid overshoot)
-		# for p in [PSU1, PSU2]:
-		# 	if p.CONFIGURED:
-		# 		p.turnOff()
-
 		# set idle conditions:
-		### Tsettle = 0.0
 		for p in [PSU1, PSU2]:
 			if p.CONFIGURED:
 				p.setCurrent(p.TEST_IIDLE,False)
 				p.setVoltage(p.TEST_VIDLE,True)
-				### Tsettle = max(p.settletime(),Tsettle)
-		### time.sleep(Tsettle) # wait for stable conditions
 
 		# wait pre-heat time:	
 		time.sleep(T_preheat)
 
-		# set outputs to zero (to avoid overshoot when starting next measurement)
-		# for p in [PSU1, PSU2]:
-		# 	if p.CONFIGURED:
-		# 		p.turnOff()
-
 	print ('Test started...\n')
 
 	for V2 in V2_steps:
+	# outer loop (V2)
 
 		if PSU2.CONFIGURED:
 
@@ -462,9 +466,9 @@ try:
 			# set PSU2 voltage + current:
 			PSU2.setCurrent(I2LIM,False)
 			PSU2.setVoltage(V2,True)
-			### time.sleep(PSU2.settletime()) # wait for stable conditions
 
 		for V1 in V1_steps:
+		# inner loop (V1)
 
 			# init measurement values		
 			V1MEAS = []
@@ -478,19 +482,12 @@ try:
 			for i in range(N_rep):
 
 				if T_idle > 0.0:
-					# set outputs to zero (to avoid overshoot)
-					# for p in [PSU1, PSU2]:
-					# 	if p.CONFIGURED:
-					# 		p.setCurrent(0.0)
 
 					# set idle conditions:
-					### Tsettle = 0.0
 					for p in [PSU1, PSU2]:
 						if p.CONFIGURED:
 							p.setCurrent(p.TEST_IIDLE,False)
 							p.setVoltage(p.TEST_VIDLE,True)
-							## Tsettle = max(p.settletime(),Tsettle)
-					### time.sleep(Tsettle) # wait for stable conditions
 
 					# wait idle time:	
 					time.sleep(T_idle)
@@ -504,7 +501,6 @@ try:
 					if PSU2.CONFIGURED:
 						PSU2.setCurrent(I2LIM,False)
 						PSU2.setVoltage(V2,True)
-						# time.sleep(PSU2.settletime()) # wait for stable conditions
 
 				# Determine PSU1 current limit:
 				if V1 > 0.0:
@@ -518,9 +514,8 @@ try:
 
 				# set up PSU1 measurement conditions:
 				if PSU1.CONFIGURED:
-					PSU1.setCurrent(I1LIM,False) # set current limit at PSU1
+					PSU1.setCurrent(I1LIM,True) # set current limit at PSU1
 					PSU1.setVoltage(V1,True) # set voltage at PSU1
-					### time.sleep(PSU1.settletime()) # wait for stable conditions at PSU and DUT
 
 				# wait a short moment to get everything stable before taking the reading:
 				time.sleep(0.1)
@@ -554,6 +549,12 @@ try:
 				V2MEAS = np.mean(V2MEAS)
 				I2MEAS = np.mean(I2MEAS)
 
+			# Check current limits (some PSUs are not very careful with this):
+			if I1MEAS > I1LIM:
+				LIMIT1 = 1
+			if I2MEAS > I2LIM:
+				LIMIT2 = 1
+
 			# Parse limiter flags:
 			if LIMIT1 > 0:
 				LIMIT1 = 1
@@ -566,6 +567,10 @@ try:
 
 			# Print results:
 			printit ( str(V1*PSU1.TEST_POLARITY) + ' ' + str(I1LIM*PSU1.TEST_POLARITY) + ' ' + str(V1MEAS*PSU1.TEST_POLARITY) + ' ' + str(I1MEAS*PSU1.TEST_POLARITY) + ' ' + str(int(LIMIT1)) + ' ' + str(V2*PSU2.TEST_POLARITY) + ' ' + str(I2LIM*PSU2.TEST_POLARITY) + ' ' + str(V2MEAS*PSU2.TEST_POLARITY) + ' ' + str(I2MEAS*PSU2.TEST_POLARITY) + ' ' + str(int(LIMIT2)) , logfile )
+
+			# Check if current / power limit has been reached:
+			if LIMIT1 + LIMIT2 > 0:
+				break # beak out of the inner loop (V1 steps) and continue with the next V2 step
 
 	print ('Test completed.')
 	for p in [PSU1, PSU2]:
