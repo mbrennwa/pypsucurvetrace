@@ -9,9 +9,9 @@ IIDLE  = 0.25
 POLARITY = -1
 
 [PSU2]
-VSTART = 2.5
+VSTART = 1
 VEND   = 4
-N      = 4
+N      = 7
 IMAX   = 1
 PMAX   = 1
 VIDLE  = 3.0
