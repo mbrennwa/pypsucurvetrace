@@ -514,7 +514,7 @@ try:
 
 				# set up PSU1 measurement conditions:
 				if PSU1.CONFIGURED:
-					PSU1.setCurrent(I1LIM,True) # set current limit at PSU1
+					PSU1.setCurrent(I1LIM,False) # set current limit at PSU1
 					PSU1.setVoltage(V1,True) # set voltage at PSU1
 
 				# wait a short moment to get everything stable before taking the reading:
