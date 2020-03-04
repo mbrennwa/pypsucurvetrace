@@ -91,7 +91,7 @@ The configuration file `config_PSU.txt` contains the configuration details of yo
 * `COMPORT`: virtual file corresponding to the serial port of the PSU
 * `COMMANDSET`: the "language" for communication with the PSU. Currently supported COMMANDSETs are "VOLTCRAFT" (for Voltcraft, Manson, etc.) and "KORAD" (for Korad, RND, etc.)
 If only one PSU is used (PSU1), the PSU2 section can be deleted.
-* `NUMMEAS` (optional): number of consecutive measurement readings that must agree to within the measurement resolution in order to achieve stable and low-noise readings
+* `NUMSTABLEREAD` (optional): number of consecutive readings that must agree to within the measurement resolution in order to achieve stable and low-noise readings
 
 ### Test configuration file
 ...(under constrution -- take a look at the example files in the `examples` directory.)...

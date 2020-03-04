@@ -97,8 +97,8 @@ def connect_PSU(configPSU,label):
 		P = powersupply.PSU(port,commandset,label)
 
 		# set number of consistent readings for measurements:
-		if 'NUMMEAS' in configPSU[label]:
-			P.NSTABLEREADINGS = int(configPSU[label]['NUMMEAS'])
+		if 'NUMSTABLEREAD' in configPSU[label]:
+			P.NSTABLEREADINGS = int(configPSU[label]['NUMSTABLEREAD'])
 		else:
 			print ('Number of consistent measurement readings not configured! Using N = 1...')
 			P.NSTABLEREADINGS = 1
@@ -115,10 +115,10 @@ def connect_PSU(configPSU,label):
 			print ('* Max. voltage: ' + str(P.VMAX) + ' V')
 			print ('* Max. current: ' + str(P.IMAX) + ' A')
 			print ('* Max. power: ' + str(P.PMAX) + ' W')
-			print ('* Resolution of voltage readings: ' + str(P.VRESREAD) + ' V')
-			print ('* Resolution of current readings: ' + str(P.IRESREAD) + ' A')
-			print ('* Resolution of voltage setting: ' + str(P.VRESSET) + ' V')
-			print ('* Resolution of current setting: ' + str(P.IRESSET) + ' A')
+			print ('* Voltage setting resolution: ' + str(P.VRESSET) + ' V')
+			print ('* Current setting resolution: ' + str(P.IRESSET) + ' A')
+			print ('* Voltage reading resolution: ' + str(P.VRESREAD) + ' V')
+			print ('* Current reading resolution: ' + str(P.IRESREAD) + ' A')
 			print ('* Max. power: ' + str(P.PMAX) + ' W')
 			print ('* Number of consistent readings for measurements: ' + str(P.NSTABLEREADINGS))
 			### print ('* Settle time: ' + str(PSU.settletime()) + ' s')
@@ -152,10 +152,13 @@ def configure_test_PSU(PSU,configDUT = []):
 		else:
 			PSU.TEST_VEND   = __get_number('* ' + PSU.LABEL + ' end voltage (V): ',allowZero=True,allowNegative=False,typ='float')
 
-		if 'N' in configDUT:
-			PSU.TEST_N      = int(configDUT['N'])
+		if PSU.TEST_VSTART == PSU.TEST_VEND:
+			PSU.TEST_VSTEP = 0
 		else:
-			PSU.TEST_N      = __get_number('* ' + PSU.LABEL + ' number of voltage steps: ',allowZero=False,allowNegative=False,typ='int')
+			if 'VSTEP' in configDUT:
+				PSU.TEST_VSTEP  = float(configDUT['VSTEP'])
+			else:
+				PSU.TEST_VSTEP      = __get_number('* ' + PSU.LABEL + ' voltage step size (V): ',allowZero=False,allowNegative=False,typ='float')
 
 		if 'IMAX' in configDUT:
 			PSU.TEST_ILIMIT = float(configDUT['IMAX'])
@@ -322,7 +325,7 @@ if (T_idle > 0.0) or (T_preheat > 0.0):
 			PSU2 = configure_idle_PSU (PSU2,None)
 
 # check voltage / power / current limits (and fix where possible and necessary):
-print ('\nChecking voltage / current / power limits...')
+print ('\nChecking voltage / current settings...')
 for p in [PSU1,PSU2]:
 	if p.CONNECTED:
 		if p.TEST_VSTART < p.VMIN:
@@ -338,20 +341,31 @@ for p in [PSU1,PSU2]:
 			print ('  ' + p.LABEL + ': Adjusting end voltage to max. value possible with the power supply (' + str(p.VMAX) + ' V).')
 			p.TEST_VEND = p.VMAX
 		if p.TEST_VEND == p.TEST_VSTART:
-			print ('  ' + p.LABEL + ': Same start and end voltage! Using single step (N = 1).')
-			p.TEST_N = 1
-		if abs(p.TEST_VEND-p.TEST_VSTART)/p.TEST_N < p.VRESSET:
-			p.TEST_N = max( 1, round(abs(p.TEST_VEND-p.TEST_VSTART)/p.VRESSET) )
-			print ('  ' + p.LABEL + ': Voltage steps are smaller than PSU resolution of voltage setting. Adjust number of steps to N = ' + str(p.TEST_N) + '.')
+			# print ('  ' + p.LABEL + ': Same start and end voltage, test will run at fixed voltage (' + str(p.TEST_VSTART) + ' V).')
+			p.TEST_VSTEP = 0
+		if abs(p.TEST_VEND-p.TEST_VSTART) < p.VRESSET:
+			print ('  ' + p.LABEL + ': Test voltage range is less than voltage setting resolution of the PSU. Test will run at fixed voltage (' + str(p.TEST_VSTART) + ' V).')
+			p.TEST_VSTEP = 0
+			p.TEST_VEND = p.TEST_VSTART
+		if p.TEST_VSTEP > 0.0:
+			if p.TEST_VSTEP > abs(p.TEST_VEND-p.TEST_VSTART):
+				p.TEST_VSTEP = abs(p.TEST_VEND-p.TEST_VSTART)
+				print ('  ' + p.LABEL + ': Voltage step size exceeds test voltage range. Adjusting step size to ' + str(p.TEST_VSTEP) + ' V.')
+			if p.TEST_VSTEP < p.VRESSET:
+				print ('  ' + p.LABEL + ': Voltage step size is less than PSU resolution of voltage setting. Adjusting step size to ' + str(p.VRESSET) + ' V.')
+				p.TEST_VSTEP = p.VRESSET
+			if p.TEST_VSTEP/p.VRESSET < p.VRESSET:
+				print ('  ' + p.LABEL + ': Voltage step size is less than PSU resolution of voltage setting. Adjusting step size to ' + str(p.VRESSET) + ' V.')
+				p.TEST_VSTEP = p.VRESSET
+			if p.TEST_VSTEP % p.VRESSET:
+				p.TEST_VSTEP = round(p.TEST_VSTEP / p.VRESSET) * p.VRESSET
+				print ('  ' + p.LABEL + ': Voltage step size is not consistent with PSU resolution of voltage setting. Adjusting step size to ' + str(p.TEST_VSTEP) + ' V.')
 		if p.TEST_ILIMIT > p.IMAX:
 			print ('  ' + p.LABEL + ': Adjusting current limit to max. value possible with the power supply (' + str(p.IMAX) + ' A).')
 			p.TEST_ILIMIT = p.IMAX
 		if p.TEST_PLIMIT > p.PMAX:
 			print ('  ' + p.LABEL + ': Adjusting power limit to max. value possible with the power supply (' + str(p.PMAX) + ' W).')
 			p.TEST_PLIMIT = p.PMAX
-		if p.TEST_N < 1:
-			print ('  ' + p.LABEL + ': Number of voltage steps with power supply (' + str(p.VMAX) + ' must be positive. Adjusting to N = 1.')
-			p.TEST_N = 1
 		if p.TEST_VIDLE > p.VMAX:
 			print ('  ' + p.LABEL + ': Adjusting idle voltage to max. value possible with the power supply (' + str(p.VMAX) + ' V).')
 			p.TEST_VIDLE = p.VMAX
@@ -380,10 +394,10 @@ for p in [PSU1, PSU2]:
 	else:
 		printit ('* ' + p.LABEL + ':',logfile,'%')
 		printit ('  - Type: ' + str(p.COMMANDSET) + ' / ' + p.MODEL,logfile,'%')
-		if p.TEST_N == 1:
-			printit ('  - voltage output = ' + str(p.TEST_VSTART) + ' V',logfile,'%')
+		if p.TEST_VSTEP == 0:
+			printit ('  - voltage output = ' + str(p.TEST_VSTART) + ' V (fixed)',logfile,'%')
 		else:
-			printit ('  - voltage output = ' + str(p.TEST_VSTART) + ' V ... ' + str(p.TEST_VEND) + ' V (' + str(p.TEST_N) + ' steps)',logfile,'%')
+			printit ('  - voltage output = ' + str(p.TEST_VSTART) + ' V ... ' + str(p.TEST_VEND) + ' V (' + str(p.TEST_VSTEP) + ' V steps)',logfile,'%')
 		printit ('  - current limit = ' + str(p.TEST_ILIMIT) + ' A',logfile,'%')
 		printit ('  - power limit = ' + str(p.TEST_PLIMIT) + ' W',logfile,'%')
 		if p.TEST_POLARITY == 1:
@@ -430,8 +444,18 @@ print ('\n')
 AVGFUNCTION = 'MEAN'
 # AVGFUNCTION = 'MEDIAN'
 
-V1_steps = np.linspace(PSU1.TEST_VSTART,PSU1.TEST_VEND,PSU1.TEST_N)
-V2_steps = np.linspace(PSU2.TEST_VSTART,PSU2.TEST_VEND,PSU2.TEST_N)
+# determine voltage step values:
+V_steps = []
+for p in [PSU1,PSU2]:
+	if p.TEST_VSTEP == 0:
+		# V_steps.append( np.linspace(p.TEST_VSTART,p.TEST_VSTART,1) )
+		V_steps.append( [ p.TEST_VSTART ] )
+	else:
+		if p.TEST_VSTART <= p.TEST_VEND:
+			u = np.arange( p.TEST_VSTART , p.TEST_VEND+PSU1.TEST_VSTEP ,  p.TEST_VSTEP )
+		else:
+			u = np.arange( p.TEST_VSTART , p.TEST_VEND-PSU1.TEST_VSTEP , -p.TEST_VSTEP )
+		V_steps.append(u)
 
 try:
 
@@ -457,8 +481,12 @@ try:
 
 	print ('Test started...\n')
 
-	for V2 in V2_steps:
+	for V2 in V_steps[1]:
 	# outer loop (V2)
+
+		# get rid of numerical imprecisions (truncate values to voltage resolution of PSU):
+		# V2 = round(V2/PSU2.VRESSET) * PSU2.VRESSET
+
 
 		if PSU2.CONFIGURED:
 
@@ -476,8 +504,11 @@ try:
 			PSU2.setCurrent(I2LIM,False)
 			PSU2.setVoltage(V2,True)
 
-		for V1 in V1_steps:
+		for V1 in V_steps[0]:
 		# inner loop (V1)
+
+			# get rid of numerical imprecisions (truncate values to voltage resolution of PSU):
+			# V1 = round(V1/PSU1.VRESSET) * PSU1.VRESSET
 
 			# init measurement values		
 			V1MEAS = []
@@ -575,7 +606,17 @@ try:
 				LIMIT2 = 0
 
 			# Print results:
-			printit ( str(V1*PSU1.TEST_POLARITY) + ' ' + str(I1LIM*PSU1.TEST_POLARITY) + ' ' + str(V1MEAS*PSU1.TEST_POLARITY) + ' ' + str(I1MEAS*PSU1.TEST_POLARITY) + ' ' + str(int(LIMIT1)) + ' ' + str(V2*PSU2.TEST_POLARITY) + ' ' + str(I2LIM*PSU2.TEST_POLARITY) + ' ' + str(V2MEAS*PSU2.TEST_POLARITY) + ' ' + str(I2MEAS*PSU2.TEST_POLARITY) + ' ' + str(int(LIMIT2)) , logfile )
+			printit (	"{:10.4f}".format(V1*PSU1.TEST_POLARITY)	+ ' ' + 
+					"{:10.4f}".format(I1LIM*PSU1.TEST_POLARITY)	+ ' ' + 
+					"{:10.4f}".format(V1MEAS*PSU1.TEST_POLARITY)	+ ' ' +
+					"{:10.4f}".format(I1MEAS*PSU1.TEST_POLARITY)	+ ' ' + 
+					"{:5d}".format(LIMIT1)				+ ' ' +
+					"{:10.4f}".format(V2*PSU2.TEST_POLARITY)	+ ' ' +
+					"{:10.4f}".format(I2LIM*PSU2.TEST_POLARITY)	+ ' ' +
+					"{:10.4f}".format(V2MEAS*PSU2.TEST_POLARITY)	+ ' ' +
+					"{:10.4f}".format(I2MEAS*PSU2.TEST_POLARITY)	+ ' ' +
+					"{:5d}".format(LIMIT2) ,
+				logfile )
 
 			# Check if current / power limit has been reached:
 			if LIMIT1 + LIMIT2 > 0:
