@@ -450,8 +450,6 @@ I2LIM = 0.0
 # determine voltage step values:
 V_steps = []
 
-print(PSU1.TEST_VEND)
-
 for p in [PSU1,PSU2]:
 	if not p.CONFIGURED:
 		V_steps.append( [ 0 ] )

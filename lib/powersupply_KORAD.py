@@ -9,6 +9,7 @@ Python class to control KORAD (RND) power supplies
 
 import serial
 import sys
+import time
 
 # Python dictionary of known KORAD (RND) power supply models (Vmin,Vmax,Imax,Pmax,VresolutionSet,IresolutionSet,VresolutionRead,IresolutionRead,MaxSettleTime)
 KORAD_SPECS = {
@@ -67,6 +68,8 @@ class KORAD(object):
 			# open port (can't ask for exclusive access):
 			self._Serial = serial.Serial(port, baudrate=baud, bytesize=8, parity='N', stopbits=1, timeout=KORAD_TIMEOUT)
 
+		time.sleep(0.2) # wait a bit unit the port is really ready
+
 		self._Serial.flushInput()
 		self._Serial.flushOutput()
 		self._debug = bool(debug)
@@ -119,18 +122,43 @@ class KORAD(object):
 		except KeyError:
 		    raise RuntimeError('Unknown KORAD model ' + self.MODEL)
 	
-	def _query(self, cmd, answer=True):
+	def _query(self, cmd, answer=True, attempt = 1):
 		"""
 		tx/rx to/from PS
 		"""
+
+		if attempt > 10:
+			raise RuntimeError('KORAD PSU does not respond to ' + cmd + ' command after 10 attempts. Giving up...')
+		elif attempt > 1:
+			if self._debug:
+				_pps_debug('*** Retrying (attempt ' + str(attempt) + ')...')
+
+		# just in case, make sure the buffers are empty before doing anything:
+		# (it seems some KORADs tend to have issues with stuff dangling in their serial buffers)
+		self._Serial.reset_output_buffer()
+		self._Serial.reset_input_buffer()
+		time.sleep(0.03)
+
 		if self._debug: _KORAD_debug('KORAD <- %s\n' % cmd)
 		self._Serial.write((cmd + '\n').encode())
 		
-		if answer:
+		if not answer:
+			ans = None
+		else:
 			ans = self._Serial.readline().decode('utf-8').rstrip("\n\r")
 			if self._debug: _KORAD_debug('KORAD -> %s\n' % ans)
+			if ans == '':
+				_KORAD_debug('*** No answer from KORAD PSU! Command: ' + cmd)
 
-			return ans
+				print('*** No answer from KORAD PSU! Command: ' + cmd)
+
+				self._Serial.flushOutput()			
+				time.sleep(0.2)
+				self._Serial.flushInput()
+				time.sleep(0.2)			
+				ans = self._query(cmd,True,attempt+1)
+
+		return ans
 
 	def output(self, state):
 		"""
@@ -180,18 +208,51 @@ class KORAD(object):
 		read applied output voltage and current and if PS is in "CV" or "CC" mode
 		"""
 		if self.MODEL == "KWR103":
-			V = float (self._query('VOUT?'))
-			I = float (self._query('IOUT?'))
-			S = self._query('STATUS?')
+			Vq = 'VOUT?'
+			Iq = 'IOUT?'
 
 		else:
-			V = float (self._query('VOUT1?'))
-			I = float (self._query('IOUT1?'))
-			S = self._query('STATUS?')
+			Vq = 'VOUT1?'
+			Iq = 'IOUT1?'
 
-		if S.encode()[0] & 0b00000001: # test bit-1 for CV or CC
-			S = 'CV'
-		else:
-			S = 'CC'
+		# read voltage:
+		k = 1
+		while True:
+			try:
+				if k > 10:
+					raise RuntimeException("Could not read voltage from KORAD PSU!")
+				V = float (self._query(Vq))
+				break
+			except:
+				k = k+1
+				pass
+
+		# read current:
+		k = 1
+		while True:
+			try:
+				if k > 10:
+					raise RuntimeException("Could not read current from KORAD PSU!")
+				I = float (self._query(Iq))
+				break
+			except:
+				k = k+1
+				pass
+
+		# read output limit status:
+		k = 1
+		while True:
+			try:
+				if k > 10:
+					raise RuntimeException("Could not read output limit status from KORAD PSU!")
+				S = self._query('STATUS?')
+				if S.encode()[0] & 0b00000001: # test bit-1 for CV or CC
+					S = 'CV'
+				else:
+					S = 'CC'
+				break
+			except:
+				k = k+1
+				pass
 
 		return (V, I, S)

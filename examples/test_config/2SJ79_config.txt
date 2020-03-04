@@ -1,7 +1,7 @@
 [PSU1]
-VSTART = 0.9
-VEND   = 36
-VSTEP  = 0.5
+VSTART = 0.0
+VEND   = 50
+VSTEP  = 10
 IMAX   = 0.51
 PMAX   = 11
 VIDLE  = 15
