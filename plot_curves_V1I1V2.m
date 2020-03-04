@@ -1,30 +1,47 @@
 function plot_curves_V1I1V2 (f)
 
-% GNU Octave m-file to plot curves:
-% x-axis: PSU-1 voltage (V1)
-% y-axis: PSU-1 current (I1)
-% one curve for each nominal PSU-2 voltage (V2)
+% function plot_curves_V1I1V2 (f)
+%
+% GNU Octave m-file to plot curves from curvetrace data in file(s) f:
+% - x-axis: PSU-1 voltage (V1)
+% - y-axis: PSU-1 current (I1)
+% - one curve for each nominal PSU-2 voltage (V2)
+% - if more than one data file is given as input, the data from all files is combined into a single data set before plotting
+%
+% INPUT:
+% f: string or cell string with the name(s) of the data file(s)
 
+% check input:
+if ~iscellstr(f)
+	f = {f};
+end
 
-x = load(f);
-k = find (x(:,5) == 0); x = x(k,:); % remove values with current limiter on
+% load data and combine into single data set:
+x = [];
+for i = 1:length(f)
+	x = [ x ; load(f{i}) ];
+end
 
-VG = unique(x(:,6));
+% remove values with current limiter on:
+k = find (x(:,5) == 0); x = x(k,:);
 
-for i = 1:length(VG)
-	k = find (x(:,6) == VG(i));
+% find V2 values:
+V2= unique(x(:,6));
+
+for i = 1:length(V2)
+	k = find (x(:,6) == V2(i));
 	V = [0 ; x(k,3)];
 	I = [0 ; x(k,4)];
-	plot (V,I,sprintf('-;V_2 = %.3g V;',VG(i)),'marker','.','markersize',12);
+	plot (V,I,sprintf('-;V_2 = %.3g V;',V2(i)),'marker','.','markersize',12);
 	hold on
 end
 hold off
 
-if(median(x(:,3) < 0 ))
+if(mean(x(:,3) < 0 ))
 	set (gca,'xdir','reverse')
 end
 
-if(median(x(:,4) < 0 ))
+if(mean(x(:,4) < 0 ))
 	set (gca,'ydir','reverse')
 end
 

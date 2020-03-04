@@ -1,6 +1,6 @@
 [PSU1]
-VSTART = 10.0
-VEND   = 25.0
+VSTART = 0.9
+VEND   = 36
 VSTEP  = 0.5
 IMAX   = 0.51
 PMAX   = 11
@@ -20,5 +20,5 @@ POLARITY = -1
 
 [EXTRA]
 IDLESECS    = 5
-PREHEATSECS = 0
+PREHEATSECS = 60
 NREP        = 1
