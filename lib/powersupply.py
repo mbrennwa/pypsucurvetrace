@@ -333,9 +333,9 @@ class PSU:
                                         V = V[-(N-1):]
                                         I = I[-(N-1):]
                                         L = L[-(N-1):]
-
-					# wait a little while before taking the next reading
-					time.sleep(self.READIDLETIME)
+                                        
+                                        # wait a little while before taking the next reading
+                                        time.sleep(self.READIDLETIME)
 
 				if time.time() - t0 > self.MAXSETTLETIME:
 					# getting consistent readings is taking too long; give up
