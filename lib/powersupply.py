@@ -159,7 +159,7 @@ class PSU:
 			t0 = time.time() # start time (now)
 			while not time.time() > t0+self.MAXSETTLETIME:
 				v = self.read()[0]
-				if abs( v - value) <= 1.3*self.VRESREAD/2:
+				if abs(v - value) <= 1.3*self.VRESREAD/2:
 					stable = True
 					break
 				else:

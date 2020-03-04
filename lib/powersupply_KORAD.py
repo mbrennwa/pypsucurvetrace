@@ -11,10 +11,19 @@ import serial
 import sys
 
 # Python dictionary of known KORAD (RND) power supply models (Vmin,Vmax,Imax,Pmax,VresolutionSet,IresolutionSet,VresolutionRead,IresolutionRead,MaxSettleTime)
-KORAD_MODELS = { "KWR103": (0.0,60.5,15.0,300,0.001,0.001,0.001,0.001,3.0) 
-		}
+KORAD_SPECS = {
+		"KA3003P":	( 0.0, 31.0,  3.0,  90,  0.01,  0.001, 0.01,  0.001, 5.0 ) , # not confirmed
+		"KA3005P":	( 0.0, 31.0,  5.1, 150,  0.01,  0.001, 0.01,  0.001, 5.0 ) , # confirmed (with the RND incarnation of the KA3005P)
+		"KD3005P":	( 0.0, 31.0,  5.1, 150,  0.01,  0.001, 0.01,  0.001, 5.0 ) , # not confirmed
+		"KA3010P":	( 0.0, 31.0, 10.0, 300,  0.01,  0.001, 0.01,  0.001, 5.0 ) , # not confirmed
+		"KA6002P":	( 0.0, 60.0,  2.0, 120,  0.01,  0.001, 0.01,  0.001, 5.0 ) , # not confirmed
+		"KA6003P":	( 0.0, 60.0,  3.0, 180,  0.01,  0.001, 0.01,  0.001, 5.0 ) , # not confirmed
+		"KA6005P":	( 0.0, 31.0,  5.0, 300,  0.01,  0.001, 0.01,  0.001, 5.0 ) , # not confirmed
+		"KD6005P":	( 0.0, 31.0,  5.0, 300,  0.01,  0.001, 0.01,  0.001, 5.0 ) , # not confirmed
+		"KWR103":	( 0.0, 60.5, 15.0, 300, 0.001,  0.001, 0.001, 0.001, 3.0 )   # confirmed (with the RND incarnation of the KWR103
+}
 
-KORAD_TIMEOUT = 10.0
+KORAD_TIMEOUT = 2.0
 
 def _KORAD_debug(s):
 	sys.stdout.write(s)
@@ -63,12 +72,37 @@ class KORAD(object):
 		self._debug = bool(debug)
 		try:
 			typestring = self._query('*IDN?').split(" ")
+
+			### print (typestring)
+
+			# parse typestring:
 			if len(typestring) < 2:
 				raise RuntimeError ('No KORAD power supply connected to ' + port)
-			if not ( typestring[0].upper() == 'KORAD' ):
+			if not ( typestring[0].upper() in [ 'KORAD' , 'RND' , 'VELLEMAN' , 'TENMA' ] ):
 				raise RuntimeError ('No KORAD power supply connected to ' + port)
-			self.MODEL = typestring[1]
-			v = KORAD_MODELS[self.MODEL]
+			if 'KA3003P' in typestring[1]:
+				self.MODEL = 'KA3003P'
+			elif 'KA3005P' in typestring[1]:
+				self.MODEL = 'KA3005P'
+			elif 'KD3005P' in typestring[1]:
+				self.MODEL = 'KD3005P'
+			elif 'KA3010P' in typestring[1]:
+				self.MODEL = 'KD3010P'
+			elif 'KA6002P' in typestring[1]:
+				self.MODEL = 'KA6002P'
+			elif 'KA6003P' in typestring[1]:
+				self.MODEL = 'KA6003P'
+			elif 'KA6005P' in typestring[1]:
+				self.MODEL = 'KA6005P'
+			elif 'KD6005P' in typestring[1]:
+				self.MODEL = 'KD6005P'
+			elif 'KWR103' in typestring[1]:
+				self.MODEL = 'KWR103'
+			else:
+				print ( 'Unknown KORAD model: ' + typestring[1] )
+				self.MODEL = '?????'
+
+			v = KORAD_SPECS[self.MODEL]
 			self.VMIN = v[0]
 			self.VMAX = v[1]
 			self.IMAX = v[2]
@@ -103,7 +137,12 @@ class KORAD(object):
 		enable/disable the PS output
 		"""
 		state = int(bool(state))
-		self._query('OUT:%d' % state,answer=False)
+
+		if self.MODEL == "KWR103":
+			self._query('OUT:%d' % state,answer=False)
+		else:
+			self._query('OUT%d' % state,answer=False)
+
 
 	def voltage(self, voltage):
 		"""
@@ -114,7 +153,11 @@ class KORAD(object):
 		if voltage < self.VMIN:
 			voltage = self.VMIN
 		voltage = round (1000*voltage) / 1000
-		self._query('VSET:' + str(voltage),answer=False)
+		if self.MODEL == "KWR103":
+			self._query('VSET:' + str(voltage),answer=False)
+		else:
+			self._query('VSET1:' + str(voltage),answer=False)
+
 
 	def current(self, current):
 		"""
@@ -126,34 +169,29 @@ class KORAD(object):
 			current = 0.0
 		current = round (1000*current) / 1000
 		self._query('ISET:' + str(current),answer=False)
+		if self.MODEL == "KWR103":
+			self._query('ISET:' + str(current),answer=False)
+		else:
+			self._query('ISET1:' + str(current),answer=False)
+
 
 	def reading(self):
 		"""
 		read applied output voltage and current and if PS is in "CV" or "CC" mode
 		"""
-		V = float (self._query('VOUT?'))
-		I = float (self._query('IOUT?'))
-		S = self._query('STATUS?')
+		if self.MODEL == "KWR103":
+			V = float (self._query('VOUT?'))
+			I = float (self._query('IOUT?'))
+			S = self._query('STATUS?')
+
+		else:
+			V = float (self._query('VOUT1?'))
+			I = float (self._query('IOUT1?'))
+			S = self._query('STATUS?')
+
 		if S.encode()[0] & 0b00000001: # test bit-1 for CV or CC
 			S = 'CV'
 		else:
 			S = 'CC'
 
 		return (V, I, S)
-
-###	def settletime(self):
-###		"""
-###		estimate settle time to attain stable output at PSU terminals in seconds. The time is determined by the charging process of the built-in capacitor at the PSU output, which is controlled by the current limit and the size of amplitude of the change in the voltage setting. This function assumes the "worst case", wher the voltage setting is changed from 0.0 V to the max. voltage.
-###		"""
-###		Ilim = float (self._query('ISET?'))		
-###		if Ilim > 0.0:
-###			if self.MODEL == 'KWR103':
-###				# DETERMINED THIS EMPIRICALLY
-###				T = max( [ 0.40 , 0.1 / Ilim ] )
-###			else:
-###				raise RuntimeError('Settle time for ' + self.MODEL + ' not known.')	
-###		else:
-###			# just some sufficiently large value:
-###			T = 2.0
-###
-###		return T

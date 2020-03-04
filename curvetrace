@@ -444,18 +444,28 @@ print ('\n')
 AVGFUNCTION = 'MEAN'
 # AVGFUNCTION = 'MEDIAN'
 
+I1LIM = 0.0
+I2LIM = 0.0
+
 # determine voltage step values:
 V_steps = []
+
+print(PSU1.TEST_VEND)
+
 for p in [PSU1,PSU2]:
-	if p.TEST_VSTEP == 0:
-		# V_steps.append( np.linspace(p.TEST_VSTART,p.TEST_VSTART,1) )
-		V_steps.append( [ p.TEST_VSTART ] )
+	if not p.CONFIGURED:
+		V_steps.append( [ 0 ] )
 	else:
-		if p.TEST_VSTART <= p.TEST_VEND:
-			u = np.arange( p.TEST_VSTART , p.TEST_VEND+PSU1.TEST_VSTEP ,  p.TEST_VSTEP )
+		if p.TEST_VSTEP == 0:
+			# V_steps.append( np.linspace(p.TEST_VSTART,p.TEST_VSTART,1) )
+			V_steps.append( [ p.TEST_VSTART ] )
 		else:
-			u = np.arange( p.TEST_VSTART , p.TEST_VEND-PSU1.TEST_VSTEP , -p.TEST_VSTEP )
-		V_steps.append(u)
+			if p.TEST_VSTART <= p.TEST_VEND:
+				u = np.arange( p.TEST_VSTART , p.TEST_VEND+PSU1.TEST_VSTEP/2 ,  p.TEST_VSTEP )
+			else:
+				u = np.arange( p.TEST_VSTART , p.TEST_VEND-PSU1.TEST_VSTEP/2 , -p.TEST_VSTEP )
+			u = [i for i in u if (i >= p.TEST_VSTART) and (i <= p.TEST_VEND) ] # filter out "outliers" that may happen with large VSTEPs
+			V_steps.append(u)
 
 try:
 
