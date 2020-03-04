@@ -33,7 +33,7 @@ def _KORAD_debug(s):
 #    .VRESREAD
 #    .IRESREAD
 #    .MAXSETTLETIME
-#    .SETTLEPOLLTIME
+#    .READIDLETIME
 #    .MODEL
 
 class KORAD(object):
@@ -78,7 +78,7 @@ class KORAD(object):
 			self.VRESREAD = v[6]
 			self.IRESREAD = v[7]
 			self.MAXSETTLETIME = v[8]
-			self.SETTLEPOLLTIME = self.MAXSETTLETIME/50
+			self.READIDLETIME = self.MAXSETTLETIME/50
 
 		except serial.SerialTimeoutException:
 		    raise RuntimeError('No KORAD powersupply connected to ' + port)

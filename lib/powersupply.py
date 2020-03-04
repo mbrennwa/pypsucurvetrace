@@ -24,7 +24,7 @@ import lib.powersupply_KORAD as powersupply_KORAD
 #    .VRESREAD              resolution of voltage readings (V)
 #    .IRESREAD              resolution of current readings (A)
 #    .MAXSETTLETIME         max. time allowed to attain stable output values (will complain if output not stable after this time) (s)
-#    .SETTLEPOLLTIME        time between readings for checking if output values of newly set voltage/current values are at set point (s)
+#    .READIDLETIME          idle time between readings for checking if output values of newly set voltage/current values are at set point, or when checking if consecutive measurement readings are consistent (s)
 #    .TEST_VSTART           start value for test (V)
 #    .TEST_VEND             end value for test (V)
 #    .TEST_ILIMIT           current limit for test (A)
@@ -100,7 +100,7 @@ class PSU:
 				self.VRESREAD = self._PSU.VRESREAD
 				self.IRESREAD = self._PSU.IRESREAD
 				self.MAXSETTLETIME = self._PSU.MAXSETTLETIME
-				self.SETTLEPOLLTIME = self._PSU.SETTLEPOLLTIME
+				self.READIDLETIME = self._PSU.READIDLETIME
 				self.MODEL = self._PSU.MODEL
 				self.CONNECTED = True
 
@@ -115,7 +115,7 @@ class PSU:
 				self.VRESREAD = self._PSU.VRESREAD
 				self.IRESREAD = self._PSU.IRESREAD
 				self.MAXSETTLETIME = self._PSU.MAXSETTLETIME
-				self.SETTLEPOLLTIME = self._PSU.SETTLEPOLLTIME
+				self.READIDLETIME = self._PSU.READIDLETIME
 				self.MODEL = self._PSU.MODEL
 				self.CONNECTED = True
 
@@ -163,7 +163,7 @@ class PSU:
 					stable = True
 					break
 				else:
-					time.sleep(self.SETTLEPOLLTIME)
+					time.sleep(self.READIDLETIME)
 			if not stable:
 				print (self.LABEL + ' warning: voltage setpoint not reached after ' + str(self.MAXSETTLETIME) + ' s!')
 
@@ -206,7 +206,7 @@ class PSU:
 					stable = True
 					break
 				else:
-					time.sleep(self.SETTLEPOLLTIME)
+					time.sleep(self.READIDLETIME)
 			if not stable:
 				print (self.LABEL + ' warning: current setpoint not reached after ' + str(self.MAXSETTLETIME) + ' s!')
 		
@@ -333,6 +333,9 @@ class PSU:
                                         V = V[-(N-1):]
                                         I = I[-(N-1):]
                                         L = L[-(N-1):]
+
+					# wait a little while before taking the next reading
+					time.sleep(self.READIDLETIME)
 
 				if time.time() - t0 > self.MAXSETTLETIME:
 					# getting consistent readings is taking too long; give up
