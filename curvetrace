@@ -630,7 +630,9 @@ try:
 				logfile )
 
 			# Check if current / power limit has been reached:
-			if LIMIT1 + LIMIT2 > 0:
+			if (LIMIT1 == 0) and (LIMIT2 == 0):
+				limit = 0 # reset counter
+			else:
 				limit = limit + 1
 				if limit >= limit_max:
 					break # break out of the inner loop (V1 steps) and continue with the next V2 step
