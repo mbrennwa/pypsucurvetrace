@@ -459,10 +459,11 @@ for p in [PSU1,PSU2]:
 			V_steps.append( [ p.TEST_VSTART ] )
 		else:
 			if p.TEST_VSTART <= p.TEST_VEND:
-				u = np.arange( p.TEST_VSTART , p.TEST_VEND+PSU1.TEST_VSTEP/2 ,  p.TEST_VSTEP )
+				u = np.arange( p.TEST_VSTART , p.TEST_VEND+PSU1.TEST_VSTEP ,  p.TEST_VSTEP )
+				u = [i for i in u if (i >= p.TEST_VSTART) and (i <= p.TEST_VEND) ] # filter out "outliers" that may happen with large VSTEPs
 			else:
-				u = np.arange( p.TEST_VSTART , p.TEST_VEND-PSU1.TEST_VSTEP/2 , -p.TEST_VSTEP )
-			u = [i for i in u if (i >= p.TEST_VSTART) and (i <= p.TEST_VEND) ] # filter out "outliers" that may happen with large VSTEPs
+				u = np.arange( p.TEST_VSTART , p.TEST_VEND-PSU1.TEST_VSTEP , -p.TEST_VSTEP )
+				u = [i for i in u if (i >= p.TEST_VEND) and (i <= p.TEST_VSTART) ] # filter out "outliers" that may happen with large VSTEPs
 			V_steps.append(u)
 
 try:
@@ -482,7 +483,7 @@ try:
 		for p in [PSU1, PSU2]:
 			if p.CONFIGURED:
 				p.setCurrent(p.TEST_IIDLE,False)
-				p.setVoltage(p.TEST_VIDLE,True)
+				p.setVoltage(p.TEST_VIDLE,False) # don't check for stable voltage, since current limiter may upset the the voltage value
 
 		# wait pre-heat time:	
 		time.sleep(T_preheat)
@@ -535,7 +536,7 @@ try:
 					for p in [PSU1, PSU2]:
 						if p.CONFIGURED:
 							p.setCurrent(p.TEST_IIDLE,False)
-							p.setVoltage(p.TEST_VIDLE,True)
+							p.setVoltage(p.TEST_VIDLE,False) # don't check for stable voltage, since current limiter may upset the the voltage value
 
 					# wait idle time:	
 					time.sleep(T_idle)
@@ -628,7 +629,7 @@ try:
 
 			# Check if current / power limit has been reached:
 			if LIMIT1 + LIMIT2 > 0:
-				break # beak out of the inner loop (V1 steps) and continue with the next V2 step
+				break # break out of the inner loop (V1 steps) and continue with the next V2 step
 
 	print ('Test completed.')
 	for p in [PSU1, PSU2]:
