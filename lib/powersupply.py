@@ -157,13 +157,17 @@ class PSU:
 		if wait_stable:
 			stable = False
 			t0 = time.time() # start time (now)
+
 			while not time.time() > t0+self.MAXSETTLETIME:
-				v = self.read()[0]
-				if abs(v - value) <= 1.3*self.VRESREAD:
+				r = self.read()
+				if r[2] == "CC":
+					print(self.LABEL + ': running in current limit mode. Skip waiting for stable output voltage...')
+					break
+				if abs(r[0] - value) <= 1.3*self.VRESREAD:
 					stable = True
 					break
-				else:
-					time.sleep(self.READIDLETIME)
+				time.sleep(self.READIDLETIME)
+
 			if not stable:
 				print ([ value , v ])
 				print (self.LABEL + ' warning: voltage setpoint not reached after ' + str(self.MAXSETTLETIME) + ' s!')
@@ -321,6 +325,8 @@ class PSU:
 				I.append(i)
 				if l == "CC":
 					L.append(1.0)
+					print(self.LABEL + ': running in current limit mode. Skip reading ' + str(N) + ' consistent readings in a row...')
+					break
 				else:
 					L.append(0.0)
 				if len(V) >= N:
