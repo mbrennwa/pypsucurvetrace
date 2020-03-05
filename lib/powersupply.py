@@ -156,14 +156,15 @@ class PSU:
 		# wait for stable output voltage:
 		if wait_stable:
 			stable = False
-			limit = 0
+			limit = 0 	# number of readings with current limiter ON
+			limit_max = 2	# max. allowed number of current limit ON readings
 			t0 = time.time() # start time (now)
 
 			while not time.time() > t0+self.MAXSETTLETIME:
 				r = self.read()
 				if r[2] == "CC":
 					limit = limit + 1
-					if limit > 2:
+					if limit > limit_max:
 						break
 				if abs(r[0] - value) <= 1.3*self.VRESREAD:
 					stable = True
@@ -208,13 +209,14 @@ class PSU:
 		# wait for stable output current:
 		if wait_stable:
 			stable = False
-			limit = 0
+			limit = 0 	# number of readings with voltage limiter ON
+			limit_max = 2	# max. allowed number of voltage limit ON readings
 			t0 = time.time() # start time (now)
 			while not time.time() - t0 > self.MAXSETTLETIME:
 				r = self.read()
 				if r[2] == "CV":
 					limit = limit + 1
-					if limit > 2:
+					if limit > limit_max:
 						break
 				if abs( r[1] - value) <= 1.3*self.IRESREAD:
 					stable = True
@@ -306,7 +308,8 @@ class PSU:
 		I = []
 		L = []
 
-		limit = 0
+		limit = 0	# number of readings with current limiter ON
+		limit_max = 2	# max. allowed number of current limit ON readings
 
 		if N < 1:
 			raise RuntimeError ('Number of consistent readings in a row must be larger than 1!')
@@ -340,7 +343,7 @@ class PSU:
 					L.append(1.0)
 					### print(self.LABEL + ': running in current limit mode. Skip reading ' + str(N) + ' consistent readings in a row...')
 					limit = limit + 1
-					if limit > 2: # ran into the current limit for the third time
+					if limit > limit_max: # ran into the current limit for the third time
 						break
 				else:
 					L.append(0.0)
@@ -361,16 +364,16 @@ class PSU:
 
 				if time.time() - t0 > self.MAXSETTLETIME:
 					# getting consistent readings is taking too long; give up
-					print(self.LABEL + ': Could not get ' + str(N) + ' consistent readings in a row after ' + str(self.MAXSETTLETIME) + ' s!')
+					print(self.LABEL + ': Could not get ' + str(N) + ' consistent readings in a row after ' + str(self.MAXSETTLETIME) + ' s! DUT drifting? Noise?')
 					break
 		
 		if N > 1:
 			V = np.mean(V)
 			I = np.mean(I)
-			if limit > 2:
+			if limit > limit_max:
 				L = "CC"
 			else:
-				if np.mean(L) > 0.5:
+				if np.mean(L) > 0.25:
 					L = "CC"
 				else:
 					L = "CV"
