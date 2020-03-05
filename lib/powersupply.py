@@ -156,12 +156,15 @@ class PSU:
 		# wait for stable output voltage:
 		if wait_stable:
 			stable = False
+			limit = 0
 			t0 = time.time() # start time (now)
 
 			while not time.time() > t0+self.MAXSETTLETIME:
 				r = self.read()
 				if r[2] == "CC":
-					break
+					limit = limit + 1
+					if limit > 2:
+						break
 				if abs(r[0] - value) <= 1.3*self.VRESREAD:
 					stable = True
 					break
@@ -205,11 +208,14 @@ class PSU:
 		# wait for stable output current:
 		if wait_stable:
 			stable = False
+			limit = 0
 			t0 = time.time() # start time (now)
 			while not time.time() - t0 > self.MAXSETTLETIME:
 				r = self.read()
 				if r[2] == "CV":
-					break
+					limit = limit + 1
+					if limit > 2:
+						break
 				if abs( r[1] - value) <= 1.3*self.IRESREAD:
 					stable = True
 					break
