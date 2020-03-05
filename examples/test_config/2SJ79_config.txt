@@ -4,8 +4,8 @@ VEND   = 50
 VSTEP  = 1
 IMAX   = 0.5
 PMAX   = 7
-VIDLE  = 0
-IIDLE  = 0
+VIDLE  = 30
+IIDLE  = 0.3
 POLARITY = -1
 
 [PSU2]
@@ -14,11 +14,11 @@ VEND   = 0.5
 VSTEP  = 0.5
 IMAX   = 1
 PMAX   = 1
-VIDLE  = 3.5
+VIDLE  = 3.0
 IIDLE  = 1
 POLARITY = -1
 
 [EXTRA]
 IDLESECS    = 10
-PREHEATSECS = 0
+PREHEATSECS = 120
 NREP        = 1
