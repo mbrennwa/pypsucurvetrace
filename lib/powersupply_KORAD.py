@@ -13,15 +13,15 @@ import time
 
 # Python dictionary of known KORAD (RND) power supply models (Vmin,Vmax,Imax,Pmax,VresolutionSet,IresolutionSet,VresolutionRead,IresolutionRead,MaxSettleTime)
 KORAD_SPECS = {
-		"KA3003P":	( 0.0, 31.0,  3.0,  90,  0.01,  0.001, 0.01,  0.001, 5.0 ) , # not confirmed
-		"KA3005P":	( 0.0, 31.0,  5.1, 150,  0.01,  0.001, 0.01,  0.001, 5.0 ) , # confirmed (with the RND incarnation of the KA3005P)
-		"KD3005P":	( 0.0, 31.0,  5.1, 150,  0.01,  0.001, 0.01,  0.001, 5.0 ) , # not confirmed
-		"KA3010P":	( 0.0, 31.0, 10.0, 300,  0.01,  0.001, 0.01,  0.001, 5.0 ) , # not confirmed
-		"KA6002P":	( 0.0, 60.0,  2.0, 120,  0.01,  0.001, 0.01,  0.001, 5.0 ) , # not confirmed
-		"KA6003P":	( 0.0, 60.0,  3.0, 180,  0.01,  0.001, 0.01,  0.001, 5.0 ) , # not confirmed
-		"KA6005P":	( 0.0, 31.0,  5.0, 300,  0.01,  0.001, 0.01,  0.001, 5.0 ) , # not confirmed
-		"KD6005P":	( 0.0, 31.0,  5.0, 300,  0.01,  0.001, 0.01,  0.001, 5.0 ) , # not confirmed
-		"KWR103":	( 0.0, 60.5, 15.0, 300, 0.001,  0.001, 0.001, 0.001, 3.0 )   # confirmed (with the RND incarnation of the KWR103
+		"KA3003P":	( 0.0, 31.0,  3.0,  90,  0.01,  0.001, 0.01,  0.001, 2.0 ) , # not confirmed
+		"KA3005P":	( 0.0, 31.0,  5.1, 150,  0.01,  0.001, 0.01,  0.001, 2.0 ) , # confirmed (with the RND incarnation of the KA3005P)
+		"KD3005P":	( 0.0, 31.0,  5.1, 150,  0.01,  0.001, 0.01,  0.001, 2.0 ) , # not confirmed
+		"KA3010P":	( 0.0, 31.0, 10.0, 300,  0.01,  0.001, 0.01,  0.001, 2.0 ) , # not confirmed
+		"KA6002P":	( 0.0, 60.0,  2.0, 120,  0.01,  0.001, 0.01,  0.001, 2.0 ) , # not confirmed
+		"KA6003P":	( 0.0, 60.0,  3.0, 180,  0.01,  0.001, 0.01,  0.001, 2.0 ) , # not confirmed
+		"KA6005P":	( 0.0, 31.0,  5.0, 300,  0.01,  0.001, 0.01,  0.001, 2.0 ) , # not confirmed
+		"KD6005P":	( 0.0, 31.0,  5.0, 300,  0.01,  0.001, 0.01,  0.001, 2.0 ) , # not confirmed
+		"KWR103":	( 0.0, 60.5, 15.0, 300, 0.001,  0.001, 0.001, 0.001, 2.0 )   # confirmed (with the RND incarnation of the KWR103
 }
 
 KORAD_TIMEOUT = 2.0
@@ -149,9 +149,6 @@ class KORAD(object):
 			if self._debug: _KORAD_debug('KORAD -> %s\n' % ans)
 			if ans == '':
 				_KORAD_debug('*** No answer from KORAD PSU! Command: ' + cmd)
-
-				print('*** No answer from KORAD PSU! Command: ' + cmd)
-
 				self._Serial.flushOutput()			
 				time.sleep(0.2)
 				self._Serial.flushInput()
@@ -225,6 +222,9 @@ class KORAD(object):
 				break
 			except:
 				k = k+1
+				self._Serial.reset_output_buffer()
+				self._Serial.reset_input_buffer()
+				time.sleep(0.05)
 				pass
 
 		# read current:
@@ -237,6 +237,9 @@ class KORAD(object):
 				break
 			except:
 				k = k+1
+				self._Serial.reset_output_buffer()
+				self._Serial.reset_input_buffer()
+				time.sleep(0.05)
 				pass
 
 		# read output limit status:
@@ -253,6 +256,9 @@ class KORAD(object):
 				break
 			except:
 				k = k+1
+				self._Serial.reset_output_buffer()
+				self._Serial.reset_input_buffer()
+				time.sleep(0.05)
 				pass
 
 		return (V, I, S)

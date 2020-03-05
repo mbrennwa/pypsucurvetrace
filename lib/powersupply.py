@@ -159,12 +159,13 @@ class PSU:
 			t0 = time.time() # start time (now)
 			while not time.time() > t0+self.MAXSETTLETIME:
 				v = self.read()[0]
-				if abs(v - value) <= 1.3*self.VRESREAD/2:
+				if abs(v - value) <= 1.3*self.VRESREAD:
 					stable = True
 					break
 				else:
 					time.sleep(self.READIDLETIME)
 			if not stable:
+				print ([ value , v ])
 				print (self.LABEL + ' warning: voltage setpoint not reached after ' + str(self.MAXSETTLETIME) + ' s!')
 
 
