@@ -30,8 +30,8 @@ V2= unique(x(:,6));
 
 for i = 1:length(V2)
 	k = find (x(:,6) == V2(i));
-	V = [0 ; x(k,3)];
-	I = [0 ; x(k,4)];
+	[V,j] = sort([0 ; x(k,3)]);
+	I     = [0 ; x(k,4)](j);
 	plot (V,I,sprintf('-;V_2 = %.3g V;',V2(i)),'marker','.','markersize',12);
 	hold on
 end

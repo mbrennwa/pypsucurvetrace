@@ -169,7 +169,7 @@ class PSU:
 				time.sleep(self.READIDLETIME)
 
 			if not stable:
-				print ([ value , v ])
+				print ([ value , r[2] ])
 				print (self.LABEL + ' warning: voltage setpoint not reached after ' + str(self.MAXSETTLETIME) + ' s!')
 
 
