@@ -306,6 +306,8 @@ class PSU:
 		I = []
 		L = []
 
+		limit = 0
+
 		if N < 1:
 			raise RuntimeError ('Number of consistent readings in a row must be larger than 1!')
 		
@@ -337,7 +339,9 @@ class PSU:
 				if l == "CC":
 					L.append(1.0)
 					print(self.LABEL + ': running in current limit mode. Skip reading ' + str(N) + ' consistent readings in a row...')
-					break
+					limit = limit + 1
+					if limit > 2: # ran into the current limit for the third time
+						break
 				else:
 					L.append(0.0)
 				if len(V) >= N:
@@ -363,9 +367,12 @@ class PSU:
 		if N > 1:
 			V = np.mean(V)
 			I = np.mean(I)
-			if np.mean(L) > 0.5:
+			if limit > 2:
 				L = "CC"
 			else:
-				L = "CV"
+				if np.mean(L) > 0.5:
+					L = "CC"
+				else:
+					L = "CV"
 
 		return (V,I,L)
