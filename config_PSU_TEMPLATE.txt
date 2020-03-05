@@ -4,6 +4,7 @@ TYPE = VOLTCRAFT
 NUMSTABLEREAD = 5
 
 [PSU2]
-COMPORT = /dev/serial/by-id/usb-Silicon_Labs_CP2102_USB_to_UART_Bridge_Controller_0020-if00-port0
-TYPE = VOLTCRAFT
-NUMSTABLEREAD = 5
+COMPORT = /dev/serial/by-id/usb-Nuvoton_USB_Virtual_COM_000624D20236-if00
+TYPE = KORAD
+NUMSTABLEREAD = 3
+
