@@ -496,6 +496,9 @@ try:
 		# get rid of numerical imprecisions (truncate values to voltage resolution of PSU):
 		# V2 = round(V2/PSU2.VRESSET) * PSU2.VRESSET
 
+		limit = 0 # number of CC events at a given step
+		limit_max = 2 # max. number of CC events before breaking from the loop
+
 
 		if PSU2.CONFIGURED:
 
@@ -528,8 +531,6 @@ try:
 			LIMIT2 = 0
 
 			# measurement loop:
-			limit = 0 # number of CC events at a given step
-			limit_max = 2 # max. number of CC events before breaking from the loop
 			for i in range(N_rep):
 
 				if T_idle > 0.0:
