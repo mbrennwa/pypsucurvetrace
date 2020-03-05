@@ -528,6 +528,8 @@ try:
 			LIMIT2 = 0
 
 			# measurement loop:
+			limit = 0 # number of CC events at a given step
+			limit_max = 2 # max. number of CC events before breaking from the loop
 			for i in range(N_rep):
 
 				if T_idle > 0.0:
@@ -629,7 +631,9 @@ try:
 
 			# Check if current / power limit has been reached:
 			if LIMIT1 + LIMIT2 > 0:
-				break # break out of the inner loop (V1 steps) and continue with the next V2 step
+				limit = limit + 1
+				if limit >= limit_max:
+					break # break out of the inner loop (V1 steps) and continue with the next V2 step
 
 	print ('Test completed.')
 	for p in [PSU1, PSU2]:
