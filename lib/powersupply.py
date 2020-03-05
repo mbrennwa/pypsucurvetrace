@@ -338,7 +338,7 @@ class PSU:
 				I.append(i)
 				if l == "CC":
 					L.append(1.0)
-					print(self.LABEL + ': running in current limit mode. Skip reading ' + str(N) + ' consistent readings in a row...')
+					### print(self.LABEL + ': running in current limit mode. Skip reading ' + str(N) + ' consistent readings in a row...')
 					limit = limit + 1
 					if limit > 2: # ran into the current limit for the third time
 						break
