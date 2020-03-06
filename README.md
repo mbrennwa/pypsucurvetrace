@@ -77,20 +77,21 @@ To run the software, execute the `curvetrace` program from a console terminal.
 
 ## Examples
 
-### IRFP150 power mosfet
+### IRFP150 N-channel power mosfet
 This example shows curve traces obtained from an IRFP150 N-channel power mosfet (drain current I<sub>D</sub> vs. drain-source voltage V<sub>DS</sub>, measured at different gate-source voltages V<sub>GS</sub>). The IRFP150 pins and PSU outputs were connected according to above diagram.
 * DUT source pin to the negative terminals of PSU1 and PSU2 (joined together)
 * DUT drain pin to the positive terminal of PSU1
 * DUT gate pin to the positive termianl of PSU2. A gate stopper resistor was used to avoid oscillation.
 ![alt text](https://github.com/mbrennwa/PyPSUcurvetrace/blob/master/figures/IRFP150_curves.png "IRFP150 curves")
+
 The power limit for the test was set to 100 W, because the DUT was mounted on a heatsink that did not provide enough cooling for more power. You can see how the IRFP150 tends to run away at higher power levels, which is due to the temperature increase. It would be better to mount such high-power DUTs on a large copper block or a water cooling system to achieve more stable temperature conditions during the test.
 
-### IRFP150 power mosfet
+### 2SJ79 P-channel mosfet
 This example shows curve traces obtained from an 2SJ79 P-channel mosfet (drain current I<sub>D</sub> vs. drain-source voltage V<sub>DS</sub>, measured at different gate-source voltages V<sub>GS</sub>). The 2SJ79 was connected in the same way as the IRFP150 in the previous example, but with the polarity of the PSU terminals inverted to obtain negative test voltages:
 * DUT source pin to the positive terminals of PSU1 and PSU2 (joined together)
 * DUT drain pin to the negative terminal of PSU1
 * DUT gate pin to the negative termianl of PSU2. A gate stopper resistor was used to avoid oscillation.
-![alt text](https://github.com/mbrennwa/PyPSUcurvetrace/blob/master/figures/2SJ79_curves.png "IRFP150 curves")
+![alt text](https://github.com/mbrennwa/PyPSUcurvetrace/blob/master/figures/2SJ79_curves.png "2SJ79 curves")
 
 ## Notes
 
