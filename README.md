@@ -79,9 +79,9 @@ To run the software, execute the `curvetrace` program from a console terminal.
 
 ### IRFP150 power mosfet
 This example shows curve traces obtained from an IRFP150 power mosfet (drain current I<sub>D</sub> vs. drain-source voltage V<sub>DS</sub>, measured at different gate-source voltages V<sub>GS</sub>). The IRFP150 pins and PSU outputs were connected according to above diagram.
-* DUT source pin to GND
+* DUT source pin to the negative terminals of PSU1 and PSU2 (joined together)
 * DUT drain pin to the positive terminal of PSU1
-* DUT gate pin to the positive termianl of PSU2. A 100 Ohm gate stopper resistor was used to avoid oscillation.
+* DUT gate pin to the positive termianl of PSU2. A gate stopper resistor was used to avoid oscillation.
 ![alt text](https://github.com/mbrennwa/PyPSUcurvetrace/blob/master/figures/IRFP150_curves.png "IRFP150 curves")
 
 ## Notes
