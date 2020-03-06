@@ -1,6 +1,6 @@
-function plot_curves_V1I1V2 (f)
+function h = plot_curves_V1I1V2 (f)
 
-% function plot_curves_V1I1V2 (f)
+% function h = plot_curves_V1I1V2 (f)
 %
 % GNU Octave m-file to plot curves from curvetrace data in file(s) f:
 % - x-axis: PSU-1 voltage (V1)
@@ -10,6 +10,20 @@ function plot_curves_V1I1V2 (f)
 %
 % INPUT:
 % f: string or cell string with the name(s) of the data file(s)
+%
+% EXAMPLE (plot 2SJ79 curves and save to PDF file):
+%
+% >> graphics_toolkit ('fltk')
+% >> h = plot_curves_V1I1V2('examples/data/2SJ79.dat');
+% >> set(h(:),'marker','none','linewidth',1.5); grid('on')
+% >> legend('boxoff')
+% >> l = get( get( gcf,'children' )(1) , 'string'); l = strrep( l , 'V_2','V_{GS}' ); l = strrep( l , ' V','.0 V' ); l = strrep( l , '.5.0','.0' ); set( get(gcf,'children')(1) , 'string',l , 'position',[0.85 0.1 0.1 0.8] )
+% >> title ('2SJ79 FET'); xlabel('Drain-Source Voltage (V)'); ylabel('Drain Current (mA)');
+% >> v = get(gca,'yticklabel'); for i = 1:length(v) v{i} = num2str(1000*str2num(v{i})); end
+% >> set( gca , 'yticklabel',v , 'linewidth',1.5 , 'position',[0.1 0.1 0.7 0.8] )
+% >> set( gcf , 'paperposition',[0 0 10 6] , 'papersize',[10 6])
+% >> print('2SJ79.pdf')
+
 
 % check input:
 if ~iscellstr(f)
@@ -26,18 +40,19 @@ end
 k = find (x(:,5) == 0); x = x(k,:);
 
 % find V2 values:
-V2= unique(x(:,6));
+V2 = unique(x(:,6));
 
+h = [];
 for i = 1:length(V2)
 	k = find (x(:,6) == V2(i));
 	[u,j] = sort(abs(x(k,3)));
 	V     = x(k,3)(j);
 	I     = x(k,4)(j);
 	if ~any(V == 0)
-		V = [0;V]
-		I = [0;I]
+		V = [0;V];
+		I = [0;I];
 	end
-	plot (V,I,sprintf('-;V_2 = %.3g V;',V2(i)),'marker','.','markersize',12);
+	h = [ h plot(V,I,sprintf('-;V_2 = %.3g V;',V2(i)),'marker','.','markersize',12) ];
 	hold on
 end
 hold off
