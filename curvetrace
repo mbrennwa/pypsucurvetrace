@@ -539,8 +539,7 @@ try:
 					for p in [PSU1, PSU2]:
 						if p.CONFIGURED:
 							p.setCurrent(p.TEST_IIDLE,False)
-							p.setVoltage(p.TEST_VIDLE,False) # don't check for stable voltage, since current limiter may upset the the voltage value
-
+							p.setVoltage(p.TEST_VIDLE,False) # don't check for stable voltage, since current limiter may prevent sucessful voltage stabilisation, resulting in substantial delay / slow down of the measurement loop
 					# wait idle time:	
 					time.sleep(T_idle)
 
