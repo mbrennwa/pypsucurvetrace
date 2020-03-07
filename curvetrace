@@ -201,14 +201,118 @@ def configure_idle_PSU(PSU,configDUT):
 		if configDUT:
 			# take configuration from DUT config file:
 			PSU.TEST_VIDLE = float(configDUT['VIDLE'])
+			if not 'VIDLE_MIN' in configDUT:
+				PSU.TEST_VIDLE_MIN = PSU.TEST_VIDLE # fixed idle voltage
+			else:
+				PSU.TEST_VIDLE_MIN = float(configDUT['VIDLE_MIN'])
+			if not 'VIDLE_MAX' in configDUT:
+				PSU.TEST_VIDLE_MAX = PSU.TEST_VIDLE # fixed idle voltage
+			else:
+				PSU.TEST_VIDLE_MAX = float(configDUT['VIDLE_MAX'])
+			if not 'IDLE_GM' in configDUT:
+				PSU.TEST_IDLE_GM = None # unknown transconductance
+			else:
+				PSU.TEST_IDLE_GM = float(configDUT['IDLE_GM']) # unknown transconductance (delta-I1 / delta-U2 or delta-U2 / delta-I1 in A/V)
 			PSU.TEST_IIDLE = float(configDUT['IIDLE'])
 
 		else:
 			print ('\n' + 'configure ' + PSU.LABEL + ' idle settings:')
 			PSU.TEST_VIDLE = __get_number('* ' + PSU.LABEL + ' idle voltage (V): ',allowZero=True,allowNegative=False,typ='float')
+			try:
+				PSU.TEST_VIDLE_MIN = float(input('* OPTIONAL: ' + PSU.LABEL + ' idle voltage range, minimum value (V): '))
+			except ValueError:
+				PSU.TEST_VIDLE_MIN = PSU.TEST_VIDLE # fixed idle voltage
+				PSU.TEST_VIDLE_MAX = PSU.TEST_VIDLE # fixed idle voltage
+			try:
+				PSU.TEST_VIDLE_MAX = float(input('* OPTIONAL: ' + PSU.LABEL + ' idle voltage range, maximum value (V): '))
+			except ValueError:
+				PSU.TEST_VIDLE_MAX = PSU.TEST_VIDLE # fixed idle voltage
+
+			if PSU.TEST_VIDLE_MAX == PSU.TEST_VIDLE_MIN:
+				PSU.TEST_IDLE_GM = None # unknown transconductance
+			else:
+				PSU.TEST_IDLE_GM = __get_number('* ' + PSU.LABEL + ' DUT transconductance at idle conditions (in A/V): ',allowZero=False,allowNegative=False,typ='float')
 			PSU.TEST_IIDLE = __get_number('* ' + PSU.LABEL + ' idle current (A): ',allowZero=True,allowNegative=False,typ='float')
 
+
 	return PSU
+
+
+######################
+# do idle / pre-heat #
+######################
+
+def do_idle(PSU1,PSU2,seconds):
+	
+	REG = None
+	if not PSU1.TEST_VIDLE_MIN == PSU1.TEST_VIDLE_MAX:
+		REG = PSU1
+		FIX = PSU2
+	elif not PSU2.TEST_VIDLE_MIN == PSU2.TEST_VIDLE_MAX:
+		REG = PSU2
+		FIX = PSU1
+
+	if REG == None:	# idling without any regulation of the voltage / current levels:
+		if PSU.CONFIGURED:
+			for p in [PSU1, PSU2]:
+				if p.CONFIGURED:
+					p.setCurrent(p.TEST_IIDLE,False)
+					p.setVoltage(p.TEST_VIDLE,False) # don't check for stable voltage, since current limiter may upset the the voltage value
+			# wait pre-heat time:
+			time.sleep(seconds)
+
+	else: # fixed output on FIX power supply and regulated output on REG power supply
+
+		IFIXLIM = min (FIX.TEST_ILIMIT,FIX.TEST_PLIMIT/FIX.TEST_VIDLE); # current limit set at fixed PSU
+
+		# sleep time (seconds):
+		dt = 0.2
+
+		# Set output limits at the fixed PSU:
+		PSU1.setCurrent(IFIXLIM,False)
+		PSU1.setVoltage(FIX.TEST_VIDLE,True)
+
+		# Set output at the regulating PSU:
+		REG.setCurrent(REG.TEST_IIDLE,False) # current limit
+		REG.setVoltage(REG.TEST_VIDLE,True) # set last-used idle setting
+
+		# start idling:
+		t0 = time.time()
+		timenow = time.time()
+		while timenow < t0+seconds:
+
+			# read and print voltages and currents at FIX and REG outputs:
+			f = FIX.read()
+			r = REG.read()
+
+			Uf = f[0]
+			If = f[1]
+
+			Ur = r[0]
+			Ir = r[1]
+
+			b = "I0={:.3f} V".format(Uf) + '  ' + "I0={:.3f} A".format(If) + '  ' + "Uc={:.3f} V".format(Ur) + '  ' + "Ic={:.3f} A".format(Ir)
+			t = "Idling ({:.1f}".format(time.time()-t0) + ' of ' + "{:.1f}".format(seconds) + ' s): '
+			print (t + b + ' '*12, end="\r")
+
+			if f[2] == "CC":
+				If = IFIXLIM * (1+(FIX.TEST_VIDLE-Uf)/FIX.TEST_VIDLE)
+
+			dIf = If-FIX.TEST_IIDLE  # deviation of the observed idle current from the target value
+			if not dIf == 0.0:
+				# determine the voltage changed needed for Ur voltage:
+				dUr = 0.65 * dIf / REG.TEST_IDLE_GM
+				
+				if REG.TEST_VIDLE - dUr < REG.TEST_VIDLE_MIN:
+					REG.TEST_VIDLE = REG.TEST_VIDLE_MIN
+				elif REG.TEST_VIDLE - dUr > REG.TEST_VIDLE_MAX:
+					REG.TEST_VIDLE = REG.TEST_VIDLE_MIN
+				else:
+					REG.TEST_VIDLE = REG.TEST_VIDLE - dUr
+				PSU2.setVoltage(REG.TEST_VIDLE,True)
+
+			time.sleep(dt)
+			timenow = time.time()
 
 
 ################
@@ -324,6 +428,11 @@ if (T_idle > 0.0) or (T_preheat > 0.0):
 		else:
 			PSU2 = configure_idle_PSU (PSU2,None)
 
+	if PSU1.CONNECTED and PSU2.CONNECTED:
+		if (not PSU1.TEST_VIDLE_MAX == PSU1.TEST_VIDLE_MIN) and (not PSU2.TEST_VIDLE_MAX == PSU2.TEST_VIDLE_MIN):
+			print('Both PSUs are configured with variable idle voltages. This cannot work. Goodbye!')
+			exit()
+
 # check voltage / power / current limits (and fix where possible and necessary):
 print ('\nChecking voltage / current settings...')
 for p in [PSU1,PSU2]:
@@ -372,6 +481,24 @@ for p in [PSU1,PSU2]:
 		if p.TEST_VIDLE < p.VMIN:
 			print ('  ' + p.LABEL + ': Adjusting idle voltage to min. value possible with the power supply (' + str(p.VMIN) + ' V).')
 			p.TEST_VIDLE = p.VMIN
+		if p.TEST_VIDLE_MAX > p.VMAX:
+			print ('  ' + p.LABEL + ': Adjusting max.-idle voltage to max. value possible with the power supply (' + str(p.VMAX) + ' V).')
+			p.TEST_VIDLE_MAX = p.VMAX
+		if p.TEST_VIDLE_MAX < p.VMIN:
+			print ('  ' + p.LABEL + ': Adjusting max.-idle voltage to min. value possible with the power supply (' + str(p.VMIN) + ' V).')
+			p.TEST_VIDLE_MAX = p.VMIN
+		if p.TEST_VIDLE_MIN > p.VMAX:
+			print ('  ' + p.LABEL + ': Adjusting min.-idle voltage to max. value possible with the power supply (' + str(p.VMAX) + ' V).')
+			p.TEST_VIDLE_MIN = p.VMAX
+		if p.TEST_VIDLE_MIN < p.VMIN:
+			print ('  ' + p.LABEL + ': Adjusting min.-idle voltage to min. value possible with the power supply (' + str(p.VMIN) + ' V).')
+			p.TEST_VIDLE_MIN = p.VMIN
+		if p.TEST_VIDLE_MIN > p.TEST_VIDLE_MAX:
+			print ('  ' + p.LABEL + ': Adjusting min.-idle voltage to ' + str(p.TEST_VIDLE) + ' V).')
+			p.TEST_VIDLE_MIN = p.TEST_VIDLE
+		if p.TEST_VIDLE_MAX < p.TEST_VIDLE_MIN:
+			print ('  ' + p.LABEL + ': Adjusting max.-idle voltage to ' + str(p.TEST_VIDLE) + ' V).')
+			p.TEST_VIDLE_MAX = p.TEST_VIDLE
 		if p.TEST_IIDLE > p.IMAX:
 			print ('  ' + p.LABEL + ': Adjusting idle current to max. value possible with the power supply (' + str(p.IMAX) + ' V).')
 			p.TEST_IIDLE = p.IMIN
@@ -419,7 +546,10 @@ if (T_idle > 0.0) or (T_preheat > 0.0):
 		if p.CONNECTED == False:
 			printit ('* ' + p.LABEL + ' Idle / pre-heat conditions not configured',logfile,'%')
 		else:
-			printit ('* ' + p.LABEL + ' idle / pre-heat voltage limit = ' + str(p.TEST_VIDLE) + ' V',logfile,'%')
+			if p.TEST_VIDLE_MAX == p.TEST_VIDLE_MIN:
+				printit ('* ' + p.LABEL + ' idle / pre-heat voltage limit = ' + str(p.TEST_VIDLE) + ' V (fixed value)',logfile,'%')
+			else:
+				printit ('* ' + p.LABEL + ' idle / pre-heat voltage range = ' + str(p.TEST_VIDLE_MIN) + ' V ... ' + str(p.TEST_VIDLE_MAX) + ' V.',logfile,'%')
 			printit ('* ' + p.LABEL + ' idle / pre-heat current limit = ' + str(p.TEST_IIDLE) + ' A',logfile,'%')
 
 
@@ -480,13 +610,7 @@ try:
 		print ('Pre-heating...\n')
 
 		# set idle conditions:
-		for p in [PSU1, PSU2]:
-			if p.CONFIGURED:
-				p.setCurrent(p.TEST_IIDLE,False)
-				p.setVoltage(p.TEST_VIDLE,False) # don't check for stable voltage, since current limiter may upset the the voltage value
-
-		# wait pre-heat time:	
-		time.sleep(T_preheat)
+		do_idle(PSU1,PSU2,T_preheat)
 
 	print ('Test started...\n')
 
@@ -534,19 +658,7 @@ try:
 			for i in range(N_rep):
 
 				if T_idle > 0.0:
-
-					# set idle conditions:
-					for p in [PSU1, PSU2]:
-						if p.CONFIGURED:
-							p.setCurrent(p.TEST_IIDLE,False)
-							p.setVoltage(p.TEST_VIDLE,False) # don't check for stable voltage, since current limiter may prevent sucessful voltage stabilisation, resulting in substantial delay / slow down of the measurement loop
-					# wait idle time:	
-					time.sleep(T_idle)
-
-					# set outputs to zero (to avoid running hot before starting next measurement)
-					for p in [PSU1, PSU2]:
-						if p.CONFIGURED:
-							p.setCurrent(0,False)
+					do_idle(PSU1,PSU2,T_idle)
 
 					# return to required PSU2 output:
 					if PSU2.CONFIGURED:

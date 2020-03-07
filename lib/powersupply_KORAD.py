@@ -148,11 +148,11 @@ class KORAD(object):
 			ans = self._Serial.readline().decode('utf-8').rstrip("\n\r")
 			if self._debug: _KORAD_debug('KORAD -> %s\n' % ans)
 			if ans == '':
-				_KORAD_debug('*** No answer from KORAD PSU! Command: ' + cmd)
+				### _KORAD_debug('*** No answer from KORAD PSU! Command: ' + cmd)
 				self._Serial.flushOutput()			
-				time.sleep(0.2)
+				time.sleep(0.1)
 				self._Serial.flushInput()
-				time.sleep(0.2)			
+				time.sleep(0.1)			
 				ans = self._query(cmd,True,attempt+1)
 
 		return ans
