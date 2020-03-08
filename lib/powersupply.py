@@ -350,8 +350,8 @@ class PSU:
 				if len(V) >= N:
 
 					# we have enough readings, so let's check if they are consistent:
-                                        if max(V)-min(V) <= self.VRESREAD:
-                                                if max(I)-min(I) <= self.IRESREAD:
+                                        if max(V)-min(V) <= 2*self.VRESREAD:
+                                                if max(I)-min(I) <= 2*self.IRESREAD:
                                                         break
 
 					# the readings are not yet consistent, so let's only keep the last N-1 readings and try again:

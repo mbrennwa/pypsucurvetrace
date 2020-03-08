@@ -314,6 +314,10 @@ def do_idle(PSU1,PSU2,seconds):
 			time.sleep(dt)
 			timenow = time.time()
 
+		# Clear the terminal:
+		print (' '*72, end="\r")
+
+
 
 ################
 # main program #
@@ -466,9 +470,10 @@ for p in [PSU1,PSU2]:
 			if p.TEST_VSTEP/p.VRESSET < p.VRESSET:
 				print ('  ' + p.LABEL + ': Voltage step size is less than PSU resolution of voltage setting. Adjusting step size to ' + str(p.VRESSET) + ' V.')
 				p.TEST_VSTEP = p.VRESSET
-			if p.TEST_VSTEP % p.VRESSET:
+			if not ( p.TEST_VSTEP / p.VRESSET == round(p.TEST_VSTEP / p.VRESSET) ):
+				u = p.TEST_VSTEP
 				p.TEST_VSTEP = round(p.TEST_VSTEP / p.VRESSET) * p.VRESSET
-				print ('  ' + p.LABEL + ': Voltage step size is not consistent with PSU resolution of voltage setting. Adjusting step size to ' + str(p.TEST_VSTEP) + ' V.')
+				print ('  ' + p.LABEL + ': Voltage step size (' + str(u) + ' V) is not consistent with PSU resolution of voltage setting. Adjusting step size to ' + str(p.TEST_VSTEP) + ' V.')
 		if p.TEST_ILIMIT > p.IMAX:
 			print ('  ' + p.LABEL + ': Adjusting current limit to max. value possible with the power supply (' + str(p.IMAX) + ' A).')
 			p.TEST_ILIMIT = p.IMAX
@@ -547,10 +552,10 @@ if (T_idle > 0.0) or (T_preheat > 0.0):
 			printit ('* ' + p.LABEL + ' Idle / pre-heat conditions not configured',logfile,'%')
 		else:
 			if p.TEST_VIDLE_MAX == p.TEST_VIDLE_MIN:
-				printit ('* ' + p.LABEL + ' idle / pre-heat voltage limit = ' + str(p.TEST_VIDLE) + ' V (fixed value)',logfile,'%')
+				printit ('* ' + p.LABEL + ' idle / pre-heat voltage = ' + str(p.TEST_VIDLE) + ' V (fixed value)',logfile,'%')
 			else:
 				printit ('* ' + p.LABEL + ' idle / pre-heat voltage range = ' + str(p.TEST_VIDLE_MIN) + ' V ... ' + str(p.TEST_VIDLE_MAX) + ' V.',logfile,'%')
-			printit ('* ' + p.LABEL + ' idle / pre-heat current limit = ' + str(p.TEST_IIDLE) + ' A',logfile,'%')
+			printit ('* ' + p.LABEL + ' idle / pre-heat current = ' + str(p.TEST_IIDLE) + ' A',logfile,'%')
 
 
 # Ask if okay to start the test
