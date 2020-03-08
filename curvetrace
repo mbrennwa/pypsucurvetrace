@@ -215,6 +215,10 @@ def configure_idle_PSU(PSU,configDUT):
 				PSU.TEST_IDLE_GM = float(configDUT['IDLE_GM']) # unknown transconductance (delta-I1 / delta-U2 or delta-U2 / delta-I1 in A/V)
 			PSU.TEST_IIDLE = float(configDUT['IIDLE'])
 
+
+			print(PSU.TEST_VIDLE_MAX)
+			print('*******************************************')
+
 		else:
 			print ('\n' + 'configure ' + PSU.LABEL + ' idle settings:')
 			PSU.TEST_VIDLE = __get_number('* ' + PSU.LABEL + ' idle voltage (V): ',allowZero=True,allowNegative=False,typ='float')
@@ -480,36 +484,37 @@ for p in [PSU1,PSU2]:
 		if p.TEST_PLIMIT > p.PMAX:
 			print ('  ' + p.LABEL + ': Adjusting power limit to max. value possible with the power supply (' + str(p.PMAX) + ' W).')
 			p.TEST_PLIMIT = p.PMAX
-		if p.TEST_VIDLE > p.VMAX:
-			print ('  ' + p.LABEL + ': Adjusting idle voltage to max. value possible with the power supply (' + str(p.VMAX) + ' V).')
-			p.TEST_VIDLE = p.VMAX
-		if p.TEST_VIDLE < p.VMIN:
-			print ('  ' + p.LABEL + ': Adjusting idle voltage to min. value possible with the power supply (' + str(p.VMIN) + ' V).')
-			p.TEST_VIDLE = p.VMIN
-		if p.TEST_VIDLE_MAX > p.VMAX:
-			print ('  ' + p.LABEL + ': Adjusting max.-idle voltage to max. value possible with the power supply (' + str(p.VMAX) + ' V).')
-			p.TEST_VIDLE_MAX = p.VMAX
-		if p.TEST_VIDLE_MAX < p.VMIN:
-			print ('  ' + p.LABEL + ': Adjusting max.-idle voltage to min. value possible with the power supply (' + str(p.VMIN) + ' V).')
-			p.TEST_VIDLE_MAX = p.VMIN
-		if p.TEST_VIDLE_MIN > p.VMAX:
-			print ('  ' + p.LABEL + ': Adjusting min.-idle voltage to max. value possible with the power supply (' + str(p.VMAX) + ' V).')
-			p.TEST_VIDLE_MIN = p.VMAX
-		if p.TEST_VIDLE_MIN < p.VMIN:
-			print ('  ' + p.LABEL + ': Adjusting min.-idle voltage to min. value possible with the power supply (' + str(p.VMIN) + ' V).')
-			p.TEST_VIDLE_MIN = p.VMIN
-		if p.TEST_VIDLE_MIN > p.TEST_VIDLE_MAX:
-			print ('  ' + p.LABEL + ': Adjusting min.-idle voltage to ' + str(p.TEST_VIDLE) + ' V).')
-			p.TEST_VIDLE_MIN = p.TEST_VIDLE
-		if p.TEST_VIDLE_MAX < p.TEST_VIDLE_MIN:
-			print ('  ' + p.LABEL + ': Adjusting max.-idle voltage to ' + str(p.TEST_VIDLE) + ' V).')
-			p.TEST_VIDLE_MAX = p.TEST_VIDLE
-		if p.TEST_IIDLE > p.IMAX:
-			print ('  ' + p.LABEL + ': Adjusting idle current to max. value possible with the power supply (' + str(p.IMAX) + ' V).')
-			p.TEST_IIDLE = p.IMIN
-		if p.TEST_VIDLE * p.TEST_IIDLE > p.PMAX:
-			p.TEST_IIDLE = p.PMAX / p.TEST_VIDLE
-			print ('  ' + p.LABEL + ': Idle current limit is higher than PSU power limit (' + str(p.PMAX) + ' W). Adjusting idle current limit to ' + str(p.TEST_IIDLE) + ' A.' )
+		if (T_idle > 0.0) or (T_preheat > 0.0):
+			if p.TEST_VIDLE > p.VMAX:
+				print ('  ' + p.LABEL + ': Adjusting idle voltage to max. value possible with the power supply (' + str(p.VMAX) + ' V).')
+				p.TEST_VIDLE = p.VMAX
+			if p.TEST_VIDLE < p.VMIN:
+				print ('  ' + p.LABEL + ': Adjusting idle voltage to min. value possible with the power supply (' + str(p.VMIN) + ' V).')
+				p.TEST_VIDLE = p.VMIN
+			if p.TEST_VIDLE_MAX > p.VMAX:
+				print ('  ' + p.LABEL + ': Adjusting max.-idle voltage to max. value possible with the power supply (' + str(p.VMAX) + ' V).')
+				p.TEST_VIDLE_MAX = p.VMAX
+			if p.TEST_VIDLE_MAX < p.VMIN:
+				print ('  ' + p.LABEL + ': Adjusting max.-idle voltage to min. value possible with the power supply (' + str(p.VMIN) + ' V).')
+				p.TEST_VIDLE_MAX = p.VMIN
+			if p.TEST_VIDLE_MIN > p.VMAX:
+				print ('  ' + p.LABEL + ': Adjusting min.-idle voltage to max. value possible with the power supply (' + str(p.VMAX) + ' V).')
+				p.TEST_VIDLE_MIN = p.VMAX
+			if p.TEST_VIDLE_MIN < p.VMIN:
+				print ('  ' + p.LABEL + ': Adjusting min.-idle voltage to min. value possible with the power supply (' + str(p.VMIN) + ' V).')
+				p.TEST_VIDLE_MIN = p.VMIN
+			if p.TEST_VIDLE_MIN > p.TEST_VIDLE_MAX:
+				print ('  ' + p.LABEL + ': Adjusting min.-idle voltage to ' + str(p.TEST_VIDLE) + ' V).')
+				p.TEST_VIDLE_MIN = p.TEST_VIDLE
+			if p.TEST_VIDLE_MAX < p.TEST_VIDLE_MIN:
+				print ('  ' + p.LABEL + ': Adjusting max.-idle voltage to ' + str(p.TEST_VIDLE) + ' V).')
+				p.TEST_VIDLE_MAX = p.TEST_VIDLE
+			if p.TEST_IIDLE > p.IMAX:
+				print ('  ' + p.LABEL + ': Adjusting idle current to max. value possible with the power supply (' + str(p.IMAX) + ' V).')
+				p.TEST_IIDLE = p.IMIN
+			if p.TEST_VIDLE * p.TEST_IIDLE > p.PMAX:
+				p.TEST_IIDLE = p.PMAX / p.TEST_VIDLE
+				print ('  ' + p.LABEL + ': Idle current limit is higher than PSU power limit (' + str(p.PMAX) + ' W). Adjusting idle current limit to ' + str(p.TEST_IIDLE) + ' A.' )
 		
 
 

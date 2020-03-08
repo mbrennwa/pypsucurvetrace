@@ -89,7 +89,7 @@ IIDLE     = 1
 [EXTRA]
 
 # Duration of idle periods between readings (seconds):
-IDLESECS    = 10
+IDLESECS    = 5
 
 # Duration of pre-heat / warmup period before starting the test (seconds):
 PREHEATSECS = 60
