@@ -1,6 +1,6 @@
-########################################
-# Test configuration IRPF150 power FET #
-########################################
+#################################
+# Test configuration 2SK214 FET #
+#################################
 
 
 
@@ -21,22 +21,22 @@ VEND   = 60
 # Test voltage V1 steps are 0.5 V:
 VSTEP  = 0.5
 
-# Max. allowed current during the test is 15 A:
-IMAX   = 15
+# Max. allowed current during the test is 500 mA:
+IMAX   = 0.5
 
-# Max. allowed power during the test is 100 W:
-PMAX   = 100
+# Max. allowed power during the test is 10 W:
+PMAX   = 10
 
 # Idle conditions for pre-heat and idle between readings are configured to fixed values (PSU2 output will be regulated to attain these values, see below):
 
-# - Idle voltage is 25 V (will be set as voltage limit at PSU-1 during idling):
-VIDLE  = 25
+# - Idle voltage is 15 V (will be set as voltage limit at PSU-1 during idling):
+VIDLE  = 15
 
 #   (no min. or max. idle voltage is specified, which tells the program to use a fixed V1 idle voltage)
 
-# - Idle current is 3 A, which is the target value to be attained with PSU-2 regulation
+# - Idle current is 250 mA, which is the target value to be attained with PSU-2 regulation
 #   (make sure this is lower and not too close to IMAX):
-IIDLE  = 3.0
+IIDLE  = 0.25
 
 
 
@@ -48,14 +48,14 @@ IIDLE  = 3.0
 # DUT is connected with normal polarity (not inverted):
 POLARITY = 1
 
-# Test voltage V2 starts at 3.2 V:
-VSTART = 3.2
+# Test voltage V2 starts at 0.5 V:
+VSTART = 0.5
 
-# Test voltage V2 ends at 4.5 V:
-VEND   = 4.5
+# Test voltage V2 ends at 4.0 V:
+VEND   = 4.0
 
-# Test voltage V2 steps are 0.1 V:
-VSTEP  = 0.1
+# Test voltage V2 steps are 0.5 V:
+VSTEP  = 0.5
 
 # Max. allowed current during the test is 1 A (this is way more than necessary for the DUT, but a larger value helps achieving quick regulation of the PSU output):
 IMAX   = 1
@@ -65,18 +65,18 @@ PMAX   = 5
 
 # Idle conditions configured such that PSU-2 regulates the idle conditions configured for PSU-1
 
-# - V2 start value is set to 3.0 V:
-VIDLE     = 3.0
+# - V2 start value is set to 2.0 V:
+VIDLE     = 2.0
 
-# - V2 minimum value is set to 1.0 V:
-VIDLE_MIN = 1.0
+# - V2 minimum value is set to 0.5 V:
+VIDLE_MIN = 0.5
 
-# - V2 maximum value is set to 10.0 V:
-VIDLE_MAX = 10.0
+# - V2 maximum value is set to 4.0 V:
+VIDLE_MAX = 4.0
 
 # - The DUT transconductance value (in A/V) to be used for regulation of the I1 idle current by adjusting the V2 voltage:
 #   (IDLE_GM = delta-I1 / delta-U2 ratio of the DUT at the idle point)
-IDLE_GM   = 20
+IDLE_GM   = 0.2
 
 # - Max. allowed idle current during the test is 1 A (this is way more than necessary for the DUT, but a larger value helps achieving quick regulation of the PSU output):
 IIDLE     = 1
@@ -92,7 +92,7 @@ IIDLE     = 1
 IDLESECS    = 10
 
 # Duration of pre-heat / warmup period before starting the test (seconds):
-PREHEATSECS = 300
+PREHEATSECS = 60
 
 # number of repeated readings at each measurement step:
 # (note that each reading is preceeded by an idle period if IDLECECS > 0):
