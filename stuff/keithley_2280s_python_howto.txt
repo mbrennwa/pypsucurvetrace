@@ -1,0 +1,12 @@
+sudo apt install python3-usb
+
+sudo nano /etc/udev/rules.d/90-keithleyPSU.rules
+--> enter: SUBSYSTEM=="usb", ACTION=="add", ATTRS{idVendor}=="05e6", ATTRS{idProduct}=="2280", GROUP="plugdev", MODE="0660"
+--> save and exit
+
+Run python3, then execute the following commands:
+import pyvisa
+rm = pyvisa.ResourceManager()
+rm.list_resources()
+inst = rm.open_resource('USB0::1510::8832::4315095::0::INSTR')
+print(inst.query("*IDN?"))
