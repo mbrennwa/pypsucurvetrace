@@ -19,24 +19,24 @@ VSTART = 0
 VEND   = 30
 
 # Test voltage V1 step size (V):
-VSTEP  = 1.0
+VSTEP  = 0.5
 
 # Max. allowed current during the test (A):
 IMAX   = 10
 
 # Max. allowed power during the test (W):
-PMAX   = 75
+PMAX   = 40
 
 # Idle conditions for pre-heat and idle between readings are configured to fixed values (PSU2 output will be regulated to attain these values, see below):
 
 # - Idle voltage (V) (will be set as voltage limit at PSU-1 during idling):
-VIDLE  = 24
+VIDLE  = 18
 
 #   (no min. or max. idle voltage is specified, which tells the program to use a fixed V1 idle voltage)
 
 # - Idle current (A) (target value to be attained with PSU-2 regulation)
 #   (make sure this is lower and not too close to IMAX):
-IIDLE  = 3.0
+IIDLE  = 2.0
 
 
 
@@ -89,10 +89,10 @@ IIDLE     = 1
 [EXTRA]
 
 # Duration of idle periods between readings (seconds):
-IDLESECS    = 20
+IDLESECS    = 00
 
 # Duration of pre-heat / warmup period before starting the test (seconds):
-PREHEATSECS = 300
+PREHEATSECS = 30
 
 # number of repeated readings at each measurement step:
 # (note that each reading is preceeded by an idle period if IDLECECS > 0):
