@@ -173,7 +173,7 @@ class PSU:
 
 			if not stable:
 				if r[2] == "CC":
-					print(self.LABEL + ': voltage setpoint running into current limit mode. Skip waiting for stable output voltage...')
+					### print(self.LABEL + ': voltage setpoint running into current limit mode. Skip waiting for stable output voltage...')
 				else:
 					print (self.LABEL + ' warning: voltage setpoint not reached after ' + str(self.MAXSETTLETIME) + ' s!')
 
