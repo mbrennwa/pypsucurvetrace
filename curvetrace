@@ -295,7 +295,7 @@ def do_idle(PSU1,PSU2,seconds):
 			Ur = r[0]
 			Ir = r[1]
 
-			b = "I0={:.3f} V".format(Uf) + '  ' + "I0={:.3f} A".format(If) + '  ' + "Uc={:.3f} V".format(Ur) + '  ' + "Ic={:.3f} A".format(Ir)
+			b = "U0={:.3f} V".format(Uf) + '  ' + "I0={:.3f} A".format(If) + '  ' + "Uc={:.3f} V".format(Ur) + '  ' + "Ic={:.3f} A".format(Ir)
 			t = "Idling ({:.1f}".format(time.time()-t0) + ' of ' + "{:.1f}".format(seconds) + ' s): '
 			print (t + b + ' '*12, end="\r")
 
