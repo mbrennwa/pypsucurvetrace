@@ -63,7 +63,8 @@ class BK(object):
 		try:
 			typestring = self._query('*IDN?').split(" ")
 
-			### print (typestring)
+			if self._debug:
+				_BK_debug (typestring)
 
 			# parse typestring:
 			if len(typestring) < 2:
@@ -126,16 +127,16 @@ class BK(object):
 		self._Serial.reset_input_buffer()
 		time.sleep(0.03)
 
-		if self._debug: _KORAD_debug('KORAD <- %s\n' % cmd)
+		if self._debug: _BK_debug('KORAD <- %s\n' % cmd)
 		self._Serial.write((cmd + '\n').encode())
 		
 		if not answer:
 			ans = None
 		else:
 			ans = self._Serial.readline().decode('utf-8').rstrip("\n\r")
-			if self._debug: _KORAD_debug('KORAD -> %s\n' % ans)
+			if self._debug: _BK_debug('KORAD -> %s\n' % ans)
 			if ans == '':
-				### _KORAD_debug('*** No answer from KORAD PSU! Command: ' + cmd)
+				### _BK_debug('*** No answer from KORAD PSU! Command: ' + cmd)
 				self._Serial.flushOutput()			
 				time.sleep(0.1)
 				self._Serial.flushInput()
