@@ -7,6 +7,7 @@ import time
 import numpy as np
 import lib.powersupply_VOLTCRAFT as powersupply_VOLTCRAFT
 import lib.powersupply_KORAD as powersupply_KORAD
+import lib.powersupply_BK as powersupply_BK
 
 # PSU object:
 #    .setVoltage(voltage)   set voltage
@@ -106,6 +107,21 @@ class PSU:
 
 			elif self.COMMANDSET == 'KORAD':
 				self._PSU = powersupply_KORAD.KORAD(port,debug=False)
+				self.VMIN = self._PSU.VMIN
+				self.VMAX = self._PSU.VMAX
+				self.IMAX = self._PSU.IMAX
+				self.PMAX = self._PSU.PMAX
+				self.VRESSET = self._PSU.VRESSET
+				self.IRESSET = self._PSU.IRESSET
+				self.VRESREAD = self._PSU.VRESREAD
+				self.IRESREAD = self._PSU.IRESREAD
+				self.MAXSETTLETIME = self._PSU.MAXSETTLETIME
+				self.READIDLETIME = self._PSU.READIDLETIME
+				self.MODEL = self._PSU.MODEL
+				self.CONNECTED = True
+
+			elif self.COMMANDSET == 'BK':
+				self._PSU = powersupply_BK.BK(port,debug=True)
 				self.VMIN = self._PSU.VMIN
 				self.VMAX = self._PSU.VMAX
 				self.IMAX = self._PSU.IMAX
