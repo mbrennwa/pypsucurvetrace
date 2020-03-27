@@ -92,52 +92,33 @@ class PSU:
 			self.COMMANDSET == self.COMMANDSET.upper()
 			if self.COMMANDSET == 'VOLTCRAFT':
 				self._PSU = powersupply_VOLTCRAFT.VOLTCRAFT(port,debug=False)
-				self.VMIN = self._PSU.VMIN
-				self.VMAX = self._PSU.VMAX
-				self.IMAX = self._PSU.IMAX
-				self.PMAX = self._PSU.PMAX
-				self.VRESSET = self._PSU.VRESSET
-				self.IRESSET = self._PSU.IRESSET
-				self.VRESREAD = self._PSU.VRESREAD
-				self.IRESREAD = self._PSU.IRESREAD
-				self.MAXSETTLETIME = self._PSU.MAXSETTLETIME
-				self.READIDLETIME = self._PSU.READIDLETIME
-				self.MODEL = self._PSU.MODEL
-				self.CONNECTED = True
 
 			elif self.COMMANDSET == 'KORAD':
 				self._PSU = powersupply_KORAD.KORAD(port,debug=False)
-				self.VMIN = self._PSU.VMIN
-				self.VMAX = self._PSU.VMAX
-				self.IMAX = self._PSU.IMAX
-				self.PMAX = self._PSU.PMAX
-				self.VRESSET = self._PSU.VRESSET
-				self.IRESSET = self._PSU.IRESSET
-				self.VRESREAD = self._PSU.VRESREAD
-				self.IRESREAD = self._PSU.IRESREAD
-				self.MAXSETTLETIME = self._PSU.MAXSETTLETIME
-				self.READIDLETIME = self._PSU.READIDLETIME
-				self.MODEL = self._PSU.MODEL
-				self.CONNECTED = True
 
-			elif self.COMMANDSET == 'BK':
-				self._PSU = powersupply_BK.BK(port,debug=True)
-				self.VMIN = self._PSU.VMIN
-				self.VMAX = self._PSU.VMAX
-				self.IMAX = self._PSU.IMAX
-				self.PMAX = self._PSU.PMAX
-				self.VRESSET = self._PSU.VRESSET
-				self.IRESSET = self._PSU.IRESSET
-				self.VRESREAD = self._PSU.VRESREAD
-				self.IRESREAD = self._PSU.IRESREAD
-				self.MAXSETTLETIME = self._PSU.MAXSETTLETIME
-				self.READIDLETIME = self._PSU.READIDLETIME
-				self.MODEL = self._PSU.MODEL
-				self.CONNECTED = True
+			elif self.COMMANDSET in [ "BK" , "BK9184B_HIGH" , "BK9185B_HIGH" ]:
+				self._PSU = powersupply_BK.BK(port,voltagemode='HIGH',debug=False)
+				self.COMMANDSET = 'BK'
+
+			elif self.COMMANDSET in [ "BK9184B_LOW" , "BK9185B_LOW" ]:
+				self._PSU = powersupply_BK.BK(port,voltagemode='LOW',debug=False)
+				self.COMMANDSET = 'BK'
 
 			else:
 				raise RuntimeError ('Unknown commandset ' + commandset + '! Cannot continue...')
 
+			self.VMIN = self._PSU.VMIN
+			self.VMAX = self._PSU.VMAX
+			self.IMAX = self._PSU.IMAX
+			self.PMAX = self._PSU.PMAX
+			self.VRESSET = self._PSU.VRESSET
+			self.IRESSET = self._PSU.IRESSET
+			self.VRESREAD = self._PSU.VRESREAD
+			self.IRESREAD = self._PSU.IRESREAD
+			self.MAXSETTLETIME = self._PSU.MAXSETTLETIME
+			self.READIDLETIME = self._PSU.READIDLETIME
+			self.MODEL = self._PSU.MODEL
+			self.CONNECTED = True
 		
 
 
@@ -162,9 +143,7 @@ class PSU:
 		# which will never give a stable output at the unresolved value		
 		value = round(value/self.VRESSET) * self.VRESSET
 		
-		if self.COMMANDSET == 'KORAD':
-			self._PSU.voltage(value)
-		elif self.COMMANDSET == 'VOLTCRAFT':
+		if self.COMMANDSET in [ 'KORAD' , 'VOLTCRAFT' , 'BK' ]:
 			self._PSU.voltage(value)
 		else:
 			raise RuntimeError('Cannot set voltage on power supply with ' + self.COMMANDSET + ' command set.')
@@ -216,9 +195,7 @@ class PSU:
 		# which will never give a stable output at the unresolved value		
 		value = round(value/self.VRESSET) * self.VRESSET
 
-		if self.COMMANDSET == 'KORAD':
-			self._PSU.current(value)
-		elif self.COMMANDSET == 'VOLTCRAFT':
+		if self.COMMANDSET in [ 'KORAD' , 'VOLTCRAFT' , 'BK' ]:
 			self._PSU.current(value)
 		else:
 			raise RuntimeError('Cannot set current on power supply with ' + self.COMMANDSET + ' command set.')
@@ -263,12 +240,7 @@ class PSU:
 		(none)
 		"""
 
-		if self.COMMANDSET == 'KORAD':
-			self._PSU.output(False)
-			self._PSU.voltage(self.VMIN)
-			self._PSU.current(0.0)
-
-		elif self.COMMANDSET == 'VOLTCRAFT':
+		if self.COMMANDSET in [ 'KORAD' , 'VOLTCRAFT' , 'BK' ]:
 			self._PSU.output(False)
 			self._PSU.voltage(self.VMIN)
 			self._PSU.current(0.0)
@@ -294,10 +266,9 @@ class PSU:
 		(none)
 		"""
 
-		if self.COMMANDSET == 'KORAD':
+		if self.COMMANDSET in [ 'KORAD' , 'VOLTCRAFT' , 'BK' ]:
 			self._PSU.output(True)
-		elif self.COMMANDSET == 'VOLTCRAFT':
-			self._PSU.output(True)
+
 		else:
 			raise RuntimeError('Cannot turn on power supply with ' + self.COMMANDSET + ' command set.')
 
@@ -334,12 +305,7 @@ class PSU:
 		t0 = time.time()
 		while True:
 
-			if self.COMMANDSET == 'KORAD':
-				# KORAD PSU:
-				v,i,l = self._PSU.reading()
-
-			elif self.COMMANDSET == 'VOLTCRAFT':
-				# VOLTCRAFT PSU:
+			if self.COMMANDSET in [ 'KORAD' , 'VOLTCRAFT' , 'BK' ]:
 				v,i,l = self._PSU.reading()
 
 			else:

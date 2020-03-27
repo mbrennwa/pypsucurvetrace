@@ -1,14 +1,15 @@
 """
-Python class to control B+K power supplies
+Python class to control B&K power supplies
 """
 
 import serial
 import sys
 import time
 
-# Python dictionary of known B+K power supply models (Vmin,Vmax,Imax,Pmax,VresolutionSet,IresolutionSet,VresolutionRead,IresolutionRead,MaxSettleTime)
+# Python dictionary of known B&K power supply models (Vmin,Vmax,Imax,Pmax,VresolutionSet,IresolutionSet,VresolutionRead,IresolutionRead,MaxSettleTime)
 BK_SPECS = {
-		"9185B":	( 0.0, 650.0,  0.5, 210,  0.02,  0.01, 0.02,  0.01, 2.0 )  # 
+		"9185B_HIGH":	( 0.0, 610.0,  0.35, 210,  0.02,  0.00001, 0.3,  0.0015, 2.0 ),  # 9185B in "HIGH" setting, confirmed working
+		"9185B_LOW":	( 0.0, 400.0,  0.5 , 210,  0.02,  0.00001, 0.3,  0.0015, 2.0 )  # 9185B in "LOW" setting, confirmed working
 }
 
 BK_TIMEOUT = 2.0
@@ -35,13 +36,14 @@ def _BK_debug(s):
 
 class BK(object):
 	"""
-	Class for B+K power supply
+	Class for B&K power supply.
 	"""
 
-	def __init__(self, port, debug=False,):
+	def __init__(self, port, debug=False,voltagemode='HIGH'):
 		'''
 		PSU(port)
 		port : serial port (string, example: port = '/dev/serial/by-id/XYZ_123_abc')
+		voltagemode: some models can work in LOW and HIGH voltage range
 		debug: flag for debugging info (bool)
 		'''
 		# open and configure serial port:
@@ -61,39 +63,20 @@ class BK(object):
 		self._Serial.flushOutput()
 		self._debug = bool(debug)
 		try:
-			typestring = self._query('*IDN?').split(" ")
-
-			if self._debug:
-				_BK_debug (typestring)
-
+			typestring = self._query('*IDN?').split(",") # <manufacturer>,<model>,<serial number>,<firmware version>,0
+			
 			# parse typestring:
-			if len(typestring) < 2:
-				raise RuntimeError ('No BK power supply connected to ' + port)
-			if not ( typestring[0].upper() in [ 'KORAD' , 'RND' , 'VELLEMAN' , 'TENMA' ] ):
-				raise RuntimeError ('No BK power supply connected to ' + port)
-			if 'KA3003P' in typestring[1]:
-				self.MODEL = 'KA3003P'
-			elif 'KA3005P' in typestring[1]:
-				self.MODEL = 'KA3005P'
-			elif 'KD3005P' in typestring[1]:
-				self.MODEL = 'KD3005P'
-			elif 'KA3010P' in typestring[1]:
-				self.MODEL = 'KD3010P'
-			elif 'KA6002P' in typestring[1]:
-				self.MODEL = 'KA6002P'
-			elif 'KA6003P' in typestring[1]:
-				self.MODEL = 'KA6003P'
-			elif 'KA6005P' in typestring[1]:
-				self.MODEL = 'KA6005P'
-			elif 'KD6005P' in typestring[1]:
-				self.MODEL = 'KD6005P'
-			elif 'KWR103' in typestring[1]:
-				self.MODEL = 'KWR103'
+			if len(typestring) < 1:
+				raise RuntimeError ('No B&K power supply connected to ' + port)
+			if not ( typestring[0].upper() == 'B&K PRECISION'):
+				raise RuntimeError ('No B&K power supply connected to ' + port)
+			if '9185B' in typestring[1]:
+				self.MODEL = '9185B_' + voltagemode.upper()
 			else:
-				print ( 'Unknown KORAD model: ' + typestring[1] )
+				print ( 'Unknown B&K model: ' + typestring[1] )
 				self.MODEL = '?????'
 
-			v = KORAD_SPECS[self.MODEL]
+			v = BK_SPECS[self.MODEL]
 			self.VMIN = v[0]
 			self.VMAX = v[1]
 			self.IMAX = v[2]
@@ -105,10 +88,23 @@ class BK(object):
 			self.MAXSETTLETIME = v[8]
 			self.READIDLETIME = self.MAXSETTLETIME/50
 
+			# Clear status and errors:
+			self._query('*CLS',answer=False)
+
+			# Reset to factory default:
+			self._query('SYStEM:RECALL:DEFAULT',answer=False)
+
+			# Set voltage range
+			if self.MODEL == '9185B_HIGH':
+				self._query('SOURCE:VOLTAGE:RANGE HIGH',answer=False)
+			if self.MODEL == '9185B_LOW':
+				self._query('SOURCE:VOLTAGE:RANGE LOW',answer=False)
+
+
 		except serial.SerialTimeoutException:
-		    raise RuntimeError('No KORAD powersupply connected to ' + port)
+		    raise RuntimeError('No B&K powersupply connected to ' + port)
 		except KeyError:
-		    raise RuntimeError('Unknown KORAD model ' + self.MODEL)
+		    raise RuntimeError('Unknown B&K model ' + self.MODEL)
 	
 	def _query(self, cmd, answer=True, attempt = 1):
 		"""
@@ -116,27 +112,26 @@ class BK(object):
 		"""
 
 		if attempt > 10:
-			raise RuntimeError('KORAD PSU does not respond to ' + cmd + ' command after 10 attempts. Giving up...')
+			raise RuntimeError('B&K PSU does not respond to ' + cmd + ' command after 10 attempts. Giving up...')
 		elif attempt > 1:
 			if self._debug:
-				_pps_debug('*** Retrying (attempt ' + str(attempt) + ')...')
+				_BK_debug('*** Retrying (attempt ' + str(attempt) + ')...')
 
-		# just in case, make sure the buffers are empty before doing anything:
-		# (it seems some KORADs tend to have issues with stuff dangling in their serial buffers)
+		# just in case, make sure the buffers are empty before doing anything
 		self._Serial.reset_output_buffer()
 		self._Serial.reset_input_buffer()
 		time.sleep(0.03)
 
-		if self._debug: _BK_debug('KORAD <- %s\n' % cmd)
+		if self._debug: _BK_debug('B&K <- %s\n' % cmd)
 		self._Serial.write((cmd + '\n').encode())
 		
 		if not answer:
 			ans = None
 		else:
 			ans = self._Serial.readline().decode('utf-8').rstrip("\n\r")
-			if self._debug: _BK_debug('KORAD -> %s\n' % ans)
+			if self._debug: _BK_debug('B&K -> %s\n' % ans)
 			if ans == '':
-				### _BK_debug('*** No answer from KORAD PSU! Command: ' + cmd)
+				### _BK_debug('*** No answer from B&K PSU! Command: ' + cmd)
 				self._Serial.flushOutput()			
 				time.sleep(0.1)
 				self._Serial.flushInput()
@@ -151,10 +146,10 @@ class BK(object):
 		"""
 		state = int(bool(state))
 
-		if self.MODEL == "KWR103":
-			self._query('OUT:%d' % state,answer=False)
+		if state:
+			self._query('OUTPUT ON',answer=False)
 		else:
-			self._query('OUT%d' % state,answer=False)
+			self._query('OUTPUT OFF',answer=False)
 
 
 	def voltage(self, voltage):
@@ -165,11 +160,8 @@ class BK(object):
 			voltage = self.VMAX
 		if voltage < self.VMIN:
 			voltage = self.VMIN
-		voltage = round (1000*voltage) / 1000
-		if self.MODEL == "KWR103":
-			self._query('VSET:' + str(voltage),answer=False)
-		else:
-			self._query('VSET1:' + str(voltage),answer=False)
+		voltage = round (voltage/self.VRESSET) * self.VRESSET
+		self._query('SOURCE:VOLTAGE ' + str(voltage),answer=False)
 
 
 	def current(self, current):
@@ -180,33 +172,22 @@ class BK(object):
 			current = self.IMAX
 		if current < 0.0:
 			current = 0.0
-		current = round (1000*current) / 1000
-		self._query('ISET:' + str(current),answer=False)
-		if self.MODEL == "KWR103":
-			self._query('ISET:' + str(current),answer=False)
-		else:
-			self._query('ISET1:' + str(current),answer=False)
+		current = round (current/self.IRESSET) * self.IRESSET
+		self._query('SOURCE:CURRENT ' + str(current),answer=False)
 
 
 	def reading(self):
 		"""
 		read applied output voltage and current and if PS is in "CV" or "CC" mode
 		"""
-		if self.MODEL == "KWR103":
-			Vq = 'VOUT?'
-			Iq = 'IOUT?'
-
-		else:
-			Vq = 'VOUT1?'
-			Iq = 'IOUT1?'
 
 		# read voltage:
 		k = 1
 		while True:
 			try:
 				if k > 10:
-					raise RuntimeException("Could not read voltage from KORAD PSU!")
-				V = float (self._query(Vq))
+					raise RuntimeException("Could not read voltage from B&K PSU!")
+				V = float (self._query('MEASURE:VOLTAGE?'))
 				break
 			except:
 				k = k+1
@@ -220,8 +201,8 @@ class BK(object):
 		while True:
 			try:
 				if k > 10:
-					raise RuntimeException("Could not read current from KORAD PSU!")
-				I = float (self._query(Iq))
+					raise RuntimeException("Could not read current from B&K PSU!")
+				I = float (self._query('MEASURE:CURRENT?'))
 				break
 			except:
 				k = k+1
@@ -235,12 +216,8 @@ class BK(object):
 		while True:
 			try:
 				if k > 10:
-					raise RuntimeException("Could not read output limit status from KORAD PSU!")
-				S = self._query('STATUS?')
-				if S.encode()[0] & 0b00000001: # test bit-1 for CV or CC
-					S = 'CV'
-				else:
-					S = 'CC'
+					raise RuntimeException("Could not read output limit status from B&K PSU!")
+				S = self._query('OUTPUT:STATE?')
 				break
 			except:
 				k = k+1
@@ -250,3 +227,5 @@ class BK(object):
 				pass
 
 		return (V, I, S)
+
+
