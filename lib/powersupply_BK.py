@@ -152,16 +152,16 @@ class BK(object):
 			self._query('OUTPUT OFF',answer=False)
 
 
-	def voltage(self, voltage):
+	def voltage(self, volt):
 		"""
 		set voltage: silently saturates at VMIN and VMAX
 		"""
-		if voltage > self.VMAX:
-			voltage = self.VMAX
-		if voltage < self.VMIN:
-			voltage = self.VMIN
-		voltage = round (voltage/self.VRESSET) * self.VRESSET
-		self._query('SOURCE:VOLTAGE ' + str(voltage),answer=False)
+		if volt > self.VMAX:
+			volt = self.VMAX
+		if volt < self.VMIN:
+			volt = self.VMIN
+		volt = round (volt/self.VRESSET) * self.VRESSET
+		self._query('SOURCE:VOLTAGE ' + str(volt),answer=False)
 
 
 	def current(self, current):
@@ -227,5 +227,4 @@ class BK(object):
 				pass
 
 		return (V, I, S)
-
 
