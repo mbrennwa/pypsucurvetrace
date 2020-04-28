@@ -102,6 +102,13 @@ def connect_PSU(configPSU,label):
 		else:
 			print ('Number of consistent measurement readings not configured! Using N = 1...')
 			P.NSTABLEREADINGS = 1
+
+		# voltage offset by series connection of additional voltage source (optional):
+		if 'VOFFSET' in configPSU[label]:
+			P.VOFFSET = fload(configPSU[label]['VOFFSET'])
+			P.VMAX = P.VMAX + P.VOFFSET
+			P.VMIN = P.VMIN + P.VOFFSET
+			P.MAX  = P.MAX  + P.VOFFSET*P.IMAX # Assume that external voltage source will be able provide P.IMAX
 			
 		if P.CONNECTED:
 
@@ -113,13 +120,13 @@ def connect_PSU(configPSU,label):
 			print ('* Model: ' + P.MODEL)
 			print ('* Min. voltage: ' + str(P.VMIN) + ' V')
 			print ('* Max. voltage: ' + str(P.VMAX) + ' V')
+			print ('* External voltage offset: ' + str(P.VOFFSET) + ' V')
 			print ('* Max. current: ' + str(P.IMAX) + ' A')
 			print ('* Max. power: ' + str(P.PMAX) + ' W')
 			print ('* Voltage setting resolution: ' + str(P.VRESSET) + ' V')
 			print ('* Current setting resolution: ' + str(P.IRESSET) + ' A')
 			print ('* Voltage reading resolution: ' + str(P.VRESREAD) + ' V')
 			print ('* Current reading resolution: ' + str(P.IRESREAD) + ' A')
-			print ('* Max. power: ' + str(P.PMAX) + ' W')
 			print ('* Number of consistent readings for measurements: ' + str(P.NSTABLEREADINGS))
 			### print ('* Settle time: ' + str(PSU.settletime()) + ' s')
 
