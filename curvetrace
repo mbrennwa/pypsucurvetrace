@@ -745,6 +745,14 @@ try:
 			else:
 				LIMIT2 = 0
 
+			# Check if current / power limit has been reached:
+			if (LIMIT1 == 0) and (LIMIT2 == 0):
+				limit = 0 # reset counter
+			else:
+				limit = limit + 1
+				if limit >= limit_max:
+					break # break out of the inner loop (V1 steps) and continue with the next V2 step
+
 			# Print results:
 			printit (	"{:10.4f}".format(V1*PSU1.TEST_POLARITY)	+ ' ' + 
 					"{:10.4f}".format(I1LIM*PSU1.TEST_POLARITY)	+ ' ' + 
@@ -757,14 +765,6 @@ try:
 					"{:10.4f}".format(I2MEAS*PSU2.TEST_POLARITY)	+ ' ' +
 					"{:5d}".format(LIMIT2) ,
 				logfile )
-
-			# Check if current / power limit has been reached:
-			if (LIMIT1 == 0) and (LIMIT2 == 0):
-				limit = 0 # reset counter
-			else:
-				limit = limit + 1
-				if limit >= limit_max:
-					break # break out of the inner loop (V1 steps) and continue with the next V2 step
 
 	print ('Test completed.')
 	for p in [PSU1, PSU2]:
