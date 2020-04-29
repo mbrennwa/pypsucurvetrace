@@ -16,7 +16,7 @@ POLARITY = 1
 VSTART = 0
 
 # Test voltage V1 end:
-VEND   = 400
+VEND   = 250
 
 # Test voltage V1 steps:
 VSTEP  = 5
@@ -55,7 +55,7 @@ VSTART = 0
 VEND   = 100.0
 
 # Test voltage V2 steps:
-VSTEP  = 10
+VSTEP  = 5
 
 # Max. allowed current during the test (usually this is way more than necessary for the DUT, but a larger value helps achieving quick regulation of the PSU output):
 IMAX   = 1
@@ -92,7 +92,7 @@ IIDLE     = 0.1
 IDLESECS    = 0
 
 # Duration of pre-heat / warmup period before starting the test (seconds):
-PREHEATSECS = 120
+PREHEATSECS = 600
 
 # number of repeated readings at each measurement step:
 # (note that each reading is preceeded by an idle period if IDLECECS > 0):
