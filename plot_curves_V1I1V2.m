@@ -37,7 +37,7 @@ for i = 1:length(f)
 end
 
 % remove values with current limiter on:
-k = find (x(:,5) == 0); x = x(k,:);
+% k = find (x(:,5) == 0); x = x(k,:);
 
 % find V2 values:
 V2 = unique(x(:,6));
