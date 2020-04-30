@@ -16,9 +16,8 @@ import lib.powersupply_BK as powersupply_BK
 #    .turnOn()   	    turn PSU output on
 #    .read()                read current voltage, current, and limiter mode (voltage or current limiter active)
 #    #### .settletime()             estimated settle time to attain stable voltage + current at PSU output after changing the setpoint (s)
-#    .VMAX                  max. supported voltage (V, including VOFFSET)
-#    .VMIN                  min. supported voltage (V, including VOFFSET)
-#    .VOFFSET               external offset voltage (if fixed external voltage source is connected in series with the PSU)
+#    .VMAX                  max. supported voltage (V)
+#    .VMIN                  min. supported voltage (V)
 #    .IMAX                  max. supported current (V)
 #    .PMAX                  max. supported power (W)
 #    .VRESSET               resolution of voltage setting (V)
@@ -59,7 +58,6 @@ class PSU:
 		# init generic PSU:
 		self.VMIN = 0.0
 		self.VMAX = 0.0
-		self.VOFFSET = 0.0
 		self.IMAX = 0.0
 		self.PMAX = 0.0
 		self.VRESREAD = 0.0
@@ -140,9 +138,6 @@ class PSU:
 		OUTPUT:
 		(none)
 		"""
-
-		# subtract external offset voltage (if any)
-		value = value - self.VOFFSET
 
 		# make sure we're not trying to set a value that is not resolved by the setting resolution of the PSU,
 		# which will never give a stable output at the unresolved value		
@@ -367,6 +362,5 @@ class PSU:
 					L = "CV"
 					
 		# add external offset voltage (if any)
-		V = V + self.VOFFSET
 
 		return (V,I,L)
