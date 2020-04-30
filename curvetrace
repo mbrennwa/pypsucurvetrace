@@ -80,23 +80,61 @@ def connect_PSU(configPSU,label):
 		P = powersupply.PSU(label=label) # init empty PSU object
 
 	else:
+
+                print ('****************************************************')
+
+		# read COMPORT field (mandatory):
 		if 'COMPORT' in configPSU[label]:
 			port=configPSU[label]['COMPORT']
 		else:
 			print ('No COMPORT field in the PSU configuration file! Cannot continue.')
 			exit()
 
+		# check if this is a single PSU unit, or a stack of serial connected PSUs:
+		num_PSU = 1 # number of PSUs
+		try:
+			x = eval(port)
+			if type(x) is tuple:
+				num_PSU = len(x)
+				port = x
+		except:
+			pass
+
+		print (num_PSU)
+		print ('****************************************************')
+
+		if num_PSU > 1:
+			print ('This is a stacked PSU, with ' + str(num_PSU) + ' PSUs!')
+		else:
+			print ('This is a single PSU!')
+
+		# read TYPE field (mandatory):
 		if 'TYPE' in configPSU[label]:
 			commandset = configPSU[label]['TYPE']
 		else:
 			print ('No TYPE field in the PSU configuration file! Cannot continue.')
 			exit()
+		if PSU_stacked:
+			try:
+				x = eval(commandset)
+				if type(x) is not tuple:
+					raise ValueError
+				commandset = x
+			except ValueError:
+				print("Could not parse TYPEs of stacked PSUs.")
+				exit()
 
-		# connect to PSU:
-		print ('Connecting to power supply ' + label + '...')
-		P = powersupply.PSU(port,commandset,label)
+		# connect to PSU(s):
+		if num_PSU == 1:
+			print ('Connecting to power supply ' + label + '...')
+			P = powersupply.PSU(port,commandset,label)
+		else:
+			P = []
+			for k in range(num_PSU):
+				print ('Connecting to power supply' + label + ' (' + str(k+1) + '/' + str(num_PSU) + ')...')
+	                        P.append = powersupply.PSU(port(k),commandset(k),label)
 
-		# set number of consistent readings for measurements:
+		# set number of consistent readings for measurements (optional):
 		if 'NUMSTABLEREAD' in configPSU[label]:
 			P.NSTABLEREADINGS = int(configPSU[label]['NUMSTABLEREAD'])
 		else:
