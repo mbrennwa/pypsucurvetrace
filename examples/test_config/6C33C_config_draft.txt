@@ -93,7 +93,7 @@ IIDLE     = 0.1
 IDLESECS    = 0
 
 # Duration of pre-heat / warmup period before starting the test (seconds):
-PREHEATSECS = 120
+PREHEATSECS = 0
 
 # number of repeated readings at each measurement step:
 # (note that each reading is preceeded by an idle period if IDLECECS > 0):

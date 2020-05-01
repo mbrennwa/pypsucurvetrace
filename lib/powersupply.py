@@ -62,7 +62,6 @@ class PSU:
 		self.PMAX = 0.0
 		self.VRESREAD = 0.0
 		self.IRESREAD = 0.0
-		self.MAXSETTLETIME = 0.0
 		self.TEST_VSTART = 0.0
 		self.TEST_VEND = 0.0
 		self.TEST_ILIMIT = 0.0
@@ -72,8 +71,6 @@ class PSU:
 		self.TEST_N = 1
 		self.TEST_POLARITY = 1
 		self.LABEL = label
-		self.COMMANDSET = commandset
-		self.MODEL = 'UNKNOWN'
 		self.CONNECTED = False
 		self.CONFIGURED = False
 
@@ -87,39 +84,79 @@ class PSU:
 		elif not label:
 			print (label + ': cannot set up power supply (no label specified).')
 
-		# connect to the PSU and set it up:
+		# connect to the PSUs and set it/them up:
 		else:
-			self.COMMANDSET == self.COMMANDSET.upper()
-			if self.COMMANDSET == 'VOLTCRAFT':
-				self._PSU = powersupply_VOLTCRAFT.VOLTCRAFT(port,debug=False)
+			self._PSU = []
 
-			elif self.COMMANDSET == 'KORAD':
-				self._PSU = powersupply_KORAD.KORAD(port,debug=False)
-
-			elif self.COMMANDSET in [ "BK" , "BK9184B_HIGH" , "BK9185B_HIGH" ]:
-				self._PSU = powersupply_BK.BK(port,voltagemode='HIGH',debug=False)
-				self.COMMANDSET = 'BK'
-
-			elif self.COMMANDSET in [ "BK9184B_LOW" , "BK9185B_LOW" ]:
-				self._PSU = powersupply_BK.BK(port,voltagemode='LOW',debug=False)
-				self.COMMANDSET = 'BK'
-
+			if type(commandset) is tuple:
+				num_PSU = len(commandset)
 			else:
-				raise RuntimeError ('Unknown commandset ' + commandset + '! Cannot continue...')
+				num_PSU = 1
 
-			self.VMIN = self._PSU.VMIN
-			self.VMAX = self._PSU.VMAX
-			self.IMAX = self._PSU.IMAX
-			self.PMAX = self._PSU.PMAX
-			self.VRESSET = self._PSU.VRESSET
-			self.IRESSET = self._PSU.IRESSET
-			self.VRESREAD = self._PSU.VRESREAD
-			self.IRESREAD = self._PSU.IRESREAD
-			self.MAXSETTLETIME = self._PSU.MAXSETTLETIME
-			self.READIDLETIME = self._PSU.READIDLETIME
-			self.MODEL = self._PSU.MODEL
+			for k in range(num_PSU):
+				if num_PSU == 1:
+					C = commandset.upper()
+					P = port
+				else:
+					C = commandset[k].upper()
+					P = port[k]
+
+				if C == 'VOLTCRAFT':
+					PSU = powersupply_VOLTCRAFT.VOLTCRAFT(P,debug=False)
+
+				elif C == 'KORAD':
+					PSU = powersupply_KORAD.KORAD(P,debug=False)
+
+				elif C in [ "BK" , "BK9184B_HIGH" , "BK9185B_HIGH" ]:
+					PSU = powersupply_BK.BK(P,voltagemode='HIGH',debug=False)
+					C = 'BK'
+
+				elif C in [ "BK9184B_LOW" , "BK9185B_LOW" ]:
+					PSU = powersupply_BK.BK(P,voltagemode='LOW',debug=False)
+					C = 'BK'
+
+				else:
+					raise RuntimeError ('Unknown commandset ' + C + '! Cannot continue...')
+
+				PSU.COMMANDSET = C
+
+				self._PSU.append(PSU)
+
+			self.VMIN = 0.0
+			self.VMAX = 0.0
+			self.PMAX = 0.0
+			self.IMAX = self._PSU[0].IMAX
+			self.VRESSET = self._PSU[0].VRESSET
+			self.IRESSET = self._PSU[0].IRESSET
+			self.VRESREAD = self._PSU[0].VRESREAD
+			self.IRESREAD = self._PSU[0].IRESREAD
+			self.MAXSETTLETIME = self._PSU[0].MAXSETTLETIME
+			self.READIDLETIME = self._PSU[k].READIDLETIME
+
+			for k in range(num_PSU):
+				self.VMIN = self.VMIN + self._PSU[k].VMIN
+				self.VMAX = self.VMAX + self._PSU[k].VMAX
+				self.PMAX = self.PMAX + self._PSU[k].PMAX
+				if self.IMAX > self._PSU[k].IMAX:
+					self.IMAX = self._PSU[k].IMAX;
+				if self.VRESSET < self._PSU[k].VRESSET:
+					self.VRESSET = self._PSU[k].VRESSET
+				if self.IRESSET < self._PSU[k].IRESSET:
+					self.IRESSET = self._PSU[k].IRESSET
+				if self.VRESREAD < self._PSU[k].VRESREAD:
+					self.VRESREAD = self._PSU[k].VRESREAD
+				if self.IRESREAD < self._PSU[k].IRESREAD:
+					self.IRESREAD = self._PSU[k].IRESREAD
+				if self.MAXSETTLETIME < self._PSU[k].MAXSETTLETIME:
+					self.MAXSETTLETIME = self._PSU[k].MAXSETTLETIME
+				if self.READIDLETIME < self._PSU[k].READIDLETIME:
+					self.READIDETIME = self._PSU[k].READIDLETIME
+
+			if num_PSU > 1:
+				self.PMAX = min (self.PMAX,self.VMAX*self.IMAX)
+
 			self.CONNECTED = True
-		
+
 
 
 	########################################################################################################
@@ -143,10 +180,32 @@ class PSU:
 		# which will never give a stable output at the unresolved value		
 		value = round(value/self.VRESSET) * self.VRESSET
 		
-		if self.COMMANDSET in [ 'KORAD' , 'VOLTCRAFT' , 'BK' ]:
-			self._PSU.voltage(value)
+		# determine voltage settings for all PSU units:
+		V = []
+		if len(self._PSU) > 1:
+			for k in range(len(self._PSU)):
+				delta = value - sum(V)
+				if delta < self._PSU[k].VMIN:
+					if k > 0:
+						V.append(self._PSU[k].VMIN)
+						V[k-1] = V[k-1] - (V[k]-delta)
+					else:
+						raise RuntimeError('Cannot set voltage -- value is lower than VMIN.')
+				if delta > 0:
+					V.append( min(delta,self._PSU[k].VMAX) )
+				else:
+					V.append(0.0)
+
+
 		else:
-			raise RuntimeError('Cannot set voltage on power supply with ' + self.COMMANDSET + ' command set.')
+			V.append(value)
+
+
+		for k in range(len(self._PSU)):
+			if self._PSU[k].COMMANDSET in [ 'KORAD' , 'VOLTCRAFT' , 'BK' ]:
+				self._PSU[k].voltage(V[k])
+			else:
+				raise RuntimeError('Cannot set voltage on power supply with ' + self.COMMANDSET + ' command set.')
 
 		# wait for stable output voltage:
 		if wait_stable:
@@ -155,8 +214,9 @@ class PSU:
 			limit_max = 2	# max. allowed number of current limit ON readings
 			t0 = time.time() # start time (now)
 
+			r = self.read()
+
 			while not time.time() > t0+self.MAXSETTLETIME:
-				r = self.read()
 				if r[2] == "CC":
 					limit = limit + 1
 					if limit > limit_max:
@@ -165,6 +225,7 @@ class PSU:
 					stable = True
 					break
 				time.sleep(self.READIDLETIME)
+				r = self.read()
 
 			if not stable:
 				if r[2] == "CC":
@@ -195,10 +256,11 @@ class PSU:
 		# which will never give a stable output at the unresolved value		
 		value = round(value/self.VRESSET) * self.VRESSET
 
-		if self.COMMANDSET in [ 'KORAD' , 'VOLTCRAFT' , 'BK' ]:
-			self._PSU.current(value)
-		else:
-			raise RuntimeError('Cannot set current on power supply with ' + self.COMMANDSET + ' command set.')
+		for k in range(len(self._PSU)):
+			if self._PSU[k].COMMANDSET in [ 'KORAD' , 'VOLTCRAFT' , 'BK' ]:
+				self._PSU[k].current(value)
+			else:
+				raise RuntimeError('Cannot set current on power supply with ' + self.COMMANDSET + ' command set.')
 
 		# wait for stable output current:
 		if wait_stable:
@@ -240,13 +302,14 @@ class PSU:
 		(none)
 		"""
 
-		if self.COMMANDSET in [ 'KORAD' , 'VOLTCRAFT' , 'BK' ]:
-			self._PSU.output(False)
-			self._PSU.voltage(self.VMIN)
-			self._PSU.current(0.0)
+		for k in range(len(self._PSU)):
+			if self._PSU[k].COMMANDSET in [ 'KORAD' , 'VOLTCRAFT' , 'BK' ]:
+				self._PSU[k].output(False)
+				self._PSU[k].voltage(self.VMIN)
+				self._PSU[k].current(0.0)
 
-		else:
-			raise RuntimeError('Cannot turn off power supply with ' + self.COMMANDSET + ' command set.')
+			else:
+				raise RuntimeError('Cannot turn off power supply with ' + self._PSU[k].COMMANDSET + ' command set.')
 
 
 
@@ -266,11 +329,12 @@ class PSU:
 		(none)
 		"""
 
-		if self.COMMANDSET in [ 'KORAD' , 'VOLTCRAFT' , 'BK' ]:
-			self._PSU.output(True)
+		for k in range(len(self._PSU)):
+			if self._PSU[k].COMMANDSET in [ 'KORAD' , 'VOLTCRAFT' , 'BK' ]:
+				self._PSU[k].output(True)
 
-		else:
-			raise RuntimeError('Cannot turn on power supply with ' + self.COMMANDSET + ' command set.')
+			else:
+				raise RuntimeError('Cannot turn on power supply with ' + self.COMMANDSET + ' command set.')
 
 
 	########################################################################################################
@@ -305,12 +369,25 @@ class PSU:
 		t0 = time.time()
 		while True:
 
-			if self.COMMANDSET in [ 'KORAD' , 'VOLTCRAFT' , 'BK' ]:
-				v,i,l = self._PSU.reading()
+			v = []
+			i = []
+			l = []
+			for k in range(len(self._PSU)):
+				if self._PSU[k].COMMANDSET in [ 'KORAD' , 'VOLTCRAFT' , 'BK' ]:
+					vv,ii,ll = self._PSU[k].reading()
+					v.append(vv)
+					i.append(ii)
+					l.append(ll)
+				else:
+					raise RuntimeError('Cannot read values from power supply with ' + self._PSU[k].COMMANDSET + ' command set.')
+					break
 
+			v = sum(v)
+			i = sum(i)/len(i)
+			if 'CC' in l:
+				l = 'CC'
 			else:
-				raise RuntimeError('Cannot read values from power supply with ' + self.COMMANDSET + ' command set.')
-				break
+				l = 'CV'
 
 			if N == 1:
 				# just single readings, no need to match repeated readings to within the resolution of the PSU
