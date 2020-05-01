@@ -111,8 +111,8 @@ For this test, only one high-voltage power supply (PSU1) was available. The seco
 The configuration file `config_PSU.txt` contains the configuration details of your power supplies (PSUs). Take a look at the `config_PSU.txt` for details of the file format. There are separate sections for PSU1 and PSU2. Each section contains the following fields:
 * `COMPORT`: virtual file corresponding to the serial port of the PSU
 * `COMMANDSET`: the "language" for communication with the PSU. Currently supported `COMMANDSET`s are
-	* `VOLTCRAFT` (for Voltcraft, Manson, etc.)
-	* `KORAD` (for Korad, RND, etc.)
+	* `VOLTCRAFT` for Voltcraft, Manson, etc.
+	* `KORAD` for Korad, RND, etc.
 	* `BK`, `BK9184B_LOW`, `BK9184B_HIGH`, `BK9185B_LOW`, and `BK9185B_HIGH` for BK Precision.
 * `NUMSTABLEREAD` (optional): number of consecutive readings that must agree to within the measurement resolution in order to achieve stable and low-noise readings
 
