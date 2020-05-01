@@ -103,7 +103,10 @@ The configuration file `config_PSU.txt` contains the configuration details of yo
 * `COMMANDSET`: the "language" for communication with the PSU. Currently supported COMMANDSETs are "VOLTCRAFT" (for Voltcraft, Manson, etc.) and "KORAD" (for Korad, RND, etc.)
 If only one PSU is used (PSU1), the PSU2 section can be deleted.
 * `NUMSTABLEREAD` (optional): number of consecutive readings that must agree to within the measurement resolution in order to achieve stable and low-noise readings
-* `VOFFSET` (optional): voltage offset from external fixed voltage source. If the voltage range of a PSU needs to be shifted to higher (or lower) values, a fixed external voltage source can be connected in series with the PSU. The current limit of this external voltage source is assumed to comply with PSU.
+
+Note that it is possible to connect multiple PSU units in series to each other to accomplish a higher voltage range. Such a series combination of multiple PSU units can be configured as a single PSU object by specifying their `COMPORT` and `COMMANDSET` fields as follows:
+* `COMPORT = ( "/dev/serial/by-id/<xxx_psu1>" , "/dev/serial/by-id/<xxx_psu2>" )`
+* `TYPE = ( "<commandset_psu1>" , "<commandset_psu2>" )`
 
 ### Test configuration file
 ...(under constrution -- take a look at the example files in the `examples` directory.)...
