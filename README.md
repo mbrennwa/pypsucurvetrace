@@ -8,6 +8,7 @@ For two-terminal devices under test (DUTs) like resistors or diodes you need onl
 Currently supported power supply types:
 * Voltcraft PPS
 * Korad / RND (confirmed: models KA3005P and KWR103, other models not tested)
+* BK Precision (confirmed: model BK9185B, other models not tested)
 
 Power supply types on the radar for future support:
 * Units with a SCPI interface
