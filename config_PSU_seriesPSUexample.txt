@@ -1,0 +1,9 @@
+[PSU1]
+COMPORT = /dev/serial/by-id/usb-Silicon_Labs_CP2102_USB_to_UART_Bridge_Controller_508D19126-if00-port0
+TYPE = BK9185B_LOW
+NUMSTABLEREAD = 1
+
+[PSU2]
+COMPORT = ( "/dev/serial/by-id/usb-Nuvoton_USB_Virtual_COM_000624D20236-if00" , "/dev/serial/by-id/usb-nuvoton_KORAD_USB_Mode_48DB467A3733-if00" )
+TYPE = ( "KORAD" , "KORAD" )
+NUMSTABLEREAD = 3
