@@ -101,7 +101,7 @@ This example shows curve traces obtained from an 6C33C power triode (anode curre
 * DUT anode pin to the positive terminals of PSU1
 * DUT cathode pin to the negative terminal of PSU1 and positive terminal of PSU2 (joined together)
 * DUT gate pin to the negative terminal of PSU2.
-For this test, only one high-voltage power supply (PSU1) was available. The second power supply (PSU2) was therefore configured as a series connection of two PSUs with maximum voltage ratings of 30 V and 60 V (see below for configuration of such a series combination)
+For this test, only one high-voltage power supply (PSU1) was available. The second power supply (PSU2) was therefore configured as a 90 V PSU made up by a series connection of a 30 V PSU and a 60 V PSU (see below for configuration of such a series combination).
 
 ![alt text](https://github.com/mbrennwa/PyPSUcurvetrace/blob/master/figures/6C33C_curves.png "6C33C curves")
 
