@@ -1,6 +1,6 @@
 ################################
 # Test configuration BC550 BJT #
-# with Rb = 1M base resistor   #
+# with Rb = 500k base resistor   #
 # as Ib current source         #
 ################################
 
@@ -18,13 +18,13 @@ POLARITY = 1
 VSTART = 0
 
 # Test voltage V1 end:
-VEND   = 15
+VEND   = 35
 
 # Test voltage V1 steps:
-VSTEP  = 0.1
+VSTEP  = 0.25
 
 # Max. allowed current during the test (A):
-IMAX   = 0.05
+IMAX   = 0.04
 
 # Max. allowed power during the test (W):
 PMAX   = 0.625
@@ -61,7 +61,7 @@ VEND   = 55.7
 
 
 # Test voltage V2 steps:
-VSTEP  = 5
+VSTEP  = 2.5
 
 # Max. allowed current during the test is 1 A (this is way more than necessary for the DUT, but a larger value helps achieving quick regulation of the PSU output):
 IMAX   = 1
@@ -82,7 +82,7 @@ VIDLE_MAX = 55
 
 # - The DUT transconductance value (in A/V) to be used for regulation of the I1 idle current by adjusting the V2 voltage:
 #   (IDLE_GM = delta-I1 / delta-U2 ratio of the DUT at the idle point)
-IDLE_GM   = 0.0005
+IDLE_GM   = 0.001
 
 # - Max. allowed idle current during the test is 1 A (this is way more than necessary for the DUT, but a larger value helps achieving quick regulation of the PSU output):
 IIDLE     = 1
