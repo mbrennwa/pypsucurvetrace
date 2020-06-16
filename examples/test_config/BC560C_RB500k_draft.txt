@@ -1,5 +1,5 @@
 #################################
-# Test configuration BC550C BJT #
+# Test configuration BC560C BJT #
 # with Rb = 500k base resistor  #
 # as Ib current source          #
 #################################
@@ -12,7 +12,7 @@
 [PSU1]
 
 # DUT polarity:
-POLARITY = 1
+POLARITY = -1
 
 # Test voltage V1 start:
 VSTART = 0
@@ -36,7 +36,7 @@ VIDLE  = 5
 
 #   (no min. or max. idle voltage is specified, which tells the program to use a fixed V1 idle voltage)
 
-# - Idle current (target to be attained with PSU-2 regulation)
+# - Idle current (target value to be attained with PSU-2 regulation):
 #   (make sure this is lower and not too close to IMAX):
 IIDLE  = 0.02
 
@@ -49,7 +49,7 @@ IIDLE  = 0.02
 [PSU2]
 
 # DUT polarity:
-POLARITY = 1
+POLARITY = -1
 
 # Test voltage V2 start:
 # Vbe = 0.7
