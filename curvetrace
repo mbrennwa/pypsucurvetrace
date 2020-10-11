@@ -272,7 +272,7 @@ def configure_idle_PSU(PSU,configDUT):
 # do idle / pre-heat #
 ######################
 
-def do_idle(PSU1,PSU2,seconds):
+def do_idle(PSU1,PSU2,seconds,file=None):
 	
 	REG = None
 
@@ -348,7 +348,9 @@ def do_idle(PSU1,PSU2,seconds):
 		# Clear the terminal:
 		print (' '*72, end="\r")
 
-
+		# write idle / preheat conditions to file:
+		if file is not None:
+			printit("* OPERATING POINT AT END OF PREHEAT / IDLE: Uc = " "U0={:.3f} V".format(Uf) + '  ' + "I0={:.3f} A".format(If) + '  ' + "Uc={:.3f} V".format(Ur) + '  ' + "Ic={:.3f} A".format(Ir) , file , '%')
 
 ################
 # main program #
@@ -652,7 +654,7 @@ try:
 		print ('Pre-heating...\n')
 
 		# set idle conditions:
-		do_idle(PSU1,PSU2,T_preheat)
+		do_idle(PSU1,PSU2,T_preheat,logfile)
 
 	print ('Test started...\n')
 
