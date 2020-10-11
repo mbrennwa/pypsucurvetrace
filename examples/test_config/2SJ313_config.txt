@@ -1,6 +1,6 @@
-##################################
-# Test configuration 2SK2013 FET #
-##################################
+#################################
+# Test configuration 2SJ313 FET #
+#################################
 
 
 
@@ -10,7 +10,7 @@
 [PSU1]
 
 # DUT is connected with normal polarity (not inverted):
-POLARITY = 1
+POLARITY = -1
 
 # Test voltage V1 starts at 0 V:
 VSTART = 0
@@ -47,7 +47,7 @@ IIDLE  = 0.25
 [PSU2]
 
 # DUT is connected with normal polarity (not inverted):
-POLARITY = 1
+POLARITY = -1
 
 # Test voltage V2 start:
 VSTART = 1.75
