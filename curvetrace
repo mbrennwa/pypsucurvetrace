@@ -195,7 +195,6 @@ def configure_test_PSU(PSU,configDUT = []):
 			PSU.TEST_PLIMIT = float(configDUT['PMAX'])
 		else:
 			PSU.TEST_PLIMIT = __get_number('* ' + PSU.LABEL + ' maximum allowed power (W): ',allowZero=False,allowNegative=False,typ='float')
-
 			
 		if 'POLARITY' in configDUT:
 			PSU.TEST_POLARITY = int(configDUT['POLARITY'])
@@ -235,6 +234,14 @@ def configure_idle_PSU(PSU,configDUT):
 				PSU.TEST_VIDLE_MAX = PSU.TEST_VIDLE # fixed idle voltage
 			else:
 				PSU.TEST_VIDLE_MAX = float(configDUT['VIDLE_MAX'])
+			if not 'IDLE_MAX' in configDUT:
+				PSU.TEST_VIDLE_MAX = PSU.TEST_VIDLE # fixed idle voltage
+			else:
+				PSU.TEST_VIDLE_MAX = float(configDUT['VIDLE_MAX'])
+			if not 'PIDLEMAX' in configDUT:
+				PSU.TEST_PIDLELIMIT = PSU.TEST_PLIMIT # use same power limit as for test conditions
+			else:
+				PSU.TEST_PIDLELIMIT = float(configDUT['PIDLEMAX'])
 			if not 'IDLE_GM' in configDUT:
 				PSU.TEST_IDLE_GM = None # unknown transconductance
 			else:
@@ -294,7 +301,7 @@ def do_idle(PSU1,PSU2,seconds,file=None):
 
 	else: # fixed output on FIX power supply and regulated output on REG power supply
 
-		IFIXLIM = min (FIX.TEST_ILIMIT,FIX.TEST_PLIMIT/FIX.TEST_VIDLE); # current limit set at fixed PSU
+		IFIXLIM = min (FIX.TEST_ILIMIT,FIX.TEST_PIDLELIMIT/FIX.TEST_VIDLE); # current limit set at fixed PSU
 
 		# sleep time (seconds):
 		dt = 0.2
@@ -351,6 +358,8 @@ def do_idle(PSU1,PSU2,seconds,file=None):
 		# write idle / preheat conditions to file:
 		if file is not None:
 			printit("* OPERATING POINT AT END OF PREHEAT / IDLE: Uc = " "U0={:.3f} V".format(Uf) + '  ' + "I0={:.3f} A".format(If) + '  ' + "Uc={:.3f} V".format(Ur) + '  ' + "Ic={:.3f} A".format(Ir) , file , '%')
+
+
 
 ################
 # main program #
@@ -513,6 +522,9 @@ for p in [PSU1,PSU2]:
 		if p.TEST_PLIMIT > p.PMAX:
 			print ('  ' + p.LABEL + ': Adjusting power limit to max. value possible with the power supply (' + str(p.PMAX) + ' W).')
 			p.TEST_PLIMIT = p.PMAX
+		if p.TEST_PIDLELIMIT > p.PMAX:
+			print ('  ' + p.LABEL + ': Adjusting idle power limit to max. value possible with the power supply (' + str(p.PMAX) + ' W).')
+			p.TEST_PIDLELIMIT = p.PMAX
 		if (T_idle > 0.0) or (T_preheat > 0.0):
 			if p.TEST_VIDLE > p.VMAX:
 				print ('  ' + p.LABEL + ': Adjusting idle voltage to max. value possible with the power supply (' + str(p.VMAX) + ' V).')
@@ -595,6 +607,7 @@ if (T_idle > 0.0) or (T_preheat > 0.0):
 			else:
 				printit ('* ' + p.LABEL + ' idle / pre-heat voltage range = ' + str(p.TEST_VIDLE_MIN) + ' V ... ' + str(p.TEST_VIDLE_MAX) + ' V.',logfile,'%')
 			printit ('* ' + p.LABEL + ' idle / pre-heat current = ' + str(p.TEST_IIDLE) + ' A',logfile,'%')
+			printit ('* ' + p.LABEL + ' max. idle / pre-heat power = ' + str(p.TEST_PIDLELIMIT) + ' W',logfile,'%')
 
 
 # Ask if okay to start the test

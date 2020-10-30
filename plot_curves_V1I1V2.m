@@ -36,8 +36,8 @@ for i = 1:length(f)
 	x = [ x ; load(f{i}) ];
 end
 
-% remove values with current limiter on:
-% k = find (x(:,5) == 0); x = x(k,:);
+% remove values with current limiter on (avoid "warping back" of data points that ran into strong limiting, with very low voltage):
+k = find (x(:,5) == 0); x = x(k,:);
 
 % find V2 values:
 V2 = unique(x(:,6));
