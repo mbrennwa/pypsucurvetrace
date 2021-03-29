@@ -10,7 +10,7 @@ import time
 BK_SPECS = {
 		"9185B_HIGH":	( 0.0, 610.0,  0.35, 210,  0.02,  0.00001, 0.3,  0.0015, 2.0 ),  # 9185B in "HIGH" setting, confirmed working
 		"9185B_LOW":	( 0.0, 400.0,  0.5 , 210,  0.02,  0.00001, 0.3,  0.0015, 2.0 ),  # 9185B in "LOW" setting, confirmed working
-		"9120A":	( 0.0, 32.0,   3.0 , 96,   0.0001,  0.0001,  0.0005,  0.00001, 2.0 )  # 9129A, currently testing / under construction
+		"9120A":	( 0.0, 32.0,   3.0 , 96,   0.0001,  0.0001,  0.0001,  0.00001, 2.0 )  # 9129A, currently testing / under construction
 }
 
 BK_TIMEOUT = 2.0
@@ -50,10 +50,6 @@ class BK(object):
 
 		# open and configure serial port:
 		baud_rates = ( 57600, 38400, 19200, 14400, 9600, 4800 )
-		
-
-
-		debug = True
 		
 		from pkg_resources import parse_version
 		typestring = None
