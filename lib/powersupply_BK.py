@@ -9,7 +9,8 @@ import time
 # Python dictionary of known B&K power supply models (Vmin,Vmax,Imax,Pmax,VresolutionSet,IresolutionSet,VresolutionRead,IresolutionRead,MaxSettleTime)
 BK_SPECS = {
 		"9185B_HIGH":	( 0.0, 610.0,  0.35, 210,  0.02,  0.00001, 0.3,  0.0015, 2.0 ),  # 9185B in "HIGH" setting, confirmed working
-		"9185B_LOW":	( 0.0, 400.0,  0.5 , 210,  0.02,  0.00001, 0.3,  0.0015, 2.0 )  # 9185B in "LOW" setting, confirmed working
+		"9185B_LOW":	( 0.0, 400.0,  0.5 , 210,  0.02,  0.00001, 0.3,  0.0015, 2.0 ),  # 9185B in "LOW" setting, confirmed working
+		"9129A":	( 0.0, 32.0,   3.0 , 96,   0.0001,  0.0001,  0.0005,  0.00001, 2.0 )  # 9129A, currently testing / under construction
 }
 
 BK_TIMEOUT = 2.0
@@ -46,32 +47,61 @@ class BK(object):
 		voltagemode: some models can work in LOW and HIGH voltage range
 		debug: flag for debugging info (bool)
 		'''
+
 		# open and configure serial port:
-		baud = 57600
+		baud_rates = ( 57600, 38400, 19200, 14400, 9600, 4800 )
+		
+
+
+		debug = True
+		
 		from pkg_resources import parse_version
-		if parse_version(serial.__version__) >= parse_version('3.3') :
-			# open port with exclusive access:
-			self._Serial = serial.Serial(port, baudrate=baud, bytesize=8, parity='N', stopbits=1, timeout=BK_TIMEOUT, exclusive = True)
+		typestring = None
+		for baud in baud_rates:
 
-		else:
-			# open port (can't ask for exclusive access):
-			self._Serial = serial.Serial(port, baudrate=baud, bytesize=8, parity='N', stopbits=1, timeout=BK_TIMEOUT)
+			try:
 
-		time.sleep(0.2) # wait a bit unit the port is really ready
+				_BK_debug('*** Trying baud rate = ' + str(baud) + '...\n')
 
-		self._Serial.flushInput()
-		self._Serial.flushOutput()
-		self._debug = bool(debug)
-		try:
-			typestring = self._query('*IDN?').split(",") # <manufacturer>,<model>,<serial number>,<firmware version>,0
-			
+				if parse_version(serial.__version__) >= parse_version('3.3') :
+					# open port with exclusive access:
+					self._Serial = serial.Serial(port, baudrate=baud, bytesize=8, parity='N', stopbits=1, timeout=BK_TIMEOUT, exclusive = True)
+
+				else:
+					# open port (can't ask for exclusive access):
+					self._Serial = serial.Serial(port, baudrate=baud, bytesize=8, parity='N', stopbits=1, timeout=BK_TIMEOUT)
+
+				time.sleep(0.2) # wait a bit unit the port is really ready
+
+				self._Serial.flushInput()
+				self._Serial.flushOutput()
+				self._debug = bool(debug)
+
+				typestring = self._query('*IDN?', max_attempts = 1).split(",") # <manufacturer>,<model>,<serial number>,<firmware version>,0
+
+				# break from the loop if successful connection:
+				break
+				
+			except:
+				# try to reset + close the serial port for the next attempt:
+				self._Serial.reset_input_buffer()
+				self._Serial.reset_output_buffer()
+				self._Serial.close()
+				time.sleep(1.5) # needs some time to calm down, BK 9120A needs a bit more than 1 second
+
+		if typestring is None:
+			raise RuntimeError('Could not connect to B&k power supply.')
+				
+		try:		
 			# parse typestring:
 			if len(typestring) < 1:
 				raise RuntimeError ('No B&K power supply connected to ' + port)
-			if not ( typestring[0].upper() == 'B&K PRECISION'):
+			if not ( ( typestring[0].upper() == 'B&K PRECISION') or ( typestring[0].upper() == 'BK PRECISION') ):
 				raise RuntimeError ('No B&K power supply connected to ' + port)
 			if '9185B' in typestring[1]:
 				self.MODEL = '9185B_' + voltagemode.upper()
+			elif '9120A' in typestring[1]:
+				self.MODEL = '9120A'
 			else:
 				print ( 'Unknown B&K model: ' + typestring[1] )
 				self.MODEL = '?????'
@@ -99,19 +129,16 @@ class BK(object):
 				self._query('SOURCE:VOLTAGE:RANGE HIGH',answer=False)
 			if self.MODEL == '9185B_LOW':
 				self._query('SOURCE:VOLTAGE:RANGE LOW',answer=False)
-
-
-		except serial.SerialTimeoutException:
-		    raise RuntimeError('No B&K powersupply connected to ' + port)
 		except KeyError:
 		    raise RuntimeError('Unknown B&K model ' + self.MODEL)
+
 	
-	def _query(self, cmd, answer=True, attempt = 1):
+	def _query(self, cmd, answer=True, attempt = 1, max_attempts = 10):
 		"""
 		tx/rx to/from PS
 		"""
-
-		if attempt > 10:
+		
+		if attempt > max_attempts:
 			raise RuntimeError('B&K PSU does not respond to ' + cmd + ' command after 10 attempts. Giving up...')
 		elif attempt > 1:
 			if self._debug:
@@ -136,7 +163,7 @@ class BK(object):
 				time.sleep(0.1)
 				self._Serial.flushInput()
 				time.sleep(0.1)			
-				ans = self._query(cmd,True,attempt+1)
+				ans = self._query(cmd,True,attempt+1, max_attempts)
 
 		return ans
 
