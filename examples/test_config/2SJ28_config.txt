@@ -3,6 +3,12 @@
 ################################
 
 
+# Connections:
+# - PSU1-RED --> SOURCE + PSU2-BLK
+# - PSU1-BLK --> DRAIN
+# - PSU2-RED --> GATE
+# - PUS2-BLK --> PSU1-RED
+
 
 #################################################
 # Configuration for first power supply (PSU-1): #
@@ -36,7 +42,7 @@ VIDLE  = 25
 
 # - Idle current is (the target value to be attained with PSU-2 regulation)
 #   (make sure this is lower and not too close to IMAX):
-IIDLE  = 2.5
+IIDLE  = 2
 
 
 
@@ -52,7 +58,7 @@ POLARITY = 1
 VSTART = 0
 
 # Test voltage V2 end:
-VEND   = 16
+VEND   = 15
 
 # Test voltage V2 steps:
 VSTEP  = 1
@@ -66,13 +72,13 @@ PMAX   = 5
 # Idle conditions configured such that PSU-2 regulates the idle conditions configured for PSU-1
 
 # - V2 start value:
-VIDLE     = 10.0
+VIDLE     = 15.0
 
 # - V2 minimum value:
 VIDLE_MIN = 0
 
 # - V2 maximum value:
-VIDLE_MAX = 15
+VIDLE_MAX = 18
 
 # - The DUT transconductance value (in A/V) to be used for regulation of the I1 idle current by adjusting the V2 voltage:
 #   (IDLE_GM = delta-I1 / delta-U2 ratio of the DUT at the idle point)
