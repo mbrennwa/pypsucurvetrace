@@ -1,6 +1,14 @@
-##################################
-# Test configuration 2SK2013 FET #
-##################################
+############################################
+# Test configuration 2SK2013 N-CHANNEL FET #
+############################################
+
+
+
+# Connections:
+# - PSU1-RED --> DRAIN
+# - PSU1-BLK --> SOURCE + PSU2-RED
+# - PSU2-RED --> GATE
+# - PSU2-BLK --> PSU1-BLK
 
 
 
@@ -12,17 +20,17 @@
 # DUT is connected with normal polarity (not inverted):
 POLARITY = 1
 
-# Test voltage V1 starts at 0 V:
+# Test voltage V1 start:
 VSTART = 0
 
-# Test voltage V1 ends at 60 V:
+# Test voltage V1 end:
 # VEND   = 60
 VEND   = 20
 
-# Test voltage V1 steps are 0.5 V:
+# Test voltage V1 steps:
 VSTEP  = 0.5
 
-# Max. allowed current during the test is 500 mA:
+# Max. allowed current during the test:
 IMAX   = 1.0
 
 # Max. allowed power during the test is 10 W:
@@ -37,7 +45,7 @@ VIDLE  = 15
 
 # - Idle current is 250 mA, which is the target value to be attained with PSU-2 regulation
 #   (make sure this is lower and not too close to IMAX):
-IIDLE  = 0.25
+IIDLE  = 0.5
 
 
 
@@ -53,7 +61,7 @@ POLARITY = 1
 VSTART = 1.75
 
 # Test voltage V2 end:t 4.0:
-VEND   = 3.5
+VEND   = 4.0
 
 # Test voltage V2 step size:
 VSTEP  = 0.25
@@ -67,7 +75,7 @@ PMAX   = 5
 # Idle conditions configured such that PSU-2 regulates the idle conditions configured for PSU-1
 
 # - V2 start value:
-VIDLE     = 2.0
+VIDLE     = 3.0
 
 # - V2 minimum value:
 VIDLE_MIN = 0.5
@@ -77,7 +85,7 @@ VIDLE_MAX = 4.0
 
 # - The DUT transconductance value (in A/V) to be used for regulation of the I1 idle current by adjusting the V2 voltage:
 #   (IDLE_GM = delta-I1 / delta-U2 ratio of the DUT at the idle point)
-IDLE_GM   = 1.0
+IDLE_GM   = 1
 
 # - Max. allowed idle current during the test is 1 A (this is way more than necessary for the DUT, but a larger value helps achieving quick regulation of the PSU output):
 IIDLE     = 1

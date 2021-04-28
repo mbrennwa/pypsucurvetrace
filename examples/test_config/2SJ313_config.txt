@@ -37,7 +37,7 @@ VIDLE  = 15
 
 # - Idle current is 250 mA, which is the target value to be attained with PSU-2 regulation
 #   (make sure this is lower and not too close to IMAX):
-IIDLE  = 0.25
+IIDLE  = 0.5
 
 
 
@@ -53,7 +53,7 @@ POLARITY = -1
 VSTART = 1.75
 
 # Test voltage V2 end:t 4.0:
-VEND   = 3.5
+VEND   = 4.0
 
 # Test voltage V2 step size:
 VSTEP  = 0.25
