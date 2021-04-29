@@ -3,6 +3,13 @@
 #################################
 
 
+# Connections CHECK THESE FIRST!!!! :
+# - PSU1-RED --> SOURCE + PSU2-RED
+# - PSU1-BLK --> DRAIN
+# - PSU2-RED --> PSU1-BLK
+# - PSU2-BLK --> GATE
+
+
 
 #################################################
 # Configuration for first power supply (PSU-1): #
@@ -67,7 +74,7 @@ PMAX   = 5
 # Idle conditions configured such that PSU-2 regulates the idle conditions configured for PSU-1
 
 # - V2 start value:
-VIDLE     = 2.0
+VIDLE     = 3.0
 
 # - V2 minimum value:
 VIDLE_MIN = 0.5

@@ -233,11 +233,7 @@ def configure_idle_PSU(PSU,configDUT):
 			if not 'VIDLE_MAX' in configDUT:
 				PSU.TEST_VIDLE_MAX = PSU.TEST_VIDLE # fixed idle voltage
 			else:
-				PSU.TEST_VIDLE_MAX = float(configDUT['VIDLE_MAX'])
-			if not 'IDLE_MAX' in configDUT:
-				PSU.TEST_VIDLE_MAX = PSU.TEST_VIDLE # fixed idle voltage
-			else:
-				PSU.TEST_VIDLE_MAX = float(configDUT['VIDLE_MAX'])
+				PSU.TEST_VIDLE_MAX = float(configDUT['VIDLE_MAX'])				
 			if not 'PIDLEMAX' in configDUT:
 				PSU.TEST_PIDLELIMIT = PSU.TEST_PLIMIT # use same power limit as for test conditions
 			else:
