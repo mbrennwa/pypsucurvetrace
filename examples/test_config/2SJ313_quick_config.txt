@@ -24,10 +24,10 @@ VSTART = 0
 
 # Test voltage V1 ends at 60 V:
 # VEND   = 60
-VEND   = 20
+VEND   = 16
 
 # Test voltage V1 steps are 0.5 V:
-VSTEP  = 0.5
+VSTEP  = 2.0
 
 # Max. allowed current during the test is 500 mA:
 IMAX   = 1.0
@@ -74,7 +74,7 @@ PMAX   = 5
 # Idle conditions configured such that PSU-2 regulates the idle conditions configured for PSU-1
 
 # - V2 start value:
-VIDLE     = 3.0
+VIDLE     = 2.0
 
 # - V2 minimum value:
 VIDLE_MIN = 0.5
@@ -97,7 +97,7 @@ IIDLE     = 1
 [EXTRA]
 
 # Duration of idle periods between readings (seconds):
-IDLESECS    = 10
+IDLESECS    = 3
 
 # Duration of pre-heat / warmup period before starting the test (seconds):
 PREHEATSECS = 60

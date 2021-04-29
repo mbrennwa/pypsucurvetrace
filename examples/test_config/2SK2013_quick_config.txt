@@ -1,13 +1,14 @@
-#################################
-# Test configuration 2SJ313 FET #
-#################################
+############################################
+# Test configuration 2SK2013 N-CHANNEL FET #
+############################################
 
 
-# Connections CHECK THESE FIRST!!!! :
-# - PSU1-RED --> SOURCE + PSU2-RED
-# - PSU1-BLK --> DRAIN
-# - PSU2-RED --> PSU1-RED
-# - PSU2-BLK --> GATE
+
+# Connections:
+# - PSU1-RED --> DRAIN
+# - PSU1-BLK --> SOURCE + PSU2-RED
+# - PSU2-RED --> GATE
+# - PSU2-BLK --> PSU1-BLK
 
 
 
@@ -17,19 +18,19 @@
 [PSU1]
 
 # DUT is connected with normal polarity (not inverted):
-POLARITY = -1
+POLARITY = 1
 
-# Test voltage V1 starts at 0 V:
+# Test voltage V1 start:
 VSTART = 0
 
-# Test voltage V1 ends at 60 V:
+# Test voltage V1 end:
 # VEND   = 60
-VEND   = 20
+VEND   = 16
 
-# Test voltage V1 steps are 0.5 V:
-VSTEP  = 0.5
+# Test voltage V1 steps:
+VSTEP  = 2.0
 
-# Max. allowed current during the test is 500 mA:
+# Max. allowed current during the test:
 IMAX   = 1.0
 
 # Max. allowed power during the test is 10 W:
@@ -54,7 +55,7 @@ IIDLE  = 0.5
 [PSU2]
 
 # DUT is connected with normal polarity (not inverted):
-POLARITY = -1
+POLARITY = 1
 
 # Test voltage V2 start:
 VSTART = 1.75
@@ -74,7 +75,7 @@ PMAX   = 5
 # Idle conditions configured such that PSU-2 regulates the idle conditions configured for PSU-1
 
 # - V2 start value:
-VIDLE     = 3.0
+VIDLE     = 2.0
 
 # - V2 minimum value:
 VIDLE_MIN = 0.5
@@ -84,7 +85,7 @@ VIDLE_MAX = 4.0
 
 # - The DUT transconductance value (in A/V) to be used for regulation of the I1 idle current by adjusting the V2 voltage:
 #   (IDLE_GM = delta-I1 / delta-U2 ratio of the DUT at the idle point)
-IDLE_GM   = 1.0
+IDLE_GM   = 1
 
 # - Max. allowed idle current during the test is 1 A (this is way more than necessary for the DUT, but a larger value helps achieving quick regulation of the PSU output):
 IIDLE     = 1
@@ -97,7 +98,7 @@ IIDLE     = 1
 [EXTRA]
 
 # Duration of idle periods between readings (seconds):
-IDLESECS    = 10
+IDLESECS    = 2
 
 # Duration of pre-heat / warmup period before starting the test (seconds):
 PREHEATSECS = 60
