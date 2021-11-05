@@ -144,7 +144,7 @@ class VOLTCRAFT(object):
 		'''
 		VOLTCRAFT.release_SERIAL_lock()
 		
-		Release lock on UART port.
+		Release lock on serial port.
 		
 		INPUT:
 		(none)
