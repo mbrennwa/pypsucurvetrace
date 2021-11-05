@@ -88,7 +88,7 @@ logging.debug ('**** SHOULD READ CONFIG FILE HERE... ****')
 
 
 
-T_target = 50		# Target temperature of the heater (°C)
+T_target = 54		# Target temperature of the heater (°C)
 
 
 
@@ -100,14 +100,10 @@ heater = heaterblock( PSU_port = '/dev/serial/by-id/usb-Silicon_Labs_CP2102_USB_
                       resistance = 9
                     )
 
-# init PID controller:
-## pid = PID(Kp=1, Ki=0.01, Kd=0.1)
-
-
-
-# THIS SHOULD GO INTO THE HEATERBLOCK OBJECT/CLASS:
+# Init and configure PID controller:
 # Determine the PID paramters: https://en.wikipedia.org/wiki/PID_controller#Manual_tuning
-pid = PID(Kp=350, Ki=15.0, Kd=30.0)
+### pid = PID(Kp=300, Ki=10.0, Kd=100.0)
+pid = PID(Kp=300, Ki=5.0, Kd=0.0)
 
 
 pid.output_limits = (0, heater.max_power)
@@ -122,7 +118,8 @@ setpoint, y, x = [], [], []
 
 T = heater.read_temp()
 
-while time.time() - start_time < 5*60: 
+# PID controller loop:
+while time.time() - start_time < 3*60*100: 
        	
 	#Setting the time variable dt
 	current_time = time.time()
