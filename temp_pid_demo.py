@@ -74,14 +74,19 @@ class heaterblock:
 		
 		# read T sensor (for next PID iteration):
 		T = self.read_temp()
-
 		return T
 
 
+	def turn_off(self):
+	
+		# turn off PSU / heater power:
+		self._PSU.turnOff()
 
-### MAIN
 
-logging.basicConfig(level=logging.DEBUG, format='%(relativeCreated)6d %(threadName)s %(message)s')
+
+### MAIN // PID CONTROLLER
+
+logging.basicConfig(level=logging.DEBUG, format='%(relativeCreated)6d %(threadName)s: %(message)s')
 
 logging.debug ('**** SHOULD READ CONFIG FILE HERE... ****')
 
@@ -119,38 +124,46 @@ setpoint, y, x = [], [], []
 T = heater.read_temp()
 
 # PID controller loop:
-while time.time() - start_time < 3*60*100: 
-       	
-	#Setting the time variable dt
-	current_time = time.time()
-	dt = (current_time - last_time)
+try:
+	while time.time() - start_time < 1000: 
+	       	
+		#Setting the time variable dt
+		current_time = time.time()
+		dt = (current_time - last_time)
 
-	# determine heating power for next step:
-	power = pid(T)
-        
-	logging.info('PID setpoint T = ' + str(pid.setpoint))
-	logging.info('Heaterblock  T = ' + str(T))
-	logging.info('PSU power    P = ' + str(power))
-        
-	# update heater block (set power, get temperature):
-	T = heater.update(power, dt)
-        
-	#Visualize Output Results
-	x += [current_time - start_time]
-	y += [T]
-	setpoint += [pid.setpoint]
-	
-	#Used for initial value assignment of variable temp
-        #if current_time - start_time > 0:
-        #    pid.setpoint = 100
+		# determine heating power for next step:
+		power = pid(T)
+		
+		logging.info('PID setpoint T = ' + str(pid.setpoint))
+		logging.info('Heaterblock  T = ' + str(T))
+		logging.info('PSU power    P = ' + str(power))
+		
+		# update heater block (set power, get temperature):
+		T = heater.update(power, dt)
+		
+		#Visualize Output Results
+		x += [current_time - start_time]
+		y += [T]
+		setpoint += [pid.setpoint]
+		
+		#Used for initial value assignment of variable temp
+		#if current_time - start_time > 0:
+		#    pid.setpoint = 100
 
-	last_time = current_time
+		last_time = current_time
 
 
-# Visualization of Output Results
-plt.plot(x, setpoint, label='target')
-plt.plot(x, y, label='PID')
-plt.xlabel('time')
-plt.ylabel('temperature')
-plt.legend()
-plt.show()
+	# Visualization of Output Results
+	### plt.plot(x, setpoint, label='target')
+	### plt.plot(x, y, label='PID')
+	### plt.xlabel('time')
+	### plt.ylabel('temperature')
+	### plt.legend()
+	### plt.show()
+
+except:
+	logging.warning('PID control loop exited early!')
+
+finally:
+	heater.turn_off()
+	logging.info('Heater turned off.')
