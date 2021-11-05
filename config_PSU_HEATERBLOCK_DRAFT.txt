@@ -1,0 +1,39 @@
+# DRAFT TEMPLATE OF CONFIG FILE INCLUDING THE NEW HEATERBLOCK CONFIG
+
+
+
+#### TARGET TEMPERATURE AND TOLERANCE GOES TO DUT CONFIG FILE!!!
+
+
+
+[PSU1]
+COMPORT = /dev/serial/by-id/usb-Prolific_Technology_Inc._USB-Serial_Controller-if00-port0
+TYPE = BK
+NUMSTABLEREAD = 5
+
+
+
+[PSU2]
+COMPORT = /dev/serial/by-id/usb-Nuvoton_USB_Virtual_COM_000624D20236-if00
+TYPE = KORAD
+NUMSTABLEREAD = 3
+
+
+
+[HEATERBLOCK]
+
+# COM port and type of temperature sensor:
+TEMPSENS_COMPORT = /dev/serial/by-id/usb-FTDI_TTL232R-3V3_FTBZLSUL-if00-port0
+TEMPSENS_TYPE = DS1820
+
+# COM port and type of PSU:
+PSU_COMPORT = /dev/serial/by-id/usb-Silicon_Labs_CP2102_USB_to_UART_Bridge_Controller_0010-if00-port0
+PSU_TYPE = VOLTCRAFT
+
+# Resistance value of the heater element (Ohm):
+RESISTANCE = 3
+
+# PID regulator coefficients:
+KP = 100
+KI = 10
+KD = 1
