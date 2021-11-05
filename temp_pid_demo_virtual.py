@@ -2,51 +2,19 @@ import time
 import matplotlib.pyplot as plt
 from simple_pid import PID
 
-
-import traceback
-import logging
-from lib.temperaturesensor_MAXIM import temperaturesensor_MAXIM as Tsensor
-
-
 # heater class (dummy):
-class heaterblock:
+class heater:
 
-	def __init__(self, PSU_port, PSU_type, TSENS_port, resistance, KP, KI, KD):
-	
-		# connect / configure PSU:
-		try:
-			print('Trying to configure PSU...')
-			
-		except Exception as e:
-			logging.error(traceback.format_exc())
-		
-		# connect / configure T sensor:
-		try:
-			print('Trying to configure T sensor...')
-			self._TSENS = Tsensor(TSENS_port , romcode = '')
-			print('Bingo!')
-
-		except Exception as e:
-			logging.error(traceback.format_exc())
-		
-		# set heater resistance:
-		self._heater_R = resistance
-		
-		# set PID parameters:
-		self._KP = KP
-		self._KI = KI
-		self._KD = KD
-				
+	def __init__(self, T_ini, T_ambient, C_heat):
+		self.temp   = T_ini  # initial temperature (°C)
+		self.temp_amb = T_ambient  # ambient air temperature (°C)
+		self.C_heat = C_heat # heat capacity of the heater (J/K)
 
 	def read_temp(self):
 		# read T sensor and return result
-
-		temp,unit = self._TSENS.temperature()
-		if unit is not 'deg.C':
-			raise ValueError('T value has wrong unit (' + unit + ').')
-		return temp
+		time.sleep(0.1)
+		return self.temp
         
-
 	def update(self, power, dt):
 	
 		## dt = 10 * dt # speed up time (for dummy purposes)
@@ -70,31 +38,16 @@ class heaterblock:
 
 ### MAIN
 
-
-
-print ('**** SHOULD READ CONFIG FILE HERE... ****')
-
-
-
 T0       = 25		# Initial temperature of the heater (°C)
 T_target = 30		# Target temperature of the heater (°C)
 P_max    = 36*12	# Max heating power (Watt)
 
-# init heaterblock object:
-heater = heaterblock( PSU_port = '/dev/serial/by-id/usb-Silicon_Labs_CP2102_USB_to_UART_Bridge_Controller_0010-if00-port0',
-                      PSU_type = 'VOLTCRAFT',
-                      TSENS_port =  '/dev/serial/by-id/usb-FTDI_TTL232R-3V3_FTBZLSUL-if00-port0',	
-                      resistance = 3,
-                      KP = 20000,
-                      KI = 0.4,
-                      KD = 0.0 )
+# init heater object:
+heater = heater(T_ini=T0, T_ambient=10, C_heat=1460)
 
 # init PID controller:
 ## pid = PID(Kp=1, Ki=0.01, Kd=0.1)
 
-
-
-# THIS SHOULD GO INTO THE HEATERBLOCK OBJECT/CLASS:
 # Determine the PID paramters: https://en.wikipedia.org/wiki/PID_controller#Manual_tuning
 pid = PID(Kp=20000, Ki=0.35, Kd=0.0)
 
