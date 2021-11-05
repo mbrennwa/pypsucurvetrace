@@ -88,6 +88,8 @@ class VOLTCRAFT(object):
 		    self.current(0)
 		if not (prom is None):
 		    self.use_preset(prom)
+		    
+		self._SERIAL_locked = False
 
 		# Determined experimentally with Voltcraft PPS-16005:
 		self.VMIN = 0.9
@@ -101,10 +103,79 @@ class VOLTCRAFT(object):
 		self.PMAX = math.floor(self.VMAX * self.IMAX)
 
 
+
+
+
+
+
+
+
+
+
+
+	########################################################################################################
+
+
+	def get_SERIAL_lock(self):
+		'''
+		VOLTCRAFT.get_SERIAL_lock()
+		
+		Lock serial port for exclusive access (important if different threads / processes are trying to use the port). Make sure to release the lock after using the port (see VOLTCRAFT.release_SERIAL_lock()!
+		
+		INPUT:
+		(none)
+		
+		OUTPUT:
+		(none)
+		'''
+
+		# wait until the serial port is unlocked:
+		while self._SERIAL_locked == True:
+			time.sleep(0.01)
+			
+		# lock the port:
+		self._SERIAL_locked = True
+
+
+	########################################################################################################
+
+
+	def release_SERIAL_lock(self):
+		'''
+		VOLTCRAFT.release_SERIAL_lock()
+		
+		Release lock on UART port.
+		
+		INPUT:
+		(none)
+		
+		OUTPUT:
+		(none)
+		'''
+
+		# release the lock:
+		self._SERIAL_locked = False
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 	def _query(self, cmd, attempt = 1):
 		"""
 		tx/rx to/from PS
 		"""
+
+		self.get_SERIAL_lock()
 
 		if attempt > 10:
 			raise RuntimeError('Voltcraft PSU does not respond to ' + cmd + ' command after 10 attempts. Giving up...')
@@ -148,6 +219,8 @@ class VOLTCRAFT(object):
 
 		else:
 			b = "".join(b[:-4])
+
+		self.release_SERIAL_lock()
 
 		return b
 
