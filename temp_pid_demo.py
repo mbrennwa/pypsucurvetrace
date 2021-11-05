@@ -22,15 +22,16 @@ class heaterblock:
 			self._PSU = PSU(port=PSU_port, commandset=PSU_type, label='Heaterblock_PSU')
 			
 			self.max_power = self._PSU.PMAX 
-			
-			# set initial voltage = 0, and initial current = max.
-			self._PSU.setVoltage(0.0,wait_stable=True)
-			
-			self._PSU.setCurrent(self._PSU.IMAX,wait_stable=False)
-			
+
 			logging.info('PSU max voltage = ' + str(self._PSU.VMAX))
 			logging.info('PSU max current = ' + str(self._PSU.IMAX))
 			logging.info('PSU max power   = ' + str(self._PSU.PMAX))
+			
+			# set initial voltage = 0, and initial current = max.
+			self._PSU.setVoltage(0.0,wait_stable=False)
+			self._PSU.setCurrent(self._PSU.IMAX,wait_stable=False)
+			logging.info('Heater turning on...')
+			self.turn_on()
 			
 			logging.info('...done.')
 		
@@ -77,6 +78,11 @@ class heaterblock:
 		return T
 
 
+	def turn_on(self):
+	
+		# turn on PSU / heater power:
+		self._PSU.turnOn()
+
 	def turn_off(self):
 	
 		# turn off PSU / heater power:
@@ -93,7 +99,7 @@ logging.debug ('**** SHOULD READ CONFIG FILE HERE... ****')
 
 
 
-T_target = 54		# Target temperature of the heater (°C)
+T_target = 35		# Target temperature of the heater (°C)
 
 
 
