@@ -205,4 +205,4 @@ class temperaturesensor_MAXIM:
 		(none)
 		'''
 		
-		print ('ERROR from temperaturesensor_MAXIM: ' + msg)
+		raise Exception('ERROR from temperaturesensor_MAXIM: ' + msg)
