@@ -29,6 +29,6 @@ class parameteranalysis_tab(wx.Panel):
 		# Add a dummy text label:
 		box = wx.BoxSizer(wx.VERTICAL)
 		lbl = wx.StaticText(self,-1,style = wx.ALIGN_CENTER)
-		lbl.SetLabel("This tab\n is for\n control of\n DUT parameter\n analysis.")
+		lbl.SetLabel("This tab\n is for\n control of\n DUT parameter\n analysis:\n\n gain (mu), transconductance (gm), etc. at specified operating point")
 		box.Add(lbl,0,wx.ALIGN_CENTER)
 		self.SetSizer(box) 

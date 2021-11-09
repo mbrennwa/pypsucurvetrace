@@ -29,6 +29,6 @@ class DUTsetup_tab(wx.Panel):
 		# Add a dummy text label:
 		box = wx.BoxSizer(wx.VERTICAL)
 		lbl = wx.StaticText(self,-1,style = wx.ALIGN_CENTER)
-		lbl.SetLabel("This tab\n is for\n setup of the\n DUT limits\n and connections.")
+		lbl.SetLabel("This tab\n is for\n setup of the\n DUT limits\n and connections\n and optional temperature setting.\n\n\n BUTTON to load DUT config file")
 		box.Add(lbl,0,wx.ALIGN_CENTER)
 		self.SetSizer(box) 

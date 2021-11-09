@@ -1,6 +1,6 @@
-##########################
-# GUI for PSU Setup tab #
-##########################
+########################
+# GUI for Settings tab #
+########################
 
 
 try:
@@ -15,8 +15,8 @@ except ImportError as e:
 #####################################################################
 
 
-# PSU Setup tab:
-class PSUsetup_tab(wx.Panel):
+# DUT Setup tab:
+class settings_tab(wx.Panel):
 
 	def __init__(self,app):
 	
@@ -29,6 +29,6 @@ class PSUsetup_tab(wx.Panel):
 		# Add a dummy text label:
 		box = wx.BoxSizer(wx.VERTICAL)
 		lbl = wx.StaticText(self,-1,style = wx.ALIGN_CENTER)
-		lbl.SetLabel("This tab\n is for\n setup of the\n PSUs\n (types, ports).")
+		lbl.SetLabel("This tab\n is for\n settings of the\n DUT PSUs\n and HEATERBLOCK PSU and T Sensor\n (Serial ports, PSU types)")
 		box.Add(lbl,0,wx.ALIGN_CENTER)
 		self.SetSizer(box) 

@@ -8,8 +8,7 @@ try:
 	from curvetrace_tab_curvetrace        import curvetrace_tab	
 	from curvetrace_tab_parameteranalysis import parameteranalysis_tab	
 	from curvetrace_tab_DUTsetup          import DUTsetup_tab
-	from curvetrace_tab_PSUsetup          import PSUsetup_tab
-	from curvetrace_tab_HEATERBLOCKsetup  import HEATERBLOCKsetup_tab
+	from curvetrace_tab_settings          import settings_tab
 	from curvetrace_constants             import MAIN_WINDOW_WIDTH_INI, MAIN_WINDOW_HEIGHT_INI
 
 except ImportError as e:
@@ -88,12 +87,7 @@ class frame_main(wx.Frame):
 		### self._log_box                = wx.TextCtrl(self, wx.ID_ANY, '', style=wx.TE_MULTILINE | wx.TE_READONLY | wx.TE_RICH )	
 		### self._log_box.num_lines      = 0        # Number of text lines in the TextCtrl
 		### self._sizer.Add(self._log_box, 1, wx.EXPAND ) # add the logging / warning panel to the sizer
-		### self.SetSizer(self._sizer) # apply the sizer to the panel
-
-		# Set window to center of screen (if the windowing system supports it), and show the window on the screen:
-		self.CenterOnScreen()
-		self.Show()
-		
+		### self.SetSizer(self._sizer) # apply the sizer to the panel		
 
 	def configure_gui(self):
 		# configure the frame/gui according to the instrument configuration
@@ -102,20 +96,23 @@ class frame_main(wx.Frame):
 		self.curvetrace_tab        = curvetrace_tab(self._app)
 		self.parameteranalysis_tab = parameteranalysis_tab(self._app)
 		self.DUTsetup_tab          = DUTsetup_tab(self._app)
-		self.PSUsetup_tab          = PSUsetup_tab(self._app)
-		self.HEATERBLOCKsetup_tab  = HEATERBLOCKsetup_tab(self._app)
+		self.settings_tab          = settings_tab(self._app)
 				
 		# Add the tabs to the notebook:
 		self.tabs.AddPage(self.curvetrace_tab,        "Curve Trace")
 		self.tabs.AddPage(self.parameteranalysis_tab, "Parameter Analysis")
 		self.tabs.AddPage(self.DUTsetup_tab,          "DUT Setup")
-		self.tabs.AddPage(self.PSUsetup_tab,          "PSU Setup")
-		self.tabs.AddPage(self.HEATERBLOCKsetup_tab,  "Heater Setup")
+		self.tabs.AddPage(self.settings_tab,          "Settings")
 		
 		# Update the window layout with the newly created / configured tabs and controls:
 		self._sizer.Prepend(self.tabs, 0, wx.EXPAND) # add the notebook (the "tabs") to the sizer, on top of the already existing logging / warning panel
 		self.SetMinSize( self._sizer.ComputeFittingWindowSize(self) ) # set minimal window size	according to the sizer with the newly configured tabs and added controls	
 		self.Layout() # update the window layout
+
+		# Set window to center of screen (if the windowing system supports it), and show the window on the screen:
+		self.CenterOnScreen()
+		self.Show()
+
 		logging.info( 'GUI configuration completed.' )
 		
 	def on_close_event(self, event):
