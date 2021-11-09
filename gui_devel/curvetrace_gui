@@ -48,8 +48,6 @@ if __name__ == "__main__":
 	
 	# Set up logging:
 	logging.basicConfig(level=logging.DEBUG, format='%(relativeCreated)6d %(threadName)s: %(message)s')
-	logging.debug ('**** SHOULD READ CONFIG FILE HERE... ****')
-
 	
 	# Set process name:
 	setproctitle(PROGRAM_NAME)

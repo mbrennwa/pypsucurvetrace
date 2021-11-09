@@ -116,8 +116,8 @@ class frame_main(wx.Frame):
 		self._sizer.Prepend(self.tabs, 0, wx.EXPAND) # add the notebook (the "tabs") to the sizer, on top of the already existing logging / warning panel
 		self.SetMinSize( self._sizer.ComputeFittingWindowSize(self) ) # set minimal window size	according to the sizer with the newly configured tabs and added controls	
 		self.Layout() # update the window layout
-		logging.info( 'Configuration completed.' )
-				
+		logging.info( 'GUI configuration completed.' )
+		
 	def on_close_event(self, event):
 		dlg = wx.MessageDialog(self, "Do you really want to close this application?", "Confirm Exit", wx.OK|wx.CANCEL|wx.ICON_QUESTION)
 		result = dlg.ShowModal()
