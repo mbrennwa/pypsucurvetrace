@@ -860,7 +860,6 @@ except KeyboardInterrupt:
 	
 except:
 	print ('\nOooops, something went wrong during testing! Exiting...\n')
-	cleanup_exit()
 
 finally:
 	cleanup_exit()
