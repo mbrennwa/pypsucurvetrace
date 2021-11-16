@@ -816,8 +816,7 @@ try:
 					"{:10.6f}".format(V2MEAS*PSU2.TEST_POLARITY)	+ ' ' +
 					"{:10.6f}".format(I2MEAS*PSU2.TEST_POLARITY)	+ ' ' +
 					"{:5d}".format(LIMIT2)                          + ' ' +
-					"{:10.6f}".format(T_HB)                         + ' ' +
-					T_HB) ,
+					T_HB ,
 				logfile )
 
 	print ('Test completed.')
