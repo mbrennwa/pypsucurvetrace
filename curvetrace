@@ -369,21 +369,25 @@ def do_idle(PSU1,PSU2,seconds,file=None):
 ###################
 
 def cleanup_exit():
+	# Try hard to turn off all PSUs to avoid unwanted/unattended powering of the DUT or heater block.
 
 	for p in [PSU1, PSU2]:
 		try:
 			if p.CONNECTED:
 				p.turnOff()
-				logging.info('Sucessfully turned off PSU ' + p.LABEL + '.')
 		except:
 			logging.warning('Could not turn off PSU ' + p.LABEL + '!')
 			pass
-	
+
 	try:
 		HEATER.turn_off()
-		logging.info('Sucessfully turned off heater.')
 	except:
 		logging.warning('Could not turn off heater!')
+		pass
+	try:
+		HEATER.terminate_TSENS_thread()
+	except:
+		logging.warning('Could not terminate TSENS thread!')
 		pass
 
 
