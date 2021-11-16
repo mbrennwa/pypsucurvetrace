@@ -354,7 +354,7 @@ def do_idle(PSU1,PSU2,seconds,file=None):
 
 		# write idle / preheat conditions to file:
 		if file is not None:
-			printit("* OPERATING POINT AT END OF PREHEAT / IDLE: Uc = " "U0={:.3f} V".format(Uf) + '  ' + "I0={:.3f} A".format(If) + '  ' + "Uc={:.3f} V".format(Ur) + '  ' + "Ic={:.3f} A".format(Ir) , file , '%')
+			printit("* OPERATING POINT AT END OF PREHEAT / IDLE: " "U0={:.3f} V".format(Uf) + '  ' + "I0={:.3f} A".format(If) + '  ' + "Uc={:.3f} V".format(Ur) + '  ' + "Ic={:.3f} A".format(Ir) , file , '%')
 
 
 
@@ -628,6 +628,7 @@ printit ('Column 7:  PSU2 nominal current setting (A)',logfile,'%')
 printit ('Column 8:  PSU2 voltage measurement (V)',logfile,'%')
 printit ('Column 9:  PSU2 current measurement (I)',logfile,'%')
 printit ('Column 10: PSU2 limiter flag',logfile,'%')
+printit ('Column 11: Heaterblock temperature (°C)',logfile,'%')
 
 print ('\n')
 
@@ -796,6 +797,14 @@ try:
 				if limit >= limit_max:
 					break # break out of the inner loop (V1 steps) and continue with the next V2 step
 
+			# Determine heaterblock temperature:
+			T_HB = None
+			try:
+				T_HB = float(T_HB) # this will fail if T_HB cannot be converted to a proper number
+				T_HB = str(T_HB) # convert numeric value to string
+			except:
+				T_HB = "NA"
+
 			# Print results:
 			printit (	"{:10.6f}".format(V1*PSU1.TEST_POLARITY)	+ ' ' + 
 					"{:10.6f}".format(I1LIM*PSU1.TEST_POLARITY)	+ ' ' + 
@@ -806,7 +815,9 @@ try:
 					"{:10.6f}".format(I2LIM*PSU2.TEST_POLARITY)	+ ' ' +
 					"{:10.6f}".format(V2MEAS*PSU2.TEST_POLARITY)	+ ' ' +
 					"{:10.6f}".format(I2MEAS*PSU2.TEST_POLARITY)	+ ' ' +
-					"{:5d}".format(LIMIT2) ,
+					"{:5d}".format(LIMIT2)                          + ' ' +
+					"{:10.6f}".format(T_HB)                         + ' ' +
+					T_HB) ,
 				logfile )
 
 	print ('Test completed.')
