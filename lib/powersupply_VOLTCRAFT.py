@@ -8,6 +8,7 @@ import sys
 import math
 import warnings
 import time
+import logging
 
 # The model can be identified by the maximum voltage and maximum current.
 # But this is probably one of the weirdest naming-schemes I've seen... 
@@ -69,6 +70,8 @@ class VOLTCRAFT(object):
 
 		self._Serial.flushInput()
 		self._Serial.flushOutput()
+		self._SERIAL_locked = False
+		
 		self._debug = bool(debug)
 
 		try:
@@ -89,8 +92,6 @@ class VOLTCRAFT(object):
 		if not (prom is None):
 		    self.use_preset(prom)
 		    
-		self._SERIAL_locked = False
-
 		# Determined experimentally with Voltcraft PPS-16005:
 		self.VMIN = 0.9
 		self.VRESSET = 0.1
@@ -101,16 +102,6 @@ class VOLTCRAFT(object):
 		self.MAXSETTLETIME = 5
 		self.READIDLETIME = 0.2
 		self.PMAX = math.floor(self.VMAX * self.IMAX)
-
-
-
-
-
-
-
-
-
-
 
 
 	########################################################################################################
@@ -130,7 +121,7 @@ class VOLTCRAFT(object):
 		'''
 
 		# wait until the serial port is unlocked:
-		while self._SERIAL_locked == True:
+		while self._SERIAL_locked:
 			time.sleep(0.01)
 			
 		# lock the port:
@@ -156,26 +147,13 @@ class VOLTCRAFT(object):
 		# release the lock:
 		self._SERIAL_locked = False
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-	def _query(self, cmd, attempt = 1):
+	def _query(self, cmd, attempt = 1, have_lock = False):
 		"""
 		tx/rx to/from PS
 		"""
 
-		self.get_SERIAL_lock()
+		if not have_lock:
+			self.get_SERIAL_lock()
 
 		if attempt > 10:
 			raise RuntimeError('Voltcraft PSU does not respond to ' + cmd + ' command after 10 attempts. Giving up...')
@@ -215,12 +193,14 @@ class VOLTCRAFT(object):
 			time.sleep(0.2)
 			self._Serial.flushInput()
 			time.sleep(0.2)			
-			b = self._query(cmd,attempt+1)
+			b = self._query(cmd,attempt+1, have_lock=True)
 
 		else:
 			b = "".join(b[:-4])
 
-		self.release_SERIAL_lock()
+
+		if not have_lock:
+			self.release_SERIAL_lock()
 
 		return b
 

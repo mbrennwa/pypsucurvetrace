@@ -24,8 +24,12 @@ import configparser
 import argparse
 import numpy as np
 import os.path
+import logging
+logging.basicConfig(level=logging.DEBUG, format='%(relativeCreated)6d %(threadName)s: %(message)s')
+
 ### from termcolor import colored
 import lib.powersupply as powersupply
+import lib.heaterblock as heaterblock
 
 
 ##########################################
@@ -325,8 +329,10 @@ def do_idle(PSU1,PSU2,seconds,file=None):
 
 			Ur = r[0]
 			Ir = r[1]
+			
+			T_HB = HEATER.get_temperature_string()
 
-			b = "U0={:.3f} V".format(Uf) + '  ' + "I0={:.3f} A".format(If) + '  ' + "Uc={:.3f} V".format(Ur) + '  ' + "Ic={:.3f} A".format(Ir)
+			b = "U0={:.3f} V".format(Uf) + '  ' + "I0={:.3f} A".format(If) + '  ' + "Uc={:.3f} V".format(Ur) + '  ' + "Ic={:.3f} A".format(Ir) + '  ' + "T="+T_HB
 			t = "Idling ({:.1f}".format(time.time()-t0) + ' of ' + "{:.1f}".format(seconds) + ' s): '
 			print (t + b + ' '*12, end="\r")
 
@@ -354,7 +360,31 @@ def do_idle(PSU1,PSU2,seconds,file=None):
 
 		# write idle / preheat conditions to file:
 		if file is not None:
-			printit("* OPERATING POINT AT END OF PREHEAT / IDLE: " "U0={:.3f} V".format(Uf) + '  ' + "I0={:.3f} A".format(If) + '  ' + "Uc={:.3f} V".format(Ur) + '  ' + "Ic={:.3f} A".format(Ir) , file , '%')
+			printit("* OPERATING POINT AT END OF PREHEAT / IDLE: " "U0={:.3f} V".format(Uf) + '  ' + "I0={:.3f} A".format(If) + '  ' + "Uc={:.3f} V".format(Ur) + '  ' + "Ic={:.3f} A".format(Ir) + '  ' + "T="+T_HB , file , '%')
+
+
+
+###################
+# cleanup at exit #
+###################
+
+def cleanup_exit():
+
+	for p in [PSU1, PSU2]:
+		try:
+			if p.CONNECTED:
+				p.turnOff()
+				logging.info('Sucessfully turned off PSU ' + p.LABEL + '.')
+		except:
+			logging.warning('Could not turn off PSU ' + p.LABEL + '!')
+			pass
+	
+	try:
+		HEATER.turn_off()
+		logging.info('Sucessfully turned off heater.')
+	except:
+		logging.warning('Could not turn off heater!')
+		pass
 
 
 
@@ -389,6 +419,15 @@ if args.c:
 # connect to PSUs:
 PSU1 = connect_PSU(configPSU,'PSU1'); print( )
 PSU2 = connect_PSU(configPSU,'PSU2'); print( )
+
+# set up heaterblock:
+# init heaterblock object:
+logging.debug('**** Connecting to heaterblock using hardwired settings ****')
+HEATER = heaterblock.heater( PSU_port = '/dev/serial/by-id/usb-Silicon_Labs_CP2102_USB_to_UART_Bridge_Controller_0010-if00-port0',
+                      PSU_type = 'VOLTCRAFT',
+                      resistance = 9, 
+                      TSENS_port =  '/dev/serial/by-id/usb-FTDI_TTL232R-3V3_FTBZLSUL-if00-port0',	
+                    )
 
 # ask for sample name:
 samplename = ''
@@ -798,12 +837,7 @@ try:
 					break # break out of the inner loop (V1 steps) and continue with the next V2 step
 
 			# Determine heaterblock temperature:
-			T_HB = None
-			try:
-				T_HB = float(T_HB) # this will fail if T_HB cannot be converted to a proper number
-				T_HB = str(T_HB) # convert numeric value to string
-			except:
-				T_HB = "NA"
+			T_HB = HEATER.get_temperature_string()
 
 			# Print results:
 			printit (	"{:10.6f}".format(V1*PSU1.TEST_POLARITY)	+ ' ' + 
@@ -820,13 +854,13 @@ try:
 				logfile )
 
 	print ('Test completed.')
-	for p in [PSU1, PSU2]:
-		if p.CONNECTED:
-			p.turnOff()
 
+except KeyboardInterrupt:
+	print ('\nCaught keyboard interrupt, exiting...\n')
+	
 except:
-	print ('\nOooops, something went wrong during testing! Trying to turn off the PSUs...\n')
-	for p in [PSU1, PSU2]:
-		if p.CONNECTED:
-			p.turnOff()
-	raise
+	print ('\nOooops, something went wrong during testing! Exiting...\n')
+	cleanup_exit()
+
+finally:
+	cleanup_exit()
