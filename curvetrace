@@ -78,17 +78,17 @@ def printit(text,f='',comm=''):
 # connect to power supply #
 ###########################
 
-def connect_PSU(configPSU,label):
+def connect_PSU(configTESTER,label):
 
-	if not (label in configPSU):
+	if not (label in configTESTER):
 		# print(label + ' not specified in configuration file. Leaving ' + label + ' unconfigured.')
 		P = powersupply.PSU(label=label) # init empty PSU object
 
 	else:
 
 		# read COMPORT field (mandatory):
-		if 'COMPORT' in configPSU[label]:
-			port=configPSU[label]['COMPORT']
+		if 'COMPORT' in configTESTER[label]:
+			port=configTESTER[label]['COMPORT']
 		else:
 			print ('No COMPORT field in the PSU configuration file! Cannot continue.')
 			exit()
@@ -104,8 +104,8 @@ def connect_PSU(configPSU,label):
 			pass
 
 		# read TYPE field (mandatory):
-		if 'TYPE' in configPSU[label]:
-			commandset = configPSU[label]['TYPE']
+		if 'TYPE' in configTESTER[label]:
+			commandset = configTESTER[label]['TYPE']
 		else:
 			print ('No TYPE field in the PSU configuration file! Cannot continue.')
 			exit()
@@ -124,8 +124,8 @@ def connect_PSU(configPSU,label):
 		P = powersupply.PSU(port,commandset,label)
 
 		# set number of consistent readings for measurements (optional):
-		if 'NUMSTABLEREAD' in configPSU[label]:
-			P.NSTABLEREADINGS = int(configPSU[label]['NUMSTABLEREAD'])
+		if 'NUMSTABLEREAD' in configTESTER[label]:
+			P.NSTABLEREADINGS = int(configTESTER[label]['NUMSTABLEREAD'])
 		else:
 			print ('Number of consistent measurement readings not configured! Using N = 1...')
 			P.NSTABLEREADINGS = 1
@@ -410,10 +410,10 @@ print('***** Disclaimer: Users are advised to study the code in order to underst
 print('\n')
 
 # read PSU config file:
-configPSU = configparser.ConfigParser()
-configPSU.read('config_PSU.txt')
+configTESTER = configparser.ConfigParser()
+configTESTER.read('config.txt')
 
-# read DUT configPSU file (if any):
+# read DUT configTESTER file (if any):
 configDUT = []
 if args.c:
 	print ('Reading DUT configuration in file ' + args.c + '...\n')
@@ -421,17 +421,12 @@ if args.c:
 	configDUT.read(args.c)
 
 # connect to PSUs:
-PSU1 = connect_PSU(configPSU,'PSU1'); print( )
-PSU2 = connect_PSU(configPSU,'PSU2'); print( )
+PSU1 = connect_PSU(configTESTER,'PSU1'); print( )
+PSU2 = connect_PSU(configTESTER,'PSU2'); print( )
 
 # set up heaterblock:
-# init heaterblock object:
-logging.debug('**** Connecting to heaterblock using hardwired settings ****')
-HEATER = heaterblock.heater( PSU_port = '/dev/serial/by-id/usb-Silicon_Labs_CP2102_USB_to_UART_Bridge_Controller_0010-if00-port0',
-                      PSU_type = 'VOLTCRAFT',
-                      resistance = 9, 
-                      TSENS_port =  '/dev/serial/by-id/usb-FTDI_TTL232R-3V3_FTBZLSUL-if00-port0',	
-                    )
+HEATER = heaterblock.heater( configTESTER )
+HEATER.turn_on()
 
 # ask for sample name:
 samplename = ''

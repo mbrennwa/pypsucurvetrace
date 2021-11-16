@@ -1,0 +1,44 @@
+###########################################
+### Power supplies used for DUT testing ###
+###########################################
+
+
+[PSU1]
+### COMPORT = /dev/serial/by-id/usb-Prolific_Technology_Inc._USB-Serial_Controller-if00-port0
+### TYPE = BK
+### NUMSTABLEREAD = 5
+COMPORT = /dev/serial/by-id/usb-nuvoton_KORAD_USB_Mode_48EA53743933-if00
+TYPE = KORAD
+NUMSTABLEREAD = 3
+
+
+[PSU2]
+COMPORT = /dev/serial/by-id/usb-nuvoton_KORAD_USB_Mode_48DB467A3733-if00
+TYPE = KORAD
+NUMSTABLEREAD = 3
+
+
+
+################################################
+### Heater block for DUT temperature control ###
+###     (optional -- delete if not used)     ###
+################################################
+
+[HEATERBLOCK]
+
+# PSU for heater:
+PSU_COMPORT = /dev/serial/by-id/usb-Silicon_Labs_CP2102_USB_to_UART_Bridge_Controller_0010-if00-port0
+PSU_TYPE = VOLTCRAFT
+
+# COM port and type of temperature sensor:
+TEMPSENS_COMPORT  = /dev/serial/by-id/usb-FTDI_TTL232R-3V3_FTBZLSUL-if00-port0
+TEMPSENS_TYPE     = DS1820
+TEMPSENS_INTERVAL = 1.0
+
+# Resistance value of the heater element (Ohm):
+HEATER_RESISTANCE = 3
+
+# PID controller coefficients:
+KP = 100
+KI = 10
+KD = 1
