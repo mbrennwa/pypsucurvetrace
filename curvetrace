@@ -385,9 +385,9 @@ def cleanup_exit():
 		logging.warning('Could not turn off heater!')
 		pass
 	try:
-		HEATER.terminate_TSENS_thread()
+		HEATER.terminate_controller_thread()
 	except:
-		logging.warning('Could not terminate TSENS thread!')
+		logging.warning('Could not terminate heaterblock controller thread!')
 		pass
 
 
@@ -425,7 +425,7 @@ PSU1 = connect_PSU(configTESTER,'PSU1'); print( )
 PSU2 = connect_PSU(configTESTER,'PSU2'); print( )
 
 # set up heaterblock:
-HEATER = heaterblock.heater( configTESTER )
+HEATER = heaterblock.heater( config=configTESTER, target_temperature=50.0 )
 HEATER.turn_on()
 
 # ask for sample name:

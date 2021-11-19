@@ -21,10 +21,7 @@
 
 try:
 	import sys
-	### import warnings
-	### import numpy
-	### import os
-	### import time
+	import time
 	import logging
 	from digitemp.master import UART_Adapter
 	from digitemp.device import AddressableDevice
