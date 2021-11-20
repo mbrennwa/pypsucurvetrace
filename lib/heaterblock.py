@@ -65,7 +65,8 @@ class heater:
 			self._PID_Kd = float(config['HEATERBLOCK']['KD'])
 
 			# thread to read T sensor and for PID control:
-			self._controller = heater_control_thread( self, float(config['HEATERBLOCK']['CONTROLLER_SECONDS']))
+			### self._controller = heater_control_thread( self, float(config['HEATERBLOCK']['CONTROLLER_SECONDS']))
+			self._controller = heater_control_thread(self)
 			self._controller.start()
 
 			# turn heater on (if required):
@@ -90,13 +91,7 @@ class heater:
 					power = min((power, self.max_power))  # make sure power is not more than max. allowed values (the PID may want that, but we can't)
 					voltage = np.sqrt(power*self._heater_R)
 					voltage = min( voltage, self._PSU.VMAX )
-					if voltage > 0.0:
-						current = power/voltage
-					else:
-						current = 0.0
-					current = min( current, self._PSU.IMAX )
 					self._PSU.setVoltage(voltage,wait_stable=False)
-					self._PSU.setCurrent(current,wait_stable=False)
 				except Exception as e:
 					logging.warning('Could not set heater power: ' + traceback.format_exc())
 	
@@ -152,6 +147,8 @@ class heater:
 		if self._PSU != None:
 			try:
 				self._PSU.turnOn()
+				self._PSU.setVoltage(0.0,wait_stable=False) # set V = 0 to avoid uncontrolled power / current draw
+				self._PSU.setCurrent(self._PSU.IMAX,wait_stable=False) # set current to max. to allow power control based on voltage limit only
 				self._power_is_on = True
 			except Exception as e:
 				logging.warning('Could not turn on the heater: ' + traceback.format_exc())
@@ -181,11 +178,12 @@ class heater:
 class heater_control_thread(Thread):
 
 
-	def __init__(self, heaterblock, interval_seconds=1):
+	def __init__(self, heaterblock):
+	### def __init__(self, heaterblock, interval_seconds=1):
 		Thread.__init__(self)
 		
 		self._heaterblock = heaterblock
-		self._interval = interval_seconds
+		### self._interval = interval_seconds
 		
 		# Init and configure PID controller:
 		self._pid = PID(Kp=self._heaterblock._PID_Kp, Ki=self._heaterblock._PID_Ki, Kd=self._heaterblock._PID_Kd)
@@ -202,9 +200,11 @@ class heater_control_thread(Thread):
 			while self._do_run:
 			
 				# sleep between PID iterations:
-				last_time = time.time()
-				while time.time() < last_time + self._interval:
-					time.sleep(self._interval/10)
+				### last_time = time.time()
+				### while time.time() < last_time + self._interval:
+				### 	time.sleep(self._interval/10)
+				
+				time.sleep(0.01)
 				
 				# get heaterblock temperature:
 				T = self._heaterblock.get_temperature(do_read=True)

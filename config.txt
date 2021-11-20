@@ -27,7 +27,7 @@ NUMSTABLEREAD = 3
 [HEATERBLOCK]
 
 # Time interval between PID control calls to read temperature and set power (seconds):
-CONTROLLER_SECONDS = 1.0
+CONTROLLER_SECONDS = 0.1
 
 # PSU for heater:
 PSU_COMPORT = /dev/serial/by-id/usb-Silicon_Labs_CP2102_USB_to_UART_Bridge_Controller_0010-if00-port0
@@ -46,5 +46,5 @@ HEATER_RESISTANCE = 3
 # PID controller coefficients:
 # Determine the PID parameters: https://en.wikipedia.org/wiki/PID_controller#Manual_tuning
 KP = 90
-KI = 3
-KD = 0
+KI = 2
+KD = 10
