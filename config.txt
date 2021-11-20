@@ -26,9 +26,6 @@ NUMSTABLEREAD = 3
 
 [HEATERBLOCK]
 
-# Time interval between PID control calls to read temperature and set power (seconds):
-CONTROLLER_SECONDS = 0.1
-
 # PSU for heater:
 PSU_COMPORT = /dev/serial/by-id/usb-Silicon_Labs_CP2102_USB_to_UART_Bridge_Controller_0010-if00-port0
 PSU_TYPE = VOLTCRAFT
