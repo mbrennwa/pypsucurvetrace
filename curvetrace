@@ -17,6 +17,7 @@
 
 
 # imports:
+import traceback
 import time
 import math
 import datetime
@@ -276,14 +277,39 @@ def configure_idle_PSU(PSU,configDUT):
 	return PSU
 
 
+################################################
+# Wait for heater to attain target temperature #
+################################################
+
+def wait_for_heater():
+
+	
+	if not HEATER.is_on():
+		delay = 0.0
+		
+	else:
+		t0       = time.time()
+		T_now    = HEATER.get_temperature()
+		T_target = HEATER.get_target_temperature()
+		while abs( T_now - T_target ) > TEMP_tol:
+			msg = 'Waiting for heater temperature (current: ' + "{:.2f}".format(T_now) +'°C, target: ' + "{:.2f}".format(T_target) + '°C)...'
+			print (msg)
+			time.sleep(0.5)
+			T_now    = HEATER.get_temperature()
+			### print (' '*len(msg), end="\r") # clear previous line from terminal
+		delay = time.time() - t0
+	
+	return delay
+
 ######################
 # do idle / pre-heat #
 ######################
 
-def do_idle(PSU1,PSU2,seconds,file=None):
+def do_idle(PSU1,PSU2,seconds,file=None,wait_for_TEMP=False):
 	
 	REG = None
 
+	# do pre-heat:
 	if PSU1.CONFIGURED and PSU2.CONFIGURED:
 		if not PSU1.TEST_VIDLE_MIN == PSU1.TEST_VIDLE_MAX:
 			REG = PSU1
@@ -318,7 +344,12 @@ def do_idle(PSU1,PSU2,seconds,file=None):
 		# start idling:
 		t0 = time.time()
 		timenow = time.time()
-		while timenow < t0+seconds:
+		heater_delays = 0.0
+		while timenow < t0+seconds+heater_delays:
+
+			# wait for heaterblock to reach prescribed temperature (if configured/available/required):
+			if wait_for_TEMP:
+				heater_delays += wait_for_heater()
 
 			# read and print voltages and currents at FIX and REG outputs:
 			f = FIX.read()
@@ -333,7 +364,7 @@ def do_idle(PSU1,PSU2,seconds,file=None):
 			T_HB = HEATER.get_temperature_string()
 
 			b = "U0={:.3f} V".format(Uf) + '  ' + "I0={:.3f} A".format(If) + '  ' + "Uc={:.3f} V".format(Ur) + '  ' + "Ic={:.3f} A".format(Ir) + '  ' + "T="+T_HB
-			t = "Idling ({:.1f}".format(time.time()-t0) + ' of ' + "{:.1f}".format(seconds) + ' s): '
+			t = "Idling ({:.1f}".format(time.time()-t0-heater_delays) + ' of ' + "{:.1f}".format(seconds) + ' s): '
 			print (t + b + ' '*12, end="\r")
 
 			if f[2] == "CC":
@@ -425,8 +456,8 @@ PSU1 = connect_PSU(configTESTER,'PSU1'); print( )
 PSU2 = connect_PSU(configTESTER,'PSU2'); print( )
 
 # set up heaterblock:
-HEATER = heaterblock.heater( config=configTESTER, target_temperature=50.0 )
-HEATER.turn_on()
+HEATER = heaterblock.heater( config=configTESTER, target_temperature=0.0 )
+HEATER.turn_off()
 
 # ask for sample name:
 samplename = ''
@@ -465,6 +496,16 @@ if not PSU1.CONFIGURED:
 	if not PSU2.CONFIGURED:
 		print('No power supply configured. Good bye.')
 		exit()
+
+# set up temperature control (optional, may be missing in DUT config file):
+TEMP_val = None
+TEMP_tol = None
+try:
+	TEMP_val = float(configDUT['EXTRA']['T_TARGET'])
+	TEMP_tol = float(configDUT['EXTRA']['T_TOL'])
+except Exception as e:
+	pass
+HEATER.set_target_temperature(TEMP_val)
 
 # set up repeats:
 if 'EXTRA' in configDUT:
@@ -650,12 +691,13 @@ if (T_idle > 0.0) or (T_preheat > 0.0):
 			printit ('* ' + p.LABEL + ' idle / pre-heat current = ' + str(p.TEST_IIDLE) + ' A',logfile,'%')
 			printit ('* ' + p.LABEL + ' max. idle / pre-heat power = ' + str(p.TEST_PIDLELIMIT) + ' W',logfile,'%')
 
+printit ('* Heaterblock temperature (current) = ' + str(HEATER.get_temperature_string()),logfile,'%')
+printit ('* Heaterblock temperature (target)  = ' + str(HEATER.get_target_temperature_string()),logfile,'%')
 
 # Ask if okay to start the test
 input ('\nReady? Press ENTER to start testing or CTRL+C to abort...')
 
-# Run the test:
-
+# Print header / column labels:
 printit ('Column 1:  PSU1 nominal voltage setting (V)',logfile,'%')
 printit ('Column 2:  PSU1 nominal current setting (A)',logfile,'%')
 printit ('Column 3:  PSU1 voltage measurement (V)',logfile,'%')
@@ -669,6 +711,9 @@ printit ('Column 10: PSU2 limiter flag',logfile,'%')
 printit ('Column 11: Heaterblock temperature (°C)',logfile,'%')
 
 print ('\n')
+
+# Turn the heater on (if possible/configured):
+HEATER.turn_on()
 
 AVGFUNCTION = 'MEAN'
 # AVGFUNCTION = 'MEDIAN'
@@ -709,7 +754,11 @@ try:
 		print ('Pre-heating...\n')
 
 		# set idle conditions:
-		do_idle(PSU1,PSU2,T_preheat,logfile)
+		if TEMP_val != None:
+			do_TEMP_wait = True
+		else:
+			do_TEMP_wait = False
+		do_idle(PSU1,PSU2,T_preheat,file=logfile,wait_for_TEMP=do_TEMP_wait)
 
 	print ('Test started...\n')
 
@@ -781,6 +830,9 @@ try:
 
 				# wait a bit to get stable conditions before taking the reading:
 				time.sleep(0.2)
+
+				# wait for heaterblock temperature (if it is configured and turned on):
+				wait_for_heater()
 
 				# read PSU output voltages and currents:
 				r = []
@@ -857,8 +909,8 @@ try:
 except KeyboardInterrupt:
 	print ('\nCaught keyboard interrupt, exiting...\n')
 	
-except:
-	print ('\nOooops, something went wrong during testing! Exiting...\n')
+except Exception as e:
+	print ('\nOooops, something went wrong during testing: ' +  traceback.format_exc())
 
 finally:
 	cleanup_exit()

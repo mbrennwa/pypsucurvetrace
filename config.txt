@@ -40,11 +40,11 @@ TEMPSENS_TYPE     = DS1820
 # Resistance value of the heater element (Ohm):
 HEATER_RESISTANCE = 3
 
-# Max. power applied to the heater (W):
+# Limit of heating power (optional, W):
 ### MAX_POWER = 300
 
 # PID controller coefficients:
 # Determine the PID parameters: https://en.wikipedia.org/wiki/PID_controller#Manual_tuning
-KP = 100
+KP = 90
 KI = 3
 KD = 0

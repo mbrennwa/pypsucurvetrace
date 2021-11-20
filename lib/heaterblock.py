@@ -22,7 +22,7 @@ from lib.powersupply import PSU
 class heater:
 
 
-	def __init__(self, config, target_temperature=0.0):
+	def __init__(self, config, target_temperature=0.0, init_on = False):
 		
 		# try to connect / configure PSU and TSENSOR, and start controller thread:
 		try:
@@ -31,24 +31,23 @@ class heater:
 			self._TSENS = None
 			self._last_T_reading = None
 
-			self.target_T = target_temperature
+			self._target_T = target_temperature
 
 			if config['HEATERBLOCK']['TEMPSENS_TYPE'].upper() != 'DS1820':
 				raise ValueError('Unknown T sensor type ' + config['HEATERBLOCK']['TEMPSENS_TYPE'] + '.')
 			
 			# connect / configure T sensor:
-			logging.info('Trying to configure heaterblock T sensor...')
+			# logging.info('Trying to configure heaterblock T sensor...')
 			self._TSENS = TSENS(config['HEATERBLOCK']['TEMPSENS_COMPORT'] , romcode = '')
 			self._TSENS_configured = True
-			logging.info('...done.')
+			# logging.info('...done.')
 
 			# connect / configure PSU:
-			logging.info('Trying to configure heaterblock PSU...')
+			# logging.info('Trying to configure heaterblock PSU...')
 			self._PSU = PSU(config['HEATERBLOCK']['PSU_COMPORT'],config['HEATERBLOCK']['PSU_TYPE'],'HEATERBLOCK_PSU')
 			self.turn_off()
 			self._PSU.setVoltage(0.0,wait_stable=False)
-			self._PSU.setCurrent(self._PSU.IMAX,wait_stable=False)
-			logging.info('...done.')
+			self._PSU.setCurrent(0.0,wait_stable=False)
 
 			self._heater_R = float(config['HEATERBLOCK']['HEATER_RESISTANCE'])
 
@@ -69,6 +68,10 @@ class heater:
 			self._controller = heater_control_thread( self, float(config['HEATERBLOCK']['CONTROLLER_SECONDS']))
 			self._controller.start()
 
+			# turn heater on (if required):
+			if init_on:
+				self.turn_on()
+
 		except KeyError as e:
 			logging.warning('Could not configure heaterblock because ' + str(e) + ' is missing in the configuration file.')
 			pass
@@ -82,12 +85,20 @@ class heater:
 		# set heater power:
 		if self._PSU != None:
 			if self._power_is_on:
-				power = max((0, power))               # make sure power is not negative (the PID may want that, but we can't)
-				power = min((power, self.max_power))  # make sure power is not more than max. allowed values (the PID may want that, but we can't)
-				voltage = np.sqrt(power*self._heater_R)
-				voltage = min( voltage, self._PSU.VMAX )
-				# logging.info('Set heater PSU voltage to ' + str(voltage) + ' V')
-				self._PSU.setVoltage(voltage,wait_stable=False)
+				try:
+					power = max((0, power))               # make sure power is not negative (the PID may want that, but we can't)
+					power = min((power, self.max_power))  # make sure power is not more than max. allowed values (the PID may want that, but we can't)
+					voltage = np.sqrt(power*self._heater_R)
+					voltage = min( voltage, self._PSU.VMAX )
+					if voltage > 0.0:
+						current = power/voltage
+					else:
+						current = 0.0
+					current = min( current, self._PSU.IMAX )
+					self._PSU.setVoltage(voltage,wait_stable=False)
+					self._PSU.setCurrent(current,wait_stable=False)
+				except Exception as e:
+					logging.warning('Could not set heater power: ' + traceback.format_exc())
 	
 		
 	def get_temperature(self, do_read = True):
@@ -117,18 +128,47 @@ class heater:
 		return T_HB
 
 
+	def set_target_temperature(self, T_value):
+		# set target temperature:
+		self._target_T = T_value
+
+
+	def get_target_temperature(self):
+		# get target temperature:
+		return self._target_T
+		
+
+	def get_target_temperature_string(self, do_read = True):
+		try:
+			T = float(self.get_target_temperature()) # this will fail if T_HB cannot be converted to a proper number
+			T = "{:.2f}".format(T) # convert and format numeric value to string
+		except:
+			T = "NA"
+		return T
+
+
 	def turn_on(self):
 		# turn on PSU / heater power:
 		if self._PSU != None:
-			self._power_is_on = True
-			self._PSU.turnOn()
+			try:
+				self._PSU.turnOn()
+				self._power_is_on = True
+			except Exception as e:
+				logging.warning('Could not turn on the heater: ' + traceback.format_exc())
 
 
 	def turn_off(self):
 		# turn off PSU / heater power:
 		if self._PSU != None:
-			self._power_is_on = False
-			self._PSU.turnOff()
+			try:
+				self._PSU.turnOff()
+				self._power_is_on = False
+			except Exception as e:
+				logging.warning('Could not turn off the heater: ' + traceback.format_exc())
+
+
+	def is_on(self):
+		return self._power_is_on
 
 
 	def terminate_controller_thread(self):
@@ -156,29 +196,42 @@ class heater_control_thread(Thread):
 	
 		
 	def run(self):
-		self._is_running = True
+		try:
+			self._is_running = True
 
-		while self._do_run:
-		
-			# sleep between PID iterations:
-			last_time = time.time()
-			while time.time() < last_time + self._interval:
-				time.sleep(self._interval/10)
+			while self._do_run:
 			
-			# get heaterblock temperature:
-			T = self._heaterblock.get_temperature(do_read=True)
+				# sleep between PID iterations:
+				last_time = time.time()
+				while time.time() < last_time + self._interval:
+					time.sleep(self._interval/10)
+				
+				# get heaterblock temperature:
+				T = self._heaterblock.get_temperature(do_read=True)
 
-			# determine and set heating power:
-			if T != None:
-				self._pid.setpoint = self._heaterblock.target_T  # update target value for PID
-				power = self._pid(T)                             # determine heater power
+				# determine and set heating power:
+				if self._heaterblock.is_on():
+					if T != None:
+						
+						T_target = self._heaterblock.get_target_temperature()
+						if T_target is None:
+							logging.warning('Heaterblock target temperature is not set. Turning heaterblock off...')
+							self._heaterblock.turn_off()
+						else:
+							self._pid.setpoint = T_target  # update target value for PID
+							power = self._pid(T)                             # determine heater power
+							self._heaterblock.set_power(power)               # set heater power
+		except Exception as e:
+			logging.debug('Heaterblock PID controller failed: ' + traceback.format_exc())
+		finally:
+			# try to turn off the power supply
+			try:
+				self._heaterblock.turn_off()
+			except:
+				pass
 				
-				logging.debug('T = ' + str(T) + ', P = ' + str(power))
-				
-				self._heaterblock.set_power(power)               # set heater power
-				
-		# let others know that thread is not running anymore
-		self._is_running = False		
+			# let others know that thread is not running anymore
+			self._is_running = False		
 	
 	
 	def terminate(self):

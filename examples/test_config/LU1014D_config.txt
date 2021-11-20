@@ -91,6 +91,10 @@ IIDLE     = 2
 ###############################################
 [EXTRA]
 
+# DUT temperature (target and tolerance values, deg.C):
+T_TARGET = 34
+T_TOL    = 0.2
+
 # Duration of idle periods between readings (seconds):
 ## IDLESECS    = 2
 IDLESECS    = 0
