@@ -91,7 +91,7 @@ IIDLE     = 1
 [EXTRA]
 
 # DUT temperature (target and tolerance values, deg.C):
-T_TARGET = 30
+T_TARGET = 70
 T_TOL    = 0.25
 
 
