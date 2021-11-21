@@ -325,7 +325,13 @@ def do_idle(PSU1,PSU2,seconds,file=None,wait_for_TEMP=False):
 
 			# wait for heaterblock to reach prescribed temperature (if configured/available/required):
 			if wait_for_TEMP:
-				heater_delays += HEATER.wait_for_stable_T(DUT_PSU_allowed_turn_off=PSU1, terminal_output=True)
+				heater_delays += HEATER.wait_for_stable_T(DUT_PSU_allowed_turn_off=None, terminal_output=True)
+				### heater_delays += HEATER.wait_for_stable_T(DUT_PSU_allowed_turn_off=PSU1, terminal_output=True)
+				
+				# make sure PSU1 is back on required settings (it may have been turned off to speed up stabilizing the HEATER temperature):
+				### PSU1.setCurrent(IFIXLIM,False)
+				### PSU1.setVoltage(FIX.TEST_VIDLE,True)
+
 
 			# read and print voltages and currents at FIX and REG outputs:
 			f = FIX.read()
@@ -339,7 +345,7 @@ def do_idle(PSU1,PSU2,seconds,file=None,wait_for_TEMP=False):
 			
 			T_HB = HEATER.get_temperature_string()
 
-			b = "U0={:.3f} V".format(Uf) + '  ' + "I0={:.3f} A".format(If) + '  ' + "Uc={:.3f} V".format(Ur) + '  ' + "Ic={:.3f} A".format(Ir) + '  ' + "T="+T_HB
+			b = "U0={:.3f} V".format(Uf) + '  ' + "I0={:.3f} A".format(If) + '  ' + "Uc={:.3f} V".format(Ur) + '  ' + "Ic={:.3f} A".format(Ir) + '  ' + "T="+T_HB+" °C"
 			t = "Idling ({:.1f}".format(time.time()-t0-heater_delays) + ' of ' + "{:.1f}".format(seconds) + ' s): '
 			print (t + b + ' '*12, end="\r")
 
@@ -389,12 +395,12 @@ def cleanup_exit():
 	try:
 		HEATER.turn_off()
 	except:
-		logging.warning('Could not turn off heater!')
+		logging.warning('Could not turn off heater: ' +  traceback.format_exc())
 		pass
 	try:
 		HEATER.terminate_controller_thread()
 	except:
-		logging.warning('Could not terminate heaterblock controller thread!')
+		logging.warning('Could not terminate heaterblock controller thread: ' +  traceback.format_exc())
 		pass
 
 
@@ -479,7 +485,7 @@ TEMP_tol = None
 try:
 	TEMP_val = float(configDUT['EXTRA']['T_TARGET'])
 	TEMP_tol = float(configDUT['EXTRA']['T_TOL'])
-except Exception as e:
+except:
 	pass
 HEATER.set_target_temperature(TEMP_val, TEMP_tol)
 
@@ -782,12 +788,13 @@ try:
 			V2MEAS = []
 			I2MEAS = []
 			LIMIT2 = 0
+			T_HB   = []
 
 			# measurement loop:
 			for i in range(N_rep):
 
 				# if heaterblock is configured and turned on:
-				# make sure the heaterblock temperature is within tolerance before configuring the measurement,
+				# make sure the heaterblock temperature is within tolerance before doing the measurement,
 				# allow turning off the DUT to prevent heat input from DUT to heaterblock
 				HEATER.wait_for_stable_T(DUT_PSU_allowed_turn_off=PSU1, terminal_output=True)
 
@@ -835,18 +842,23 @@ try:
 				if r[1][2] == 'CC':
 					LIMIT2 = LIMIT2 + 1
 
+				# Determine heaterblock temperature:
+				T_HB.append(HEATER.get_temperature())
+
 			# Determine median or mean of repeated readings:
 			if AVGFUNCTION == 'MEDIAN':
 				V1MEAS = np.median(V1MEAS)
 				I1MEAS = np.median(I1MEAS)
 				V2MEAS = np.median(V2MEAS)
 				I2MEAS = np.median(I2MEAS)
+				T_HB   = np.median(T_HB)
 			else:
 				V1MEAS = np.mean(V1MEAS)
 				I1MEAS = np.mean(I1MEAS)
 				V2MEAS = np.mean(V2MEAS)
 				I2MEAS = np.mean(I2MEAS)
-
+				T_HB   = np.mean(T_HB)
+				
 			# Check current limits (some PSUs are not very careful with this):
 			if I1MEAS > I1LIM:
 				LIMIT1 = 1
@@ -871,9 +883,6 @@ try:
 				if limit >= limit_max:
 					break # break out of the inner loop (V1 steps) and continue with the next V2 step
 
-			# Determine heaterblock temperature:
-			T_HB = HEATER.get_temperature_string()
-
 			# Print results:
 			printit (	"{:10.6f}".format(V1*PSU1.TEST_POLARITY)	+ ' ' + 
 					"{:10.6f}".format(I1LIM*PSU1.TEST_POLARITY)	+ ' ' + 
@@ -885,7 +894,7 @@ try:
 					"{:10.6f}".format(V2MEAS*PSU2.TEST_POLARITY)	+ ' ' +
 					"{:10.6f}".format(I2MEAS*PSU2.TEST_POLARITY)	+ ' ' +
 					"{:5d}".format(LIMIT2)                          + ' ' +
-					T_HB ,
+					"{:.2f}".format(T_HB) ,
 				logfile )
 
 	print ('Test completed.')
@@ -893,7 +902,7 @@ try:
 except KeyboardInterrupt:
 	print ('\nCaught keyboard interrupt, exiting...\n')
 	
-except Exception as e:
+except:
 	print ('\nOooops, something went wrong during testing: ' +  traceback.format_exc())
 
 finally:

@@ -53,4 +53,4 @@ HEATER_RESISTANCE = 3
 # Determine the PID parameters: https://en.wikipedia.org/wiki/PID_controller#Manual_tuning
 KP = 90
 KI = 2
-KD = 10
+KD = 100

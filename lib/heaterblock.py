@@ -130,15 +130,16 @@ class heater:
 		is_stable = True
 		T_tgt, T_tol = self.get_target_temperature()
 		
-		if any(map(lambda x: x is None, self._T_buffer)):
-			# buffer still contains some None values, so we need more readings
-			is_stable = False
-		
-		elif min(self._T_buffer) < T_tgt - T_tol:
-			is_stable = False
+		if T_tgt != None:
+			if any(map(lambda x: x is None, self._T_buffer)):
+				# buffer still contains some None values, so we need more readings
+				is_stable = False
 			
-		elif max(self._T_buffer) > T_tgt + T_tol:
-			is_stable = False
+			elif min(self._T_buffer) < T_tgt - T_tol:
+				is_stable = False
+				
+			elif max(self._T_buffer) > T_tgt + T_tol:
+				is_stable = False
 		
 		return is_stable
 
@@ -238,9 +239,9 @@ class heater:
 		return delay
 		
 
-		def terminate_controller_thread(self):
-			# turn off PSU / heater power:
-			self._controller.terminate()
+	def terminate_controller_thread(self):
+		# turn off PSU / heater power:
+		self._controller.terminate()
 
 
 
@@ -264,6 +265,7 @@ class heater_control_thread(Thread):
 	
 		
 	def run(self):
+	
 		try:
 			self._is_running = True
 
@@ -289,13 +291,16 @@ class heater_control_thread(Thread):
 							self._pid.setpoint = T_target  # update target value for PID
 							power = self._pid(T)                             # determine heater power
 							self._heaterblock.set_power(power)               # set heater power
-		except Exception as e:
-			logging.debug('Heaterblock PID controller failed: ' + traceback.format_exc())
+							
+		except:
+			logging.warning('Heaterblock PID controller failed: ' + traceback.format_exc())
+			
 		finally:
 			# try to turn off the power supply
 			try:
 				self._heaterblock.turn_off()
 			except:
+				logging.warning('Could not turn off heaterblock: ' + traceback.format_exc())
 				pass
 				
 			# let others know that thread is not running anymore
