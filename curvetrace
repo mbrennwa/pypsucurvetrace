@@ -277,39 +277,15 @@ def configure_idle_PSU(PSU,configDUT):
 	return PSU
 
 
-################################################
-# Wait for heater to attain target temperature #
-################################################
-
-def wait_for_heater():
-
-	
-	if not HEATER.is_on():
-		delay = 0.0
-		
-	else:
-		t0       = time.time()
-		T_now    = HEATER.get_temperature()
-		T_target = HEATER.get_target_temperature()
-		while abs( T_now - T_target ) > TEMP_tol:
-			msg = 'Waiting for heater temperature (current: ' + "{:.2f}".format(T_now) +'°C, target: ' + "{:.2f}".format(T_target) + '°C)...'
-			print (msg)
-			time.sleep(0.5)
-			T_now    = HEATER.get_temperature()
-			### print (' '*len(msg), end="\r") # clear previous line from terminal
-		delay = time.time() - t0
-	
-	return delay
-
-######################
-# do idle / pre-heat #
-######################
+##########################
+# do idle / DUT break-in #
+##########################
 
 def do_idle(PSU1,PSU2,seconds,file=None,wait_for_TEMP=False):
 	
 	REG = None
 
-	# do pre-heat:
+	# do DUT break-in:
 	if PSU1.CONFIGURED and PSU2.CONFIGURED:
 		if not PSU1.TEST_VIDLE_MIN == PSU1.TEST_VIDLE_MAX:
 			REG = PSU1
@@ -331,7 +307,7 @@ def do_idle(PSU1,PSU2,seconds,file=None,wait_for_TEMP=False):
 		IFIXLIM = min (FIX.TEST_ILIMIT,FIX.TEST_PIDLELIMIT/FIX.TEST_VIDLE); # current limit set at fixed PSU
 
 		# sleep time (seconds):
-		dt = 0.2
+		dt = 0.0
 
 		# Set output limits at the fixed PSU:
 		PSU1.setCurrent(IFIXLIM,False)
@@ -349,7 +325,7 @@ def do_idle(PSU1,PSU2,seconds,file=None,wait_for_TEMP=False):
 
 			# wait for heaterblock to reach prescribed temperature (if configured/available/required):
 			if wait_for_TEMP:
-				heater_delays += wait_for_heater()
+				heater_delays += HEATER.wait_for_stable_T(DUT_PSU_allowed_turn_off=PSU1, terminal_output=True)
 
 			# read and print voltages and currents at FIX and REG outputs:
 			f = FIX.read()
@@ -505,7 +481,7 @@ try:
 	TEMP_tol = float(configDUT['EXTRA']['T_TOL'])
 except Exception as e:
 	pass
-HEATER.set_target_temperature(TEMP_val)
+HEATER.set_target_temperature(TEMP_val, TEMP_tol)
 
 # set up repeats:
 if 'EXTRA' in configDUT:
@@ -521,7 +497,7 @@ if N_rep <= 0:
 
 # set up idle time between readings:
 if 'EXTRA' in configDUT:
-	T_idle    = int(configDUT['EXTRA']['IDLESECS'])
+	T_idle    = float(configDUT['EXTRA']['IDLESECS'])
 else:
 	try:
 		T_idle = float(input('\nOPTIONAL: idle time between readings (s) [default=0]: '))
@@ -533,7 +509,7 @@ if T_idle < 0:
 
 # set up pre-heat time between readings:
 if 'EXTRA' in configDUT:
-	T_preheat    = int(configDUT['EXTRA']['PREHEATSECS'])
+	T_preheat    = float(configDUT['EXTRA']['PREHEATSECS'])
 else:
 	try:
 		T_preheat = float(input('\nOPTIONAL: pre-heat time before starting the test (s) [default=0]: '))
@@ -742,6 +718,10 @@ for p in [PSU1,PSU2]:
 
 try:
 
+	# if heaterblock is configured and turned on:
+	# make sure the heaterblock temperature is within tolerance before configuring the measurement,
+	HEATER.wait_for_stable_T(DUT_PSU_allowed_turn_off=None, terminal_output=True)
+	
 	# turn on PSU outputs:
 	for p in [PSU1, PSU2]:
 		if p.CONFIGURED:
@@ -749,9 +729,10 @@ try:
 			p.setVoltage(p.VMIN,False)
 			p.turnOn()
 
+	# DUT break-in / pre-heat
 	if T_preheat > 0.0:
 		
-		print ('Pre-heating...\n')
+		print ('DUT break-in / pre-heat...\n')
 
 		# set idle conditions:
 		if TEMP_val != None:
@@ -805,6 +786,12 @@ try:
 			# measurement loop:
 			for i in range(N_rep):
 
+				# if heaterblock is configured and turned on:
+				# make sure the heaterblock temperature is within tolerance before configuring the measurement,
+				# allow turning off the DUT to prevent heat input from DUT to heaterblock
+				HEATER.wait_for_stable_T(DUT_PSU_allowed_turn_off=PSU1, terminal_output=True)
+
+				# idle (if configured)
 				if T_idle > 0.0:
 					do_idle(PSU1,PSU2,T_idle)
 
@@ -830,9 +817,6 @@ try:
 
 				# wait a bit to get stable conditions before taking the reading:
 				time.sleep(0.2)
-
-				# wait for heaterblock temperature (if it is configured and turned on):
-				wait_for_heater()
 
 				# read PSU output voltages and currents:
 				r = []

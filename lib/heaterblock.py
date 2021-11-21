@@ -29,7 +29,10 @@ class heater:
 
 			self._PSU   = None
 			self._TSENS = None
-			self._last_T_reading = None
+
+			self._T_buffer         = tuple(None for i in range(int(config['HEATERBLOCK']['TBUFFER_NUM'])))
+			self._T_buffer_seconds = float(config['HEATERBLOCK']['TBUFFER_INTERVAL'])
+			self._T_buffer_last    = time.time() - self._T_buffer_seconds
 
 			self._target_T = target_temperature
 
@@ -37,20 +40,17 @@ class heater:
 				raise ValueError('Unknown T sensor type ' + config['HEATERBLOCK']['TEMPSENS_TYPE'] + '.')
 			
 			# connect / configure T sensor:
-			# logging.info('Trying to configure heaterblock T sensor...')
 			self._TSENS = TSENS(config['HEATERBLOCK']['TEMPSENS_COMPORT'] , romcode = '')
 			self._TSENS_configured = True
-			# logging.info('...done.')
 
 			# connect / configure PSU:
-			# logging.info('Trying to configure heaterblock PSU...')
 			self._PSU = PSU(config['HEATERBLOCK']['PSU_COMPORT'],config['HEATERBLOCK']['PSU_TYPE'],'HEATERBLOCK_PSU')
 			self.turn_off()
 			self._PSU.setVoltage(0.0,wait_stable=False)
 			self._PSU.setCurrent(0.0,wait_stable=False)
-
-			self._heater_R = float(config['HEATERBLOCK']['HEATER_RESISTANCE'])
-
+			
+			self._heater_R         = float(config['HEATERBLOCK']['HEATER_RESISTANCE'])
+			
 			# max. heater power:
 			try:
 				P_max = float(config['HEATERBLOCK']['MAX_POWER'])
@@ -101,17 +101,20 @@ class heater:
 		if self._TSENS is None:
 			temp = None
 		else:
-			if self._last_T_reading is None:
+			if self._T_buffer[-1] is None:
 				do_read = True
 			if do_read:
 				temp,unit = self._TSENS.temperature()
 				if unit != 'deg.C':
 					raise ValueError('T value has wrong unit (' + unit + ').')
-				self._last_T_reading = temp
-				self._last_time = time.time()
-			else:
-				temp = self._last_T_reading
-		return temp
+				
+				# add to T buffer:
+				now = time.time()
+				if self._T_buffer_last + self._T_buffer_seconds < now:
+					self._T_buffer = self._T_buffer[1:] + (temp,)
+					self._T_buffer_last = now
+
+		return self._T_buffer[-1] # return last entry in T_buffer
 		
 
 	def get_temperature_string(self, do_read = True):
@@ -121,22 +124,42 @@ class heater:
 		except:
 			T_HB = "NA"
 		return T_HB
+		
+	
+	def temperature_is_stable(self):
+		is_stable = True
+		T_tgt, T_tol = self.get_target_temperature()
+		
+		if any(map(lambda x: x is None, self._T_buffer)):
+			# buffer still contains some None values, so we need more readings
+			is_stable = False
+		
+		elif min(self._T_buffer) < T_tgt - T_tol:
+			is_stable = False
+			
+		elif max(self._T_buffer) > T_tgt + T_tol:
+			is_stable = False
+		
+		return is_stable
 
 
-	def set_target_temperature(self, T_value):
+	def set_target_temperature(self, T_value, T_tolerance):
 		# set target temperature:
-		self._target_T = T_value
+		self._target_T_val = T_value
+		self._target_T_tol = T_tolerance
 
 
 	def get_target_temperature(self):
 		# get target temperature:
-		return self._target_T
+		return self._target_T_val, self._target_T_tol
 		
 
 	def get_target_temperature_string(self, do_read = True):
 		try:
-			T = float(self.get_target_temperature()) # this will fail if T_HB cannot be converted to a proper number
-			T = "{:.2f}".format(T) # convert and format numeric value to string
+			T_tgt, T_tol = self.get_target_temperature()
+			T_tgt = float(T_tgt) # this will fail if T_tgt cannot be converted to a proper number
+			T_tol = float(T_tol) # this will fail if T_tol cannot be converted to a proper number
+			T = "{:.2f}".format(T_tgt) + " " + u"\u00B1" + " " + "{:.2f}".format(T_tol) # convert and format numeric value to string
 		except:
 			T = "NA"
 		return T
@@ -168,9 +191,56 @@ class heater:
 		return self._power_is_on
 
 
-	def terminate_controller_thread(self):
-		# turn off PSU / heater power:
-		self._controller.terminate()
+	def wait_for_stable_T(self, DUT_PSU_allowed_turn_off=None, terminal_output=False):
+		
+		if not self.is_on():
+			delay = 0.0
+			
+		else:
+			t0 = time.time()
+												
+			# wait for heaterblock to attain required temperature:
+			is_first_line = True
+			PSU_turned_off = False
+			
+			while not self.temperature_is_stable():
+			
+				# go to new line on terminal output:
+				if terminal_output:
+					if is_first_line:
+						print('')
+						is_first_line = False
+
+				# if necessary and allowed: turn DUT PSU off (to speed up / allow cooling of heaterblock without heat input from DUT)
+				T_tgt, T_tol = self.get_target_temperature()
+				T_now        = self.get_temperature(do_read=True)
+				
+				if T_now + T_tgt + T_tol:
+					if DUT_PSU_allowed_turn_off is not None:
+						if DUT_PSU_allowed_turn_off.CONFIGURED:
+							DUT_PSU_allowed_turn_off.turnOff()
+							PSU_turned_off = True
+
+				msg = 'Waiting for heaterblock temperature (current: ' + self.get_temperature_string() +' °C, target: ' + self.get_target_temperature_string() + ' °C)...'
+				print (msg, end="\r")
+				# time.sleep(0.5)
+				# T_now = HEATER.get_temperature()
+			
+			if not is_first_line:
+				print (' '*len(msg), end="\r") # clear previous line from terminal
+				
+			# turn DUT PSU on again (if necessary):
+			if PSU_turned_off:
+				DUT_PSU_allowed_turn_off.turnOn()
+			
+			delay = time.time() - t0
+		
+		return delay
+		
+
+		def terminate_controller_thread(self):
+			# turn off PSU / heater power:
+			self._controller.terminate()
 
 
 
@@ -204,8 +274,6 @@ class heater_control_thread(Thread):
 				### while time.time() < last_time + self._interval:
 				### 	time.sleep(self._interval/10)
 				
-				time.sleep(0.01)
-				
 				# get heaterblock temperature:
 				T = self._heaterblock.get_temperature(do_read=True)
 
@@ -213,9 +281,9 @@ class heater_control_thread(Thread):
 				if self._heaterblock.is_on():
 					if T != None:
 						
-						T_target = self._heaterblock.get_target_temperature()
+						T_target, T_tol = self._heaterblock.get_target_temperature()
+						
 						if T_target is None:
-							logging.warning('Heaterblock target temperature is not set. Turning heaterblock off...')
 							self._heaterblock.turn_off()
 						else:
 							self._pid.setpoint = T_target  # update target value for PID

@@ -34,6 +34,15 @@ PSU_TYPE = VOLTCRAFT
 TEMPSENS_COMPORT  = /dev/serial/by-id/usb-FTDI_TTL232R-3V3_FTBZLSUL-if00-port0
 TEMPSENS_TYPE     = DS1820
 
+# Buffer of T readings (all values must conform with the required T tolerance in order to assume stable conditions)
+# - Number of values in the buffer
+# - Min. time interval between values in the buffer (seconds)
+TBUFFER_NUM      = 5
+TBUFFER_INTERVAL = 1
+
+# Number of consecutive readings in the T buffer that must conform :
+NUMSTABLEREAD     = 3
+
 # Resistance value of the heater element (Ohm):
 HEATER_RESISTANCE = 3
 

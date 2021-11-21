@@ -82,9 +82,10 @@ class temperaturesensor_MAXIM:
 				
 				self._UART_locked = False
 
-			if hasattr(self,'_sensor'):
-				print ( 'Successfully configured DS18B20 temperature sensor (ROM code ' + self._ROMcode + ')' )
-			else:
+			### if hasattr(self,'_sensor'):
+			### 	print ( 'Successfully configured DS18B20 temperature sensor (ROM code ' + self._ROMcode + ')' )
+			### else:
+			if not hasattr(self,'_sensor'):
 				self.warning( 'Could not initialize MAXIM DS1820 temperature sensor.' )
 
 
@@ -134,6 +135,10 @@ class temperaturesensor_MAXIM:
 
 		# release the lock:
 		self._UART_locked = False
+		
+		# sleep to allow access to T sensor from others
+		time.sleep(0.013)
+
 
 	
 	########################################################################################################
