@@ -225,8 +225,9 @@ class curvetrace_controlled_parameter_StaticBox(wx.StaticBox):
 		elif sc == 'LOG':
 			x_min = max(abs(self.get_PSU_min()), x_res)
 			x_max = max(abs(self.get_PSU_max()), x_res)
+			# determine n_max such that the smallest step (between first and second value) is equivalent to the PSU resolution
+			# note that logspace(a,b,N) = 10.^linspace(a,b,N), then consider the delta of the first two values to find the following equation:
 			n_max = math.floor(1 + (np.log10(x_max)-np.log10(x_min)) / (np.log10(x_res + x_min) - np.log10(x_min)))
-			
 		else:
 			logging.error('Unknown x-step scaling: ' + sc)
 
