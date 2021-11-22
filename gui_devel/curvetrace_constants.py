@@ -17,4 +17,4 @@ DUT_PSU_PARAMETERS                = ('U1',     'I1',     'U2',     'I2')
 DUT_PSU_LABELS                    = ('U\u2081','I\u2081','U\u2082','I\u2082')
 DUT_PSU_UNITS                     = ('V',      'A',      'V',      'A')
 
-X_STEP_SCALES                     = ('Linear', 'Logarithmic')
+STEP_SCALES                       = ('Linear', 'Logarithmic')

@@ -9,7 +9,7 @@ try:
 	import math
 	import numpy as np
 	
-	from curvetrace_constants import GUI_STATICBOX_MARGIN_HOR, GUI_STATICBOX_MARGIN_VER, DUT_PSU_PARAMETERS, DUT_PSU_LABELS, DUT_PSU_UNITS, X_STEP_SCALES
+	from curvetrace_constants import GUI_STATICBOX_MARGIN_HOR, GUI_STATICBOX_MARGIN_VER, DUT_PSU_PARAMETERS, DUT_PSU_LABELS, DUT_PSU_UNITS, STEP_SCALES
 	
 except ImportError as e:
 	logging.error( 'Could not import: ' + str(e) )
@@ -37,15 +37,15 @@ class curvetrace_tab(wx.Panel):
 		
 		# Primary parameter:	
 		# x-axis ws.StaticBox
-		self.x_axis = curvetrace_xaxis_StaticBox(self,self._app)
+		self.x_axis = curvetrace_controlled_parameter_StaticBox(self, self._app, 'Primary Parameter (x-axis)', 'U1')
 		
 		# Secondary parameter:	
 		# curves ws.StaticBox
-		self.curves = curvetrace_curves_StaticBox(self,self._app)
+		self.curves = curvetrace_controlled_parameter_StaticBox(self, self._app, 'Secondary Parameter (curves)', 'U2')
 		
 		# Measured parameter:
 		# y-axis ws.StaticBox
-		self.y_axis = curvetrace_yaxis_StaticBox(self,self._app)
+		self.y_axis = curvetrace_measured_parameter_StaticBox(self, self._app, 'Measured parameter (y-axis)', 'I1')
 		
 		# Button to run curve tracing:
 		run_btn = wx.Button(self, label="Run...", size=(80,60))
@@ -84,28 +84,28 @@ class curvetrace_tab(wx.Panel):
 
 
 # wx-StaticBox for x axis
-class curvetrace_xaxis_StaticBox(wx.StaticBox):
+class curvetrace_controlled_parameter_StaticBox(wx.StaticBox):
 
-	def __init__(self, parent, app):
+	def __init__(self, parent, app, label, default_par):
 	
 		# init the wx.StaticBox:
-		super(curvetrace_xaxis_StaticBox, self).__init__(parent, label='Primary Parameter (x-axis)')
+		super(curvetrace_controlled_parameter_StaticBox, self).__init__(parent, label=label)
 	
 		# App configs and objects:
 		self._app = app
 		
-		# x-axis parameter:
+		# parameter choice:
+		kpar = DUT_PSU_PARAMETERS.index(default_par)
 		self._parameter = wx.Choice(self, choices = DUT_PSU_LABELS)
-		self._parameter.SetSelection (0)
+		self._parameter.SetSelection(kpar)
 		self._parameter.Bind(wx.EVT_CHOICE, self.on_parameter)
 		
 		# x-axis start/step/end/scaling:
 		logging.debug('...add smart max/min limits for GUI based on axis parameter and PSU specs...')
 
-		# parameter choice:
-		kpar = 0
-		self._step_scale  = wx.Choice(self, choices = X_STEP_SCALES)
-		self._step_scale.SetSelection(kpar)
+		# parameter scaling:
+		self._step_scale  = wx.Choice(self, choices = STEP_SCALES)
+		self._step_scale.SetSelection(0)
 
 		self._start = wx.SpinCtrlDouble( self, size=(150, -1), style=wx.ALIGN_RIGHT )
 		self._end   = wx.SpinCtrlDouble( self, size=(150, -1), style=wx.ALIGN_RIGHT )
@@ -114,14 +114,6 @@ class curvetrace_xaxis_StaticBox(wx.StaticBox):
 		self._end_label   = wx.StaticText(self, label='End (?):')
 		self._step_preview = wx.StaticText(self, label='[show preview of step values here]')
 		self._step_preview_label = wx.StaticText(self, label='Step values (?):')
-
-		# set digits and increments:
-		# DO THIS CTRL_SETUP, AS THINGS WILL/MAY CHANGE IF PSU/PARAMETER IS CHANGED!
-		### digits = math.ceil(-math.log10(_PSU1_RESOLUTION)) # number of digits corresponding to PSU resolution
-		### self._start.SetDigits(digits)
-		### self._start.SetIncrement(_PSU1_RESOLUTION)
-		### self._end.SetDigits(digits)
-		### self._end.SetIncrement(_PSU1_RESOLUTION)
 
 		# bind events for updating things:
 		self._start.Bind(wx.EVT_SPINCTRLDOUBLE, self.on_parameter)
@@ -156,11 +148,15 @@ class curvetrace_xaxis_StaticBox(wx.StaticBox):
 		self.sizer.Add(controls, 0, wx.CENTER)
 
 		# adjust values/limits/ranges of controls:
-		self.ctrl_setup()
+		self.ctrl_setup(do_init=True)
 		
 		
 	def get_PSU_parameter(self):
-		return DUT_PSU_PARAMETERS[ self._step_scale.GetSelection() ]
+		return DUT_PSU_PARAMETERS[ self._parameter.GetSelection() ]
+	
+	
+	def get_PSU_unit(self):
+		return DUT_PSU_UNITS[ self._parameter.GetSelection() ]
 	
 	
 	def get_PSU_min(self):
@@ -168,7 +164,7 @@ class curvetrace_xaxis_StaticBox(wx.StaticBox):
 		if p == 'U1':
 			val = self._app.PSU1.VMIN
 		elif p == 'I1':
-			val = self_app.PSU1.IMIN
+			val = self._app.PSU1.IMIN
 		elif p == 'U2':
 			val = self._app.PSU2.VMIN
 		elif p == 'I2':
@@ -183,7 +179,7 @@ class curvetrace_xaxis_StaticBox(wx.StaticBox):
 		if p == 'U1':
 			val = self._app.PSU1.VMAX
 		elif p == 'I1':
-			val = self_app.PSU1.IMAX
+			val = self._app.PSU1.IMAX
 		elif p == 'U2':
 			val = self._app.PSU2.VMAX
 		elif p == 'I2':
@@ -198,7 +194,7 @@ class curvetrace_xaxis_StaticBox(wx.StaticBox):
 		if p == 'U1':
 			val = self._app.PSU1.VRESSET
 		elif p == 'I1':
-			val = self_app.PSU1.IRESSET
+			val = self._app.PSU1.IRESSET
 		elif p == 'U2':
 			val = self._app.PSU2.VRESSET
 		elif p == 'I2':
@@ -210,40 +206,51 @@ class curvetrace_xaxis_StaticBox(wx.StaticBox):
 		
 	def get_step_scale(self):
 		# return scaling of x steps (either 'LIN' or 'LOG')
-		spacing = X_STEP_SCALES[self._step_scale.GetSelection()].upper()[0:3]
+		spacing = STEP_SCALES[self._step_scale.GetSelection()].upper()[0:3]
 		if spacing not in ['LIN', 'LOG']:
 			logging.error('Unknown step spacing ' + spacing + '. Assuming linear spacing...')
 			spacing = 'LIN'
 		return spacing
 
 		
-	def ctrl_setup(self):
-
-		# Set min/max/resolution/etc. depending on PSU1 and LIN or LOG scale:
-		logging.debug('***** ctrl_setup: UNDER CONSTRUCTION --- need to set digits, limits, etc using the get_PSU_[min,max,res] functions to reflect the parameter choice U1/I1/U2/I2 *****')
+	def ctrl_setup(self, do_init=False):
+	
+		# determine min/max/stepsize depending on PSU and step spacing/scaling:
+		x_res = self.get_PSU_res()
 		sc = self.get_step_scale()	
 		if sc == 'LIN':
 			x_min = self.get_PSU_min()
 			x_max = self.get_PSU_max()
-			n_max = (x_max - x_min) / self.get_PSU_res() + 1
+			n_max = (x_max - x_min) / x_res + 1
 		elif sc == 'LOG':
-			x_min = max(abs(_PSU1_MIN), _PSU1_RESOLUTION)
-			x_max = max(abs(_PSU1_MAX), _PSU1_RESOLUTION)
+			x_min = max(abs(self.get_PSU_min()), x_res)
+			x_max = max(abs(self.get_PSU_max()), x_res)
+			n_max = math.floor(1 + (np.log10(x_max)-np.log10(x_min)) / (np.log10(x_res + x_min) - np.log10(x_min)))
 			
-			logging.debug('determine n_max such that smallest step size is not less than PSU resolution!')
-			n_max = 42
 		else:
 			logging.error('Unknown x-step scaling: ' + sc)
-			
+
+		# Set min/max/resolution/etc.:
 		self._start.SetRange(x_min, x_max)
 		self._end.SetRange(x_min, x_max)
 		self._step_number.SetRange(1, n_max)
+		digits = math.ceil(-math.log10(x_res)) # number of digits corresponding to PSU resolution
+		self._start.SetDigits(digits)
+		self._start.SetIncrement(x_res)
+		self._end.SetDigits(digits)
+		self._end.SetIncrement(x_res)
+		
+		# set initial values (only if do_init, i.e., whenn called from __init__):
+		if do_init:
+			self._start.SetValue(x_min)
+			self._end.SetValue(x_max)
+			self._step_number.SetValue(n_max)
 
 		# set units in labels:
-		k = self._parameter.GetSelection ()
-		self._start_label.SetLabel('Start (' + DUT_PSU_UNITS[k] + '):')	
-		self._end_label.SetLabel('End (' + DUT_PSU_UNITS[k] + '):')
-		self._step_preview_label.SetLabel('Steps (' + DUT_PSU_UNITS[k] + '):')
+		unit = self.get_PSU_unit()
+		self._start_label.SetLabel('Start (' + unit + '):')	
+		self._end_label.SetLabel('End (' + unit + '):')
+		self._step_preview_label.SetLabel('Steps (' + unit + '):')
 
 		# steps preview:
 		val = self.get_axis_steps()  # list of values
@@ -260,7 +267,6 @@ class curvetrace_xaxis_StaticBox(wx.StaticBox):
 		
 
 	def on_parameter(self, event):
-		logging.debug('Called on_parameter: adjust x-axis limit and units in the GUI, and maybe other things')
 		self.ctrl_setup()
 	
 	
@@ -291,42 +297,47 @@ class curvetrace_xaxis_StaticBox(wx.StaticBox):
 					val = np.logspace(np.log10(x1),np.log10(x2),N)
 			
 		else:
-			logging.error('Unknown step spacing ' + spacing + '.')
+			raise ValueError('Unknown step spacing ' + spacing + '.')
 
 		# make val unique:
 		if val[0] > val[-1]:
 			val = np.unique(val)[::-1]
 		else:
 			val = np.unique(val)
+		
+		# round values to resolution of PSU:
+		res = self.get_PSU_res()
+		val = res * np.round(val/res)
 
 		return tuple(val)
 
 
 # wx-StaticBox for y axis
-class curvetrace_yaxis_StaticBox(wx.StaticBox):
+class curvetrace_measured_parameter_StaticBox(wx.StaticBox):
 
-	def __init__(self,parent,app):
+	def __init__(self, parent, app, label, default_par):
 	
 		# init the wx.StaticBox:
-		super(curvetrace_yaxis_StaticBox, self).__init__(parent, label='Measured Parameter (y-axis)')
+		super(curvetrace_measured_parameter_StaticBox, self).__init__(parent, label=label)
 	
 		# App configs:
 		self._app = app
 		
-		# x-axis parameter:
+		# parameter choice:
+		kpar = DUT_PSU_PARAMETERS.index(default_par)
 		self._parameter = wx.Choice(self, choices = DUT_PSU_LABELS)
-		self._parameter.SetSelection (1)
+		self._parameter.SetSelection (kpar)
 		self._parameter.Bind(wx.EVT_CHOICE, self.on_parameter)
-		
+
 		# y-axis limit:
-		logging.debug('...add smart max/min limits for GUI based on PSU specs...')
+		logging.debug('...add smart max/min limits for GUI based on PSU specs, like with controlled parameter box...')
 		self._limit = wx.SpinCtrlDouble( self, size=(150, -1), style=wx.ALIGN_RIGHT )
 		self._limit_label = wx.StaticText(self, label='Limit (?):')
 
 		# Arrange controls:
 		controls = wx.GridBagSizer(10,10)
 		
-		# x-axis parameter:
+		# y-axis parameter:
 		controls.Add( wx.StaticText(self, label='Parameter:'),                 (0, 0),   flag = wx.ALIGN_RIGHT | wx.ALIGN_CENTER_VERTICAL )
 		controls.Add( self._parameter,                                         (0, 1),   flag = wx.ALIGN_LEFT  | wx.ALIGN_CENTER_VERTICAL )
 		
@@ -352,94 +363,11 @@ class curvetrace_yaxis_StaticBox(wx.StaticBox):
 		self._limit.SetDigits(y_digits)
 		self._limit.SetIncrement(y_resolution)
 		self._limit.SetRange(0, y_limit)
-		self._limit.SetValue(y_limit)		
+		self._limit.SetValue(y_limit)
+		
+		logging.debug('curvetrace_yaxis_StaticBox: UNDER CONSTRUCTION -- use similar get_PSU_xyz methods as in x-axis')
+		
 		self._limit_label.SetLabel('Limit (' + DUT_PSU_UNITS[self._parameter.GetSelection ()] + '):')	
 
 	def on_parameter (self, event):
 		self.ctrl_setup()
-		
-
-
-# wx-StaticBox for curves
-class curvetrace_curves_StaticBox(wx.StaticBox):
-
-	def __init__(self,parent,app):
-	
-		logging.debug('curvetrace_curves_StaticBox: can this be combined / instantiated from the x-axis box??? It is pretty much the same thing...')
-	
-		# init the wx.StaticBox:
-		super(curvetrace_curves_StaticBox, self).__init__(parent, label='Secondary Parameter (curves)')
-	
-		# App configs:
-		self._app = app
-		
-		# x-axis parameter:
-		self._parameter = wx.Choice(self, choices = ['U\u2081','I\u2081','U\u2082','I\u2082'])
-		self._parameter.SetSelection (2)
-		self._parameter.Bind(wx.EVT_CHOICE, self.on_parameter)
-		
-		# curves start/step/end:
-		logging.debug('...add smart max/min limits for GUI based on axis parameter and PSU specs...')
-		self._start = wx.SpinCtrlDouble( self, size=(150, -1), style=wx.ALIGN_RIGHT )
-		self._end   = wx.SpinCtrlDouble( self, size=(150, -1), style=wx.ALIGN_RIGHT )
-		self._step  = wx.SpinCtrlDouble( self, size=(150, -1), style=wx.ALIGN_RIGHT )
-		self._start_label = wx.StaticText(self, label='Start (?):')
-		self._end_label   = wx.StaticText(self, label='End (?):')
-		self._step_label  = wx.StaticText(self, label='Step size (?):')
-
-		# Arrange controls:
-		controls = wx.GridBagSizer(10,10)
-		
-		# x-axis parameter:
-		controls.Add( wx.StaticText(self, label='Parameter:'),                 (0, 0),   flag = wx.ALIGN_RIGHT | wx.ALIGN_CENTER_VERTICAL )
-		controls.Add( self._parameter,                                         (0, 1),   flag = wx.ALIGN_LEFT  | wx.ALIGN_CENTER_VERTICAL )
-		
-		# x-axis start/step/end:
-		controls.Add( self._start_label,                                       (1, 0),   flag = wx.ALIGN_RIGHT | wx.ALIGN_CENTER_VERTICAL )
-		controls.Add( self._start,                                             (1, 1),   flag = wx.ALIGN_LEFT  | wx.ALIGN_CENTER_VERTICAL )
-		controls.Add( self._step_label,                                        (2, 0),   flag = wx.ALIGN_RIGHT | wx.ALIGN_CENTER_VERTICAL )
-		controls.Add( self._step,                                              (2, 1),   flag = wx.ALIGN_LEFT  | wx.ALIGN_CENTER_VERTICAL )
-		controls.Add( self._end_label,                                         (3, 0),   flag = wx.ALIGN_RIGHT | wx.ALIGN_CENTER_VERTICAL )
-		controls.Add( self._end,                                               (3, 1),   flag = wx.ALIGN_LEFT  | wx.ALIGN_CENTER_VERTICAL )
-
-		# add some extra space at the bottom:
-		controls.Add ( 1, 8,                                                   (4, 1) )
-
-		# setup sizer for the box:
-		self.sizer = wx.StaticBoxSizer(self, wx.VERTICAL)
-		self.sizer.Add(controls, 0, wx.CENTER)
-
-		# adjust values/limits/ranges of controls:
-		self.ctrl_setup()
-		
-	def ctrl_setup (self):
-		logging.debug('setting up curves controls -- change: look this up from the PSU / axis parameter and the DUT config/limits...')
-		min_val    = 0;
-		max_val    = 10;
-		min_step   = 0.1;
-		resolution = 0.001
-		digits     = math.ceil(-math.log10(resolution))
-		
-		self._start.SetDigits(digits)
-		self._start.SetIncrement(resolution)
-		self._start.SetRange(min_val, max_val)
-		self._start.SetValue(min_val)
-		
-		self._end.SetDigits(digits)
-		self._end.SetIncrement(resolution)
-		self._end.SetRange(min_val, max_val)
-		self._end.SetValue(max_val)
-
-		self._step.SetDigits(digits)
-		self._step.SetIncrement(resolution)
-		self._step.SetRange(resolution, max_val-min_val)
-		self._step.SetValue(resolution)
-
-		k = self._parameter.GetSelection ()
-		self._start_label.SetLabel('Start (' + DUT_PSU_UNITS[k] + '):')	
-		self._end_label.SetLabel('End (' + DUT_PSU_UNITS[k] + '):')	
-		self._step_label.SetLabel('Step size (' + DUT_PSU_UNITS[k] + '):')			
-		
-	def on_parameter (self, event):
-		self.ctrl_setup()
-
