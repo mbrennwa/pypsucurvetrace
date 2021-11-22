@@ -17,11 +17,6 @@ except ImportError as e:
 
 
 
-# for GUI mockup without real PSU units:
-_PSU1_MIN = 0.0
-_PSU1_MAX = 32.0
-_PSU1_RESOLUTION = 0.001
-
 
 
 
@@ -91,12 +86,12 @@ class curvetrace_tab(wx.Panel):
 # wx-StaticBox for x axis
 class curvetrace_xaxis_StaticBox(wx.StaticBox):
 
-	def __init__(self,parent,app):
+	def __init__(self, parent, app):
 	
 		# init the wx.StaticBox:
 		super(curvetrace_xaxis_StaticBox, self).__init__(parent, label='Primary Parameter (x-axis)')
 	
-		# App configs:
+		# App configs and objects:
 		self._app = app
 		
 		# x-axis parameter:
@@ -106,22 +101,27 @@ class curvetrace_xaxis_StaticBox(wx.StaticBox):
 		
 		# x-axis start/step/end/scaling:
 		logging.debug('...add smart max/min limits for GUI based on axis parameter and PSU specs...')
-		self._start = wx.SpinCtrlDouble( self, size=(150, -1), style=wx.ALIGN_RIGHT, initial=_PSU1_MIN )
-		self._end   = wx.SpinCtrlDouble( self, size=(150, -1), style=wx.ALIGN_RIGHT, initial=_PSU1_MAX )
-		self._step_number = wx.SpinCtrl( self, size=(150, -1), style=wx.ALIGN_RIGHT, min=1, max=1001, initial=int(_PSU1_MAX)+1 )		
+
+		# parameter choice:
+		kpar = 0
+		self._step_scale  = wx.Choice(self, choices = X_STEP_SCALES)
+		self._step_scale.SetSelection(kpar)
+
+		self._start = wx.SpinCtrlDouble( self, size=(150, -1), style=wx.ALIGN_RIGHT )
+		self._end   = wx.SpinCtrlDouble( self, size=(150, -1), style=wx.ALIGN_RIGHT )
+		self._step_number = wx.SpinCtrl( self, size=(150, -1), style=wx.ALIGN_RIGHT )		
 		self._start_label = wx.StaticText(self, label='Start (?):')
 		self._end_label   = wx.StaticText(self, label='End (?):')
-		self._step_scale  = wx.Choice(self, choices = X_STEP_SCALES)
-		self._step_scale.SetSelection (0)
 		self._step_preview = wx.StaticText(self, label='[show preview of step values here]')
 		self._step_preview_label = wx.StaticText(self, label='Step values (?):')
 
 		# set digits and increments:
-		digits = math.ceil(-math.log10(_PSU1_RESOLUTION)) # number of digits corresponding to PSU resolution
-		self._start.SetDigits(digits)
-		self._start.SetIncrement(_PSU1_RESOLUTION)
-		self._end.SetDigits(digits)
-		self._end.SetIncrement(_PSU1_RESOLUTION)
+		# DO THIS CTRL_SETUP, AS THINGS WILL/MAY CHANGE IF PSU/PARAMETER IS CHANGED!
+		### digits = math.ceil(-math.log10(_PSU1_RESOLUTION)) # number of digits corresponding to PSU resolution
+		### self._start.SetDigits(digits)
+		### self._start.SetIncrement(_PSU1_RESOLUTION)
+		### self._end.SetDigits(digits)
+		### self._end.SetIncrement(_PSU1_RESOLUTION)
 
 		# bind events for updating things:
 		self._start.Bind(wx.EVT_SPINCTRLDOUBLE, self.on_parameter)
@@ -159,6 +159,55 @@ class curvetrace_xaxis_StaticBox(wx.StaticBox):
 		self.ctrl_setup()
 		
 		
+	def get_PSU_parameter(self):
+		return DUT_PSU_PARAMETERS[ self._step_scale.GetSelection() ]
+	
+	
+	def get_PSU_min(self):
+		p = self.get_PSU_parameter()
+		if p == 'U1':
+			val = self._app.PSU1.VMIN
+		elif p == 'I1':
+			val = self_app.PSU1.IMIN
+		elif p == 'U2':
+			val = self._app.PSU2.VMIN
+		elif p == 'I2':
+			val = self._app.PSU2.IMIN
+		else:
+			raise ValueError('Unknown parameter ' + p + '.')
+		return val
+
+
+	def get_PSU_max(self):
+		p = self.get_PSU_parameter()
+		if p == 'U1':
+			val = self._app.PSU1.VMAX
+		elif p == 'I1':
+			val = self_app.PSU1.IMAX
+		elif p == 'U2':
+			val = self._app.PSU2.VMAX
+		elif p == 'I2':
+			val = self._app.PSU2.IMAX
+		else:
+			raise ValueError('Unknown parameter ' + p + '.')
+		return val
+
+
+	def get_PSU_res(self):
+		p = self.get_PSU_parameter()
+		if p == 'U1':
+			val = self._app.PSU1.VRESSET
+		elif p == 'I1':
+			val = self_app.PSU1.IRESSET
+		elif p == 'U2':
+			val = self._app.PSU2.VRESSET
+		elif p == 'I2':
+			val = self._app.PSU2.IRESSET
+		else:
+			raise ValueError('Unknown parameter ' + p + '.')
+		return val
+		
+		
 	def get_step_scale(self):
 		# return scaling of x steps (either 'LIN' or 'LOG')
 		spacing = X_STEP_SCALES[self._step_scale.GetSelection()].upper()[0:3]
@@ -170,30 +219,32 @@ class curvetrace_xaxis_StaticBox(wx.StaticBox):
 		
 	def ctrl_setup(self):
 
-		# Set min/max/resolution depending on PSU1 and LIN or LOG scale:
-		logging.debug('Using dummy values for PSU1 min/max/resolution for now...')
+		# Set min/max/resolution/etc. depending on PSU1 and LIN or LOG scale:
+		logging.debug('***** ctrl_setup: UNDER CONSTRUCTION --- need to set digits, limits, etc using the get_PSU_[min,max,res] functions to reflect the parameter choice U1/I1/U2/I2 *****')
 		sc = self.get_step_scale()	
 		if sc == 'LIN':
-			x_min = _PSU1_MIN
-			x_max = _PSU1_MAX
+			x_min = self.get_PSU_min()
+			x_max = self.get_PSU_max()
+			n_max = (x_max - x_min) / self.get_PSU_res() + 1
 		elif sc == 'LOG':
 			x_min = max(abs(_PSU1_MIN), _PSU1_RESOLUTION)
 			x_max = max(abs(_PSU1_MAX), _PSU1_RESOLUTION)
+			
+			logging.debug('determine n_max such that smallest step size is not less than PSU resolution!')
+			n_max = 42
 		else:
 			logging.error('Unknown x-step scaling: ' + sc)
 			
 		self._start.SetRange(x_min, x_max)
 		self._end.SetRange(x_min, x_max)
+		self._step_number.SetRange(1, n_max)
 
-
-
-
+		# set units in labels:
 		k = self._parameter.GetSelection ()
 		self._start_label.SetLabel('Start (' + DUT_PSU_UNITS[k] + '):')	
 		self._end_label.SetLabel('End (' + DUT_PSU_UNITS[k] + '):')
 		self._step_preview_label.SetLabel('Steps (' + DUT_PSU_UNITS[k] + '):')
 
-		
 		# steps preview:
 		val = self.get_axis_steps()  # list of values
 		val = ["%g" % x for x in val] # list of strings
@@ -205,7 +256,6 @@ class curvetrace_xaxis_StaticBox(wx.StaticBox):
 			if k == []:
 				k = max_len
 			s = s[0:k+1] + '...'
-		
 		self._step_preview.SetLabel(s)
 		
 
@@ -314,6 +364,8 @@ class curvetrace_yaxis_StaticBox(wx.StaticBox):
 class curvetrace_curves_StaticBox(wx.StaticBox):
 
 	def __init__(self,parent,app):
+	
+		logging.debug('curvetrace_curves_StaticBox: can this be combined / instantiated from the x-axis box??? It is pretty much the same thing...')
 	
 		# init the wx.StaticBox:
 		super(curvetrace_curves_StaticBox, self).__init__(parent, label='Secondary Parameter (curves)')

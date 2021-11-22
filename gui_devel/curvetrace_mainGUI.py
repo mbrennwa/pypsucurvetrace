@@ -19,6 +19,20 @@ except ImportError as e:
 #####################################################################
 
 
+# for GUI mockup without real PSU units:
+class PSU_for_mockup:
+	
+	def __init__(self, Umin, Umax, Ures, Imax, Ires):
+		self.VMIN    = Umin
+		self.VMAX    = Umax
+		self.VRESSET = Ures
+		self.IMAX    = Imax
+		self.IRESSET = Ires
+
+
+#####################################################################
+
+
 # class curvetrace_app(wx.Frame):
 class curvetrace_app(wx.App):
 
@@ -34,7 +48,8 @@ class curvetrace_app(wx.App):
 		self.DUT_config = None
 		
 		# Init PSU configuration (still empty, will be loaded later):
-		self.PSU_config = None
+		self.PSU1 = None
+		self.PSU2 = None
 		
 		# Init HEATERBLOCK configuration (still empty, will be loaded later):
 		self.HEATERBLOCK_config = None
@@ -52,6 +67,8 @@ class curvetrace_app(wx.App):
 
 	def startup(self):
 		logging.info('Called startup! Should read and process configuration here...')
+		self.PSU1 = PSU_for_mockup(Umin=0.0, Umax=32.0, Ures=0.01, Imax=5.0, Ires=0.01)
+		self.PSU2 = PSU_for_mockup(Umin=0.0, Umax=12.0, Ures=0.001, Imax=2.0, Ires=0.001)
 		self.frame_main.configure_gui()
 
 
