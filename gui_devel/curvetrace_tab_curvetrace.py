@@ -39,15 +39,18 @@ class curvetrace_tab(wx.Panel):
 	
 		# Init the panel:
 		wx.Panel.__init__(self, app.frame_main.tabs)
-				
+		
+		# Primary parameter:	
 		# x-axis ws.StaticBox
 		self.x_axis = curvetrace_xaxis_StaticBox(self,self._app)
 		
-		# y-axis ws.StaticBox
-		self.y_axis = curvetrace_yaxis_StaticBox(self,self._app)
-		
+		# Secondary parameter:	
 		# curves ws.StaticBox
 		self.curves = curvetrace_curves_StaticBox(self,self._app)
+		
+		# Measured parameter:
+		# y-axis ws.StaticBox
+		self.y_axis = curvetrace_yaxis_StaticBox(self,self._app)
 		
 		# Button to run curve tracing:
 		run_btn = wx.Button(self, label="Run...", size=(80,60))
@@ -57,19 +60,24 @@ class curvetrace_tab(wx.Panel):
 		vsizer = wx.BoxSizer(wx.VERTICAL)
 		vsizer.AddSpacer(GUI_STATICBOX_MARGIN_VER)
 		vsizer.AddStretchSpacer(prop=1)
+		
 		vsizer.Add(self.x_axis.sizer, 0, wx.EXPAND | wx.LEFT | wx.RIGHT, GUI_STATICBOX_MARGIN_HOR)
 		vsizer.AddSpacer(GUI_STATICBOX_MARGIN_VER)
 		vsizer.AddStretchSpacer(prop=1)
-		vsizer.Add(self.y_axis.sizer, 0, wx.EXPAND | wx.LEFT | wx.RIGHT, GUI_STATICBOX_MARGIN_HOR)
-		vsizer.AddSpacer(GUI_STATICBOX_MARGIN_VER)
-		vsizer.AddStretchSpacer(prop=1)
+		
 		vsizer.Add(self.curves.sizer, 0, wx.EXPAND | wx.LEFT | wx.RIGHT, GUI_STATICBOX_MARGIN_HOR)
 		vsizer.AddSpacer(GUI_STATICBOX_MARGIN_VER)
 		vsizer.AddStretchSpacer(prop=1)
+		
+		vsizer.Add(self.y_axis.sizer, 0, wx.EXPAND | wx.LEFT | wx.RIGHT, GUI_STATICBOX_MARGIN_HOR)
+		vsizer.AddSpacer(GUI_STATICBOX_MARGIN_VER)
+		vsizer.AddStretchSpacer(prop=1)
+		
 		hsizer = wx.BoxSizer(wx.HORIZONTAL)
 		hsizer.AddStretchSpacer(1)
 		hsizer.Add(run_btn, 0)
 		hsizer.AddStretchSpacer(1)
+		
 		vsizer.Add(hsizer, 0, wx.EXPAND | wx.LEFT | wx.RIGHT, GUI_STATICBOX_MARGIN_HOR)	
 		vsizer.AddSpacer(GUI_STATICBOX_MARGIN_VER)
 		vsizer.AddStretchSpacer(prop=1)
@@ -86,7 +94,7 @@ class curvetrace_xaxis_StaticBox(wx.StaticBox):
 	def __init__(self,parent,app):
 	
 		# init the wx.StaticBox:
-		super(curvetrace_xaxis_StaticBox, self).__init__(parent, label='Primary Parameter (x axis)')
+		super(curvetrace_xaxis_StaticBox, self).__init__(parent, label='Primary Parameter (x-axis)')
 	
 		# App configs:
 		self._app = app
@@ -100,7 +108,7 @@ class curvetrace_xaxis_StaticBox(wx.StaticBox):
 		logging.debug('...add smart max/min limits for GUI based on axis parameter and PSU specs...')
 		self._start = wx.SpinCtrlDouble( self, size=(150, -1), style=wx.ALIGN_RIGHT, initial=_PSU1_MIN )
 		self._end   = wx.SpinCtrlDouble( self, size=(150, -1), style=wx.ALIGN_RIGHT, initial=_PSU1_MAX )
-		self._step_number = wx.SpinCtrl( self, size=(150, -1), style=wx.ALIGN_RIGHT, min=1, max=1001, initial=11 )		
+		self._step_number = wx.SpinCtrl( self, size=(150, -1), style=wx.ALIGN_RIGHT, min=1, max=1001, initial=int(_PSU1_MAX)+1 )		
 		self._start_label = wx.StaticText(self, label='Start (?):')
 		self._end_label   = wx.StaticText(self, label='End (?):')
 		self._step_scale  = wx.Choice(self, choices = X_STEP_SCALES)
@@ -194,7 +202,6 @@ class curvetrace_xaxis_StaticBox(wx.StaticBox):
 		if len(s) > max_len:
 			# find position of last comma separator that fits into max_len:
 			k = [pos for pos, char in enumerate(s) if char == ',' and pos < max_len][-1]
-			logging.debug('last comma position = ' + str(k))
 			if k == []:
 				k = max_len
 			s = s[0:k+1] + '...'
@@ -236,8 +243,6 @@ class curvetrace_xaxis_StaticBox(wx.StaticBox):
 		else:
 			logging.error('Unknown step spacing ' + spacing + '.')
 
-		print(val)
-
 		# make val unique:
 		if val[0] > val[-1]:
 			val = np.unique(val)[::-1]
@@ -253,7 +258,7 @@ class curvetrace_yaxis_StaticBox(wx.StaticBox):
 	def __init__(self,parent,app):
 	
 		# init the wx.StaticBox:
-		super(curvetrace_yaxis_StaticBox, self).__init__(parent, label='Measured Parameter (y axis)')
+		super(curvetrace_yaxis_StaticBox, self).__init__(parent, label='Measured Parameter (y-axis)')
 	
 		# App configs:
 		self._app = app
@@ -264,7 +269,7 @@ class curvetrace_yaxis_StaticBox(wx.StaticBox):
 		self._parameter.Bind(wx.EVT_CHOICE, self.on_parameter)
 		
 		# y-axis limit:
-		logging.debug('...add smart max/min limits for GUI based on axis parameter and PSU specs...')
+		logging.debug('...add smart max/min limits for GUI based on PSU specs...')
 		self._limit = wx.SpinCtrlDouble( self, size=(150, -1), style=wx.ALIGN_RIGHT )
 		self._limit_label = wx.StaticText(self, label='Limit (?):')
 
@@ -290,7 +295,6 @@ class curvetrace_yaxis_StaticBox(wx.StaticBox):
 		self.ctrl_setup()
 		
 	def ctrl_setup (self):
-		logging.debug('setting up y-axis controls -- change: look this up from the PSU / axis parameter and the DUT config/limits...')
 		y_limit      = 3;
 		y_resolution = 0.001
 		y_digits     = math.ceil(-math.log10(y_resolution))
@@ -299,10 +303,9 @@ class curvetrace_yaxis_StaticBox(wx.StaticBox):
 		self._limit.SetIncrement(y_resolution)
 		self._limit.SetRange(0, y_limit)
 		self._limit.SetValue(y_limit)		
-		self._limit_label.SetLabel('Start (' + DUT_PSU_UNITS[self._parameter.GetSelection ()] + '):')	
+		self._limit_label.SetLabel('Limit (' + DUT_PSU_UNITS[self._parameter.GetSelection ()] + '):')	
 
 	def on_parameter (self, event):
-		logging.debug('Called on_parameter: adjust y-axis limit and units in the GUI, and maybe other things')
 		self.ctrl_setup()
 		
 
@@ -386,6 +389,5 @@ class curvetrace_curves_StaticBox(wx.StaticBox):
 		self._step_label.SetLabel('Step size (' + DUT_PSU_UNITS[k] + '):')			
 		
 	def on_parameter (self, event):
-		logging.debug('Called on_parameter: adjust curves limit and units in the GUI, and maybe other things')
 		self.ctrl_setup()
 
