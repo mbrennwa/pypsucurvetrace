@@ -7,6 +7,7 @@ try:
 	import wx
 	import logging
 	import math
+	import numpy as np
 	
 	from curvetrace_constants import GUI_STATICBOX_MARGIN_HOR, GUI_STATICBOX_MARGIN_VER, DUT_PSU_PARAMETERS, DUT_PSU_LABELS, DUT_PSU_UNITS, X_STEP_SCALES
 	
@@ -89,46 +90,13 @@ class curvetrace_xaxis_StaticBox(wx.StaticBox):
 		logging.debug('...add smart max/min limits for GUI based on axis parameter and PSU specs...')
 		self._start = wx.SpinCtrlDouble( self, size=(150, -1), style=wx.ALIGN_RIGHT )
 		self._end   = wx.SpinCtrlDouble( self, size=(150, -1), style=wx.ALIGN_RIGHT )
-		self._step_number = wx.SpinCtrl( self, size=(150, -1), style=wx.ALIGN_RIGHT, min=1, max=1000, initial=10 )		
+		self._step_number = wx.SpinCtrl( self, size=(150, -1), style=wx.ALIGN_RIGHT, min=1, max=1001, initial=10 )		
 		self._start_label = wx.StaticText(self, label='Start (?):')
 		self._end_label   = wx.StaticText(self, label='End (?):')
 		self._step_scale  = wx.Choice(self, choices = X_STEP_SCALES)
 		self._step_scale.SetSelection (0)
-		self._step_scale.Bind(wx.EVT_CHOICE, self.on_parameter)
-		
 		self._step_preview = wx.StaticText(self, label='[show preview of step values here]')
 
-		
-		# Arrange controls:
-		controls = wx.GridBagSizer(10,10)
-		
-		# x-axis parameter:
-		controls.Add( wx.StaticText(self, label='Parameter:'),                 (0, 0),   flag = wx.ALIGN_RIGHT | wx.ALIGN_CENTER_VERTICAL )
-		controls.Add( self._parameter,                                         (0, 1),   flag = wx.ALIGN_LEFT  | wx.ALIGN_CENTER_VERTICAL )
-		
-		# x-axis start/step/end:
-		controls.Add( self._start_label,                                       (1, 0),   flag = wx.ALIGN_RIGHT | wx.ALIGN_CENTER_VERTICAL )
-		controls.Add( self._start,                                             (1, 1),   flag = wx.ALIGN_LEFT  | wx.ALIGN_CENTER_VERTICAL )
-		controls.Add( self._end_label,                                         (2, 0),   flag = wx.ALIGN_RIGHT | wx.ALIGN_CENTER_VERTICAL )
-		controls.Add( self._end,                                               (2, 1),   flag = wx.ALIGN_LEFT  | wx.ALIGN_CENTER_VERTICAL )
-		controls.Add( wx.StaticText(self, label='Number of steps:'),           (3, 0),   flag = wx.ALIGN_RIGHT | wx.ALIGN_CENTER_VERTICAL )
-		controls.Add( self._step_number,                                       (3, 1),   flag = wx.ALIGN_LEFT  | wx.ALIGN_CENTER_VERTICAL )
-		controls.Add( wx.StaticText(self, label='Step scale:'),                (4, 0),   flag = wx.ALIGN_RIGHT | wx.ALIGN_CENTER_VERTICAL )
-		controls.Add( self._step_scale,                                        (4, 1),   flag = wx.ALIGN_LEFT  | wx.ALIGN_CENTER_VERTICAL )
-		controls.Add( wx.StaticText(self, label='Step preview:'),              (5, 0),   flag = wx.ALIGN_RIGHT | wx.ALIGN_CENTER_VERTICAL )
-		controls.Add( self._step_preview,                                      (5, 1),   flag = wx.ALIGN_LEFT  | wx.ALIGN_CENTER_VERTICAL )
-
-		# add some extra space at the bottom:
-		controls.Add ( 1, 8,                                                   (6, 1) )
-
-		# setup sizer for the box:
-		self.sizer = wx.StaticBoxSizer(self, wx.VERTICAL)
-		self.sizer.Add(controls, 0, wx.CENTER)
-
-		# adjust values/limits/ranges of controls:
-		self.ctrl_setup()
-		
-	def ctrl_setup (self):
 		logging.debug('setting up x-axis controls -- change: look this up from the PSU / axis parameter and the DUT config/limits...')
 		x_min_val    = 0;
 		x_max_val    = 10;
@@ -146,6 +114,44 @@ class curvetrace_xaxis_StaticBox(wx.StaticBox):
 		self._end.SetRange(x_min_val, x_max_val)
 		self._end.SetValue(x_max_val)
 
+		# bind events for updating things:
+		self._start.Bind(wx.EVT_SPINCTRLDOUBLE, self.on_parameter)
+		self._end.Bind(wx.EVT_SPINCTRLDOUBLE, self.on_parameter)
+		self._step_number.Bind(wx.EVT_SPINCTRL, self.on_parameter)
+		self._step_scale.Bind(wx.EVT_CHOICE, self.on_parameter)
+
+		
+		# Arrange controls:
+		controls = wx.GridBagSizer(10,10)
+		
+		# x-axis parameter:
+		controls.Add( wx.StaticText(self, label='Parameter:'),                 (0, 0),   flag = wx.ALIGN_RIGHT | wx.ALIGN_CENTER_VERTICAL )
+		controls.Add( self._parameter,                                         (0, 1),   flag = wx.ALIGN_LEFT  | wx.ALIGN_CENTER_VERTICAL )
+		
+		# x-axis start/step/end:
+		controls.Add( self._start_label,                                       (1, 0),   flag = wx.ALIGN_RIGHT | wx.ALIGN_CENTER_VERTICAL )
+		controls.Add( self._start,                                             (1, 1),   flag = wx.ALIGN_LEFT  | wx.ALIGN_CENTER_VERTICAL )
+		controls.Add( self._end_label,                                         (2, 0),   flag = wx.ALIGN_RIGHT | wx.ALIGN_CENTER_VERTICAL )
+		controls.Add( self._end,                                               (2, 1),   flag = wx.ALIGN_LEFT  | wx.ALIGN_CENTER_VERTICAL )
+		controls.Add( wx.StaticText(self, label='Number of steps:'),           (3, 0),   flag = wx.ALIGN_RIGHT | wx.ALIGN_CENTER_VERTICAL )
+		controls.Add( self._step_number,                                       (3, 1),   flag = wx.ALIGN_LEFT  | wx.ALIGN_CENTER_VERTICAL )
+		controls.Add( wx.StaticText(self, label='Step spacing:'),              (4, 0),   flag = wx.ALIGN_RIGHT | wx.ALIGN_CENTER_VERTICAL )
+		controls.Add( self._step_scale,                                        (4, 1),   flag = wx.ALIGN_LEFT  | wx.ALIGN_CENTER_VERTICAL )
+		controls.Add( wx.StaticText(self, label='Step values (?):'),              (5, 0),   flag = wx.ALIGN_RIGHT | wx.ALIGN_CENTER_VERTICAL )
+		controls.Add( self._step_preview,                                      (5, 1),   flag = wx.ALIGN_LEFT  | wx.ALIGN_CENTER_VERTICAL )
+
+		# add some extra space at the bottom:
+		controls.Add ( 1, 8,                                                   (6, 1) )
+
+		# setup sizer for the box:
+		self.sizer = wx.StaticBoxSizer(self, wx.VERTICAL)
+		self.sizer.Add(controls, 0, wx.CENTER)
+
+		# adjust values/limits/ranges of controls:
+		self.ctrl_setup()
+		
+	def ctrl_setup (self):
+
 		### self._step.SetDigits(x_digits)
 		### self._step.SetIncrement(x_resolution)
 		### self._step.SetRange(x_resolution, x_max_val-x_min_val)
@@ -153,12 +159,33 @@ class curvetrace_xaxis_StaticBox(wx.StaticBox):
 		k = self._parameter.GetSelection ()
 		self._start_label.SetLabel('Start (' + DUT_PSU_UNITS[k] + '):')	
 		self._end_label.SetLabel('End (' + DUT_PSU_UNITS[k] + '):')	
-		### self._step_label.SetLabel('Step size (' + DUT_PSU_UNITS[k] + '):')			
+		### self._step_label.SetLabel('Step size (' + DUT_PSU_UNITS[k] + '):')
+		
+		# steps preview:
+		val = self.get_xaxis_steps()  # list of values
+		val = ["%g" % x for x in val] # list of strings
+		s   = ', '.join(val)
+		self._step_preview.SetLabel(s)
+		
 
-	def on_parameter (self, event):
+	def on_parameter(self, event):
 		logging.debug('Called on_parameter: adjust x-axis limit and units in the GUI, and maybe other things')
 		self.ctrl_setup()
-
+		
+	def get_xaxis_steps(self):
+		x1 = self._start.GetValue()
+		x2 = self._end.GetValue()
+		N  = self._step_number.GetValue()
+		spacing = X_STEP_SCALES[self._step_scale.GetSelection()].upper()[0:3]
+		if spacing not in ['LIN', 'LOG']:
+			logging.error('Unknown step spacing ' + spacing + '. Assuming linear spacing...')
+			spacing = 'LIN'
+		if spacing == 'LIN':
+			val = np.linspace(x1,x2,N)
+		else:
+			val = np.logspace(np.log10(x1),np.log10(x2),N)
+			logging.debug('Need to check for x1, x2 == 0 when doing log scale...')
+		return val
 
 
 # wx-StaticBox for y axis
