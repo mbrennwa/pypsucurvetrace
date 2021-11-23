@@ -215,38 +215,53 @@ class curvetrace_controlled_parameter_StaticBox(wx.StaticBox):
 		
 	def ctrl_setup(self, do_init=False):
 	
-		# determine min/max/stepsize depending on PSU and step spacing/scaling:
+		# Set range of start end end values:
 		x_res = self.get_PSU_res()
-		sc = self.get_step_scale()	
+		sc = self.get_step_scale()
 		if sc == 'LIN':
 			x_min = self.get_PSU_min()
-			x_max = self.get_PSU_max()
-			n_max = (x_max - x_min) / x_res + 1
 		elif sc == 'LOG':
-			x_min = max(abs(self.get_PSU_min()), x_res)
-			x_max = max(abs(self.get_PSU_max()), x_res)
-			# determine n_max such that the smallest step (between first and second value) is equivalent to the PSU resolution
-			# note that logspace(a,b,N) = 10.^linspace(a,b,N), then consider the delta of the first two values to find the following equation:
-			n_max = math.floor(1 + (np.log10(x_max)-np.log10(x_min)) / (np.log10(x_res + x_min) - np.log10(x_min)))
-		else:
-			logging.error('Unknown x-step scaling: ' + sc)
-
-		# Set min/max/resolution/etc.:
+			x_min = max(self.get_PSU_min(), x_res)
+		x_max = self.get_PSU_max()
 		self._start.SetRange(x_min, x_max)
 		self._end.SetRange(x_min, x_max)
+
+		# set initial start / end values (only if do_init, i.e., whenn called from __init__):
+		if do_init:
+			self._start.SetValue(x_min)
+			self._end.SetValue(x_max)
+
+		# determine max number of steps depending on start/end values and step spacing/scaling:
+		x1 = self._start.GetValue()
+		x2 = self._end.GetValue()
+		if sc == 'LIN':
+			n_max = abs(x2 - x1) / x_res + 1
+		elif sc == 'LOG':
+			x1 = max(abs(x1), x_res)
+			x2 = max(abs(x2), x_res)
+			# determine n_max such that the smallest step (between first and second value) is equivalent to the PSU resolution
+			# note that logspace(a,b,N) = 10.^linspace(a,b,N), then consider the delta of the first two values to find the following equation:
+			if x2 < x1:
+				u = x1
+				x1 = x2
+				x2 = u
+			n_max = math.floor(1 + (np.log10(x2)-np.log10(x1)) / (np.log10(x_res + x1) - np.log10(x1)))
+		else:
+			logging.error('Unknown x-step scaling: ' + sc)
+		
 		self._step_number.SetRange(1, n_max)
+
+		# set initial step-number value (only if do_init, i.e., whenn called from __init__):
+		if do_init:
+			self._step_number.SetValue(n_max)
+		
+		# set digits:
 		digits = math.ceil(-math.log10(x_res)) # number of digits corresponding to PSU resolution
 		self._start.SetDigits(digits)
 		self._start.SetIncrement(x_res)
 		self._end.SetDigits(digits)
 		self._end.SetIncrement(x_res)
 		
-		# set initial values (only if do_init, i.e., whenn called from __init__):
-		if do_init:
-			self._start.SetValue(x_min)
-			self._end.SetValue(x_max)
-			self._step_number.SetValue(n_max)
-
 		# set units in labels:
 		unit = self.get_PSU_unit()
 		self._start_label.SetLabel('Start (' + unit + '):')	
