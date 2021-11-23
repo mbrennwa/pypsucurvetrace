@@ -42,6 +42,8 @@ k = find (x(:,5) == 0); x = x(k,:);
 % find V2 values:
 V2 = unique(x(:,6));
 
+holdstate = ishold;
+
 h = [];
 for i = 1:length(V2)
 	k = find (x(:,6) == V2(i));
@@ -55,7 +57,11 @@ for i = 1:length(V2)
 	h = [ h plot(V,I,sprintf('-;V_2 = %.3g V;',V2(i)),'marker','.','markersize',12) ];
 	hold on
 end
-hold off
+if holdstate
+	hold on
+else
+	hold off
+end
 
 if(mean(x(:,3) < 0 ))
 	set (gca,'xdir','reverse')
