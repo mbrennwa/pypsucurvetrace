@@ -16,11 +16,6 @@ except ImportError as e:
 	raise
 
 
-
-
-
-
-
 #####################################################################
 
 
@@ -82,8 +77,10 @@ class curvetrace_tab(wx.Panel):
 		logging.debug('Called on_run_btn')
 
 
+#####################################################################
 
-# wx-StaticBox for x axis
+
+# wx-StaticBox for controlled parameter (x-axis, curves)
 class curvetrace_controlled_parameter_StaticBox(wx.StaticBox):
 
 	def __init__(self, parent, app, label, default_par):
@@ -290,46 +287,40 @@ class curvetrace_controlled_parameter_StaticBox(wx.StaticBox):
 		x1 = self._start.GetValue()
 		x2 = self._end.GetValue()
 		N  = self._step_number.GetValue()
-		sc = self.get_step_scale()
-		if sc == 'LIN':
-			val = np.linspace(x1,x2,N)
-		elif sc == 'LOG':
-		# log scale
-			if x1 == x2:
-				val = (x1,)
-			elif N == 1:
-				val = (x1,)
-			else:
-				if x1 == 0:
-					x1  = abs(x2)**(1/(N-1)) * np.sign(x2)
-					val = (0,) + tuple(np.logspace(np.log10(x1),np.log10(x2),N-1))
-				elif x2 == 0:
-					x2  = abs(x1)**(1/(N-1)) * np.sign(x1)
-					if abs(x1) > 1:
-						val = tuple(np.logspace(np.log10(x1),np.log10(x2),N-1)) + (0,)
-					else:
-						val = tuple(np.logspace(np.log10(x1),np.log10(x2),N-1)) + (0,)
-				else:
-					val = np.logspace(np.log10(x1),np.log10(x2),N)
-			
+		
+		if x1 == x2:
+			N = 1
+		if N == 1:
+			val = np.array((x1,))
+		
 		else:
-			raise ValueError('Unknown step spacing ' + spacing + '.')
+			sc = self.get_step_scale()
+			if sc == 'LIN':
+				val = np.linspace(x1,x2,N)
+			elif sc == 'LOG':
+				val = np.logspace(np.log10(x1),np.log10(x2),N)
+			else:
+				raise ValueError('Unknown step spacing ' + spacing + '.')
+
+		# round values to resolution of PSU:
+		res = self.get_PSU_res()
+		val = res * np.round(val/res)
 
 		# make val unique:
 		if val[0] > val[-1]:
 			val = np.unique(val)[::-1]
 		else:
 			val = np.unique(val)
-		
-		# round values to resolution of PSU:
-		res = self.get_PSU_res()
-		val = res * np.round(val/res)
 
 		return tuple(val)
 
 
-# wx-StaticBox for y axis
+#####################################################################
+
+
+# wx-StaticBox for measured parameter (y-axis)
 class curvetrace_measured_parameter_StaticBox(wx.StaticBox):
+
 
 	def __init__(self, parent, app, label, default_par):
 	
@@ -371,6 +362,7 @@ class curvetrace_measured_parameter_StaticBox(wx.StaticBox):
 		# adjust values/limits/ranges of controls:
 		self.ctrl_setup()
 		
+		
 	def ctrl_setup (self):
 		y_limit      = 3;
 		y_resolution = 0.001
@@ -384,6 +376,7 @@ class curvetrace_measured_parameter_StaticBox(wx.StaticBox):
 		logging.debug('curvetrace_yaxis_StaticBox: UNDER CONSTRUCTION -- use similar get_PSU_xyz methods as in x-axis')
 		
 		self._limit_label.SetLabel('Limit (' + DUT_PSU_UNITS[self._parameter.GetSelection ()] + '):')	
+
 
 	def on_parameter (self, event):
 		self.ctrl_setup()
