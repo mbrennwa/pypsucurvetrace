@@ -380,3 +380,27 @@ class curvetrace_measured_parameter_StaticBox(wx.StaticBox):
 
 	def on_parameter (self, event):
 		self.ctrl_setup()
+		
+
+#####################################################################
+
+
+# wx-StaticBox for idle conditions (parameter settings, times)
+class curvetrace_idle_parameter_StaticBox(wx.StaticBox):
+
+	def __init__(self, parent, app):
+	
+		# init the wx.StaticBox:
+		super(curvetrace_controlled_parameter_StaticBox, self).__init__(parent, label=label)
+	
+		# App configs and objects:
+		self._app = app
+	
+		# Arrange controls:
+		controls = wx.GridBagSizer(10,10)
+		controls.Add( wx.StaticText(self, label='Idle controls here...'),                 (0, 0),   flag = wx.ALIGN_RIGHT | wx.ALIGN_CENTER_VERTICAL )
+
+		# setup sizer for the box:
+		self.sizer = wx.StaticBoxSizer(self, wx.VERTICAL)
+		self.sizer.Add(controls, 0, wx.CENTER)
+

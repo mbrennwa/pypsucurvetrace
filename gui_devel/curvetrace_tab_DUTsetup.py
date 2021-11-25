@@ -6,7 +6,11 @@
 try:
 	import wx
 	import logging
-		
+	import matplotlib
+	matplotlib.use('Agg') # Set the backend here
+	import schemdraw
+	import schemdraw.elements as elm
+
 except ImportError as e:
 	logging.error( 'Could not import: ' + str(e) )
 	raise
@@ -31,4 +35,18 @@ class DUTsetup_tab(wx.Panel):
 		lbl = wx.StaticText(self,-1,style = wx.ALIGN_CENTER)
 		lbl.SetLabel("This tab\n is for\n setup of the\n DUT limits\n and connections\n and optional temperature setting.\n\n\n BUTTON to load DUT config file")
 		box.Add(lbl,0,wx.ALIGN_CENTER)
-		self.SetSizer(box) 
+
+		# Add a dummy circuit / symbol:
+		self._circuit = schemdraw.Drawing()
+		self._circuit.draw(backend='svg')
+		self._circuit += elm.Resistor().label('100KΩ')
+
+		logging.debug('Need to figure out how to add the circuit symobol to the wx panel...')
+
+class Panel(wx.Panel):
+    def __init__(self, parent, path):
+        super(Panel, self).__init__(parent, -1)
+        bitmap = wx.Bitmap(path)
+        bitmap = scale_bitmap(bitmap, 300, 200)
+        control = wx.StaticBitmap(self, -1, bitmap)
+        control.SetPosition((10, 10))
