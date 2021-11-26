@@ -1,6 +1,17 @@
-function delta = match_curves_V1V2_I1 (f)
+function delta = match_curves_V1V2_I1 (f, P_max, V0, I0, deltaV0, deltaI0)
 
-% function delta = match_curves_V1V2_I1 (f)
+% function delta = match_curves_V1V2_I1 (f, P_max, V0, I0, deltaV0, deltaI0)
+%
+% Determine overall difference between two curve sets (squared residual)
+%
+% INPUT:
+% f: curve data files (cell string)
+% P_max (optional): ignore data points taken at power = V1 * I1 > P_max
+% V0, I0, deltaV0, deltaI0 (optional): weighting parameters. If specified, apply weight = exp(-(V-V0)²/deltaV0² - (I-I0)²/deltaI0² ) to each delta value
+%
+% OUTPUT:
+% delta: matrix of sum of squared residuals (delta(i,j) is the difference between x{i} and x{j})
+
 
 % check input:
 if ~iscellstr(f)
