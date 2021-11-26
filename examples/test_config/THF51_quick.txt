@@ -13,10 +13,10 @@
 POLARITY = 1
 
 # Test voltage V1 start:
-VSTART = 0
+VSTART = 15
 
 # Test voltage V1 end:
-VEND   = 60
+VEND   = 15
 
 # Test voltage V1 step size:
 VSTEP  = 2.0
@@ -25,20 +25,20 @@ VSTEP  = 2.0
 IMAX   = 3.5
 
 # Max. allowed power during the test:
-PMAX   = 200
+PMAX   = 100
 
 # Idle conditions for pre-heat and idle between readings are configured to fixed values (PSU2 output will be regulated to attain these values, see below):
 
 # - Idle voltage (will be set as voltage limit at PSU-1 during idling):
 #   (no min. or max. idle voltage is specified, which tells the program to use a fixed V1 idle voltage)
-VIDLE  = 25
+VIDLE  = 15
 
 # - Idle current (the target value to be attained with PSU-2 regulation)
 #   (make sure this is lower and not too close to IMAX):
-IIDLE  = 2
+IIDLE  = 1.5
 
 # Max. allowed power during idle:
-PIDLEMAX   = 105
+PIDLEMAX   = 50
 
 
 ##################################################
@@ -50,10 +50,10 @@ PIDLEMAX   = 105
 POLARITY = -1
 
 # Test voltage V2 start:
-VSTART = 0.0
+VSTART = 3.0
 
 # Test voltage V2 end:
-VEND   = 7
+VEND   = 3.0
 
 # Test voltage V2 step size:
 VSTEP  = 0.5
@@ -67,7 +67,7 @@ PMAX   = 5
 # Idle conditions configured such that PSU-2 regulates the idle conditions configured for PSU-1
 
 # - V2 initial value:
-VIDLE     = 5.0
+VIDLE     = 4.0
 
 # - V2 minimum value:
 VIDLE_MIN = 0.0
@@ -88,11 +88,15 @@ IIDLE     = 1
 ###############################################
 [EXTRA]
 
+# DUT temperature (target and tolerance values, deg.C):
+T_TARGET = 50
+T_TOL    = 0.5
+
 # Duration of idle periods between readings (seconds):
 IDLESECS    = 0
 
 # Duration of pre-heat / warmup period before starting the test (seconds):
-PREHEATSECS = 10
+PREHEATSECS = 50
 
 # number of repeated readings at each measurement step:
 # (note that each reading is preceeded by an idle period if IDLECECS > 0):

@@ -17,11 +17,11 @@ VSTART = 0
 
 # Test voltage V1 ends at 60 V:
 ### VEND   = 60
-VEND   = 50
+VEND   = 15
 
 # Test voltage V1 steps are 0.5 V:
-### VSTEP  = 0.5
-VSTEP  = 2
+VSTEP  = 0.25
+### VSTEP  = 2
 
 # Max. allowed current during the test is 15 A:
 IMAX   = 15
@@ -91,8 +91,8 @@ IIDLE     = 1
 [EXTRA]
 
 # DUT temperature (target and tolerance values, deg.C):
-T_TARGET = 50
-T_TOL    = 0.25
+### T_TARGET = 70
+### T_TOL    = 0.25
 
 
 # Duration of idle periods between readings (seconds):
