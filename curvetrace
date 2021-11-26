@@ -345,9 +345,8 @@ def do_idle(PSU1,PSU2,seconds,file=None,wait_for_TEMP=False):
 			
 			T_HB = HEATER.get_temperature_string()
 
-			b = "U0={:.3f} V".format(Uf) + '  ' + "I0={:.3f} A".format(If) + '  ' + "Uc={:.3f} V".format(Ur) + '  ' + "Ic={:.3f} A".format(Ir) + '  ' + "T="+T_HB+" °C"
-			t = "Idling ({:.1f}".format(time.time()-t0-heater_delays) + ' of ' + "{:.1f}".format(seconds) + ' s): '
-			print (t + b + ' '*12, end="\r")
+			t = "Idling ({:.1f}".format(time.time()-t0-heater_delays) + ' of ' + "{:.1f}".format(seconds) + ' s): ' + "U0={:.3f} V".format(Uf) + '  ' + "I0={:.3f} A".format(If) + '  ' + "Uc={:.3f} V".format(Ur) + '  ' + "Ic={:.3f} A".format(Ir) + '  ' + "T="+T_HB+" °C"
+			print (t, end="\r")
 
 			if f[2] == "CC":
 				If = IFIXLIM * (1+(FIX.TEST_VIDLE-Uf)/FIX.TEST_VIDLE)
@@ -369,7 +368,7 @@ def do_idle(PSU1,PSU2,seconds,file=None,wait_for_TEMP=False):
 			timenow = time.time()
 
 		# Clear the terminal:
-		print (' '*72, end="\r")
+		print (' '*len(t), end="\r")
 
 		# write idle / preheat conditions to file:
 		if file is not None:
