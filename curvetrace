@@ -17,8 +17,9 @@
 
 import argparse
 import configparser
+import datetime
 
-from lib.curvetrace_lib import printit, connect_PSU, configure_test_PSU, configure_idle_PSU, do_idle
+from lib.curvetrace_lib import printit, connect_PSU, configure_test_PSU, configure_idle_PSU, do_idle, start_new_logfile
 
 import lib.powersupply as powersupply
 import lib.heaterblock as heaterblock
@@ -89,27 +90,7 @@ PSU2 = connect_PSU(configTESTER,'PSU2'); print( )
 HEATER = heaterblock.heater( config=configTESTER, target_temperature=0.0 )
 HEATER.turn_off()
 
-# ask for sample name:
-samplename = ''
-while not samplename:
-    samplename = input('Enter sample name / label: ')
-    samplename = samplename.strip()
-    
-    # name of data file:
-    logfilename = samplename + '.dat'
-    
-    # check if data file exists:
-    if os.path.exists(logfilename):
-    	print('Data / log file ' + logfilename + ' already exists! Please use a different name...')
-    	samplename = ''
-
-# start logfile:
-logfile = open(logfilename,'w')
-if logfile:
-    print('\nLogging output to ' + logfilename + '...')
-else:
-    print('Could not open log file!')
-    exit()
+logfile, samplename = start_new_logfile()
 
 # configure voltage values / current and power limits:
 if 'PSU1' in configDUT:

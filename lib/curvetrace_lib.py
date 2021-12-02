@@ -10,7 +10,7 @@ Function definitison for use with curvetrace programs
 # import configparser
 # import argparse
 # import numpy as np
-# import os.path
+import os.path
 # import logging
 
 ### from termcolor import colored
@@ -44,6 +44,37 @@ def __get_number(text,allowNegative = False,allowZero = True,typ='float'):
 			print ('  Invalid input! Try again...')
 	
 	return val
+
+
+############################################
+# start a new file for logging data output #
+############################################
+
+def start_new_logfile():
+
+	# ask for sample name:
+	samplename = ''
+	while not samplename:
+	    samplename = input('Enter sample name / label: ')
+	    samplename = samplename.strip()
+	    
+	    # name of data file:
+	    logfilename = samplename + '.dat'
+	    
+	    # check if data file exists:
+	    if os.path.exists(logfilename):
+	    	print('Data / log file ' + logfilename + ' already exists! Please use a different name...')
+	    	samplename = ''
+
+	# start logfile:
+	logfile = open(logfilename,'w')
+	if logfile:
+	    print('\nLogging output to ' + logfilename + '...')
+	else:
+	    print('Could not open log file!')
+	    exit()
+	    
+	return logfile, samplename
 
 
 #############################################################
