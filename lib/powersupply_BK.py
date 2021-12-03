@@ -6,6 +6,7 @@ import serial
 import sys
 import time
 
+
 # Python dictionary of known B&K power supply models (Vmin,Vmax,Imax,Pmax,VresolutionSet,IresolutionSet,VresolutionRead,IresolutionRead,MaxSettleTime)
 BK_SPECS = {
 		"9185B_HIGH":	( 0.0, 610.0,  0.35, 210,  0.02,    0.00001, 0.3,    0.0015,  2.0 ),  # 9185B in "HIGH" setting, confirmed working
@@ -239,8 +240,12 @@ class BK(object):
 		while True:
 			try:
 				if k > 10:
-					raise RuntimeException("Could not read output limit status from B&K PSU!")
-				S = self._query('OUTPUT:STATE?')
+					raise RuntimeException("Could not read output limit status from B&K PSU!")					
+				S = int(self._query('STATus:OPERation:CONDition?'))
+				if S&8 != 0:
+					S = 'CC'
+				else:
+					S = 'CV'
 				break
 			except:
 				k = k+1
