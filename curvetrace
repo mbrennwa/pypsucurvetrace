@@ -564,13 +564,7 @@ try:
 	
 		if batch_mode:
 			# prepare next step and file:
-			step += 1
-			
-			logging.debug('New step number: ' + str(step))
-			
-			x = start_new_logfile(batch_mode, basename, step)
-			logfile = x[0]
-			samplename = x[1]
+			logfile, samplename, _, step = start_new_logfile(batch_mode, basename, step+1)
 		else:
 			do_run = False
 

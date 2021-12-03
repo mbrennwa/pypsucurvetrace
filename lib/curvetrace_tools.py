@@ -52,10 +52,8 @@ def __get_number(text,allowNegative = False,allowZero = True,typ='float'):
 
 def start_new_logfile(do_batch=False, basename=None, step=None):
 
-	logging.debug('setting up new file: do_batch ' + str(do_batch) + ', basename = ' + str(basename) + ', step = ' + str(step))
-
 	samplename = None
-	
+
 	while samplename is None:
 
 		# ask for sample name:
