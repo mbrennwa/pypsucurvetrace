@@ -15,14 +15,20 @@
 # You should have received a copy of the GNU General Public License
 # along with PyPSUcurvetrace.  If not, see <http://www.gnu.org/licenses/>.
 
+import traceback
 import argparse
 import configparser
 import datetime
-
-from lib.curvetrace_lib import printit, connect_PSU, configure_test_PSU, configure_idle_PSU, do_idle, start_new_logfile
+import numpy as np
+import time
+import logging
+logging.basicConfig(level=logging.DEBUG)
 
 import lib.powersupply as powersupply
 import lib.heaterblock as heaterblock
+
+from lib.curvetrace_tools import printit, connect_PSU, configure_test_PSU, configure_idle_PSU, do_idle, start_new_logfile
+
 
 
 
@@ -60,7 +66,9 @@ def cleanup_exit():
 
 # parse input arguments (if any):
 parser = argparse.ArgumentParser(description='PyPSUcurvetrace is a Python program for I-V curve tracing of electronic parts using programmable power supplies.')
-parser.add_argument('-c', help='configuration file with test parameters (name/path)')
+parser.add_argument('-c', help='configuration file with test parameters [name/path]')
+parser.add_argument('-b', action='store_true', help='Batch mode (loop of repeated test tuns)')
+parser.add_argument('-q', action='store_true', help='Quick mode (pre-heating only, no curve tracing)')
 args = parser.parse_args()
 
 # Say Hello:
@@ -75,13 +83,25 @@ print('\n')
 configTESTER = configparser.ConfigParser()
 configTESTER.read('config.txt')
 
+# check for batch mode:
+batch_mode = False
+if args.b:
+	print ('Running in batch mode (loop of repeated test tuns)...\n')
+	batch_mode = True
+
+# check for quick mode:
+quick_mode = False
+if args.q:
+	print ('Running in quick mode (pre-heating only, no curve tracing)...\n')
+	quick_mode = True
+
 # read DUT configTESTER file (if any):
 configDUT = []
 if args.c:
 	print ('Reading DUT configuration in file ' + args.c + '...\n')
 	configDUT = configparser.ConfigParser()
 	configDUT.read(args.c)
-
+	
 # connect to PSUs:
 PSU1 = connect_PSU(configTESTER,'PSU1'); print( )
 PSU2 = connect_PSU(configTESTER,'PSU2'); print( )
@@ -90,7 +110,7 @@ PSU2 = connect_PSU(configTESTER,'PSU2'); print( )
 HEATER = heaterblock.heater( config=configTESTER, target_temperature=0.0 )
 HEATER.turn_off()
 
-logfile, samplename = start_new_logfile()
+logfile, samplename, basename, step = start_new_logfile(batch_mode)
 
 # configure voltage values / current and power limits:
 if 'PSU1' in configDUT:
@@ -254,83 +274,68 @@ for p in [PSU1,PSU2]:
 
 # Print summary of test setup:
 print('\nTest setup:')
-printit('* Sample: ' + samplename,logfile,'%')
-printit('* Date / time: ' + str(datetime.datetime.now()),logfile,'%')
 for p in [PSU1, PSU2]:
 	
 	if not p.CONNECTED:
-		printit ('* ' + p.LABEL + ': Not connected',logfile,'%')
+		print ('* ' + p.LABEL + ': Not connected')
 	elif not p.CONFIGURED:
-		printit ('* ' + p.LABEL + ': Test parameters not configured',logfile,'%')
+		print ('* ' + p.LABEL + ': Test parameters not configured')
 	else:
-		printit ('* ' + p.LABEL + ':',logfile,'%')
+		print ('* ' + p.LABEL + ':')
 		for k in range(len(p._PSU)):
 			if len(p._PSU) == 1:
-				printit ('  - Type: ' + str(p._PSU[k].COMMANDSET) + ' / ' + p._PSU[k].MODEL,logfile,'%')
+				print ('  - Type: ' + str(p._PSU[k].COMMANDSET) + ' / ' + p._PSU[k].MODEL)
 			else:
-				printit ('  - Type (unit '+str(k+1)+'): ' + str(p._PSU[k].COMMANDSET) + ' / ' + p._PSU[k].MODEL,logfile,'%')
+				print ('  - Type (unit '+str(k+1)+'): ' + str(p._PSU[k].COMMANDSET) + ' / ' + p._PSU[k].MODEL)
 
 		if p.TEST_VSTEP == 0:
-			printit ('  - voltage output = ' + str(p.TEST_VSTART) + ' V (fixed)',logfile,'%')
+			print ('  - voltage output = ' + str(p.TEST_VSTART) + ' V (fixed)')
 		else:
-			printit ('  - voltage output = ' + str(p.TEST_VSTART) + ' V ... ' + str(p.TEST_VEND) + ' V (' + str(p.TEST_VSTEP) + ' V steps)',logfile,'%')
-		printit ('  - current limit = ' + str(p.TEST_ILIMIT) + ' A',logfile,'%')
-		printit ('  - power limit = ' + str(p.TEST_PLIMIT) + ' W',logfile,'%')
+			print ('  - voltage output = ' + str(p.TEST_VSTART) + ' V ... ' + str(p.TEST_VEND) + ' V (' + str(p.TEST_VSTEP) + ' V steps)')
+		print ('  - current limit = ' + str(p.TEST_ILIMIT) + ' A')
+		print ('  - power limit = ' + str(p.TEST_PLIMIT) + ' W')
 		if p.TEST_POLARITY == 1:
-			printit ('  - polarity: normal',logfile,'%')
+			print ('  - polarity: normal')
 		else:
-			printit ('  - polarity: inverted',logfile,'%')
+			print ('  - polarity: inverted')
 
-printit ('* Repeats per reading = ' + str(N_rep),logfile,'%')
+print ('* Repeats per reading = ' + str(N_rep))
 if T_idle == 0.0:
-	printit ('* No idle time between measurements',logfile,'%')
+	print ('* No idle time between measurements')
 else:
-	printit ('* Idle time between measurements: ' + str(T_idle) + ' s',logfile,'%')
+	print ('* Idle time between measurements: ' + str(T_idle) + ' s')
 if T_preheat == 0.0:
-	printit ('* No pre-heating before measurements',logfile,'%')
+	print ('* No pre-heating before measurements')
 else:
-	printit ('* Pre-heat time before measurements (at idle conditions): ' + str(T_preheat) + ' seconds',logfile,'%')
+	print ('* Pre-heat time before measurements (at idle conditions): ' + str(T_preheat) + ' seconds')
 if (T_idle > 0.0) or (T_preheat > 0.0):
 	for p in [PSU1, PSU2]:
 		if p.CONNECTED == False:
-			printit ('* ' + p.LABEL + ' Idle / pre-heat conditions not configured',logfile,'%')
+			print ('* ' + p.LABEL + ' Idle / pre-heat conditions not configured')
 		else:
 			if p.TEST_VIDLE_MAX == p.TEST_VIDLE_MIN:
-				printit ('* ' + p.LABEL + ' idle / pre-heat voltage = ' + str(p.TEST_VIDLE) + ' V (fixed value)',logfile,'%')
+				print ('* ' + p.LABEL + ' idle / pre-heat voltage = ' + str(p.TEST_VIDLE) + ' V (fixed value)')
 			else:
-				printit ('* ' + p.LABEL + ' idle / pre-heat voltage range = ' + str(p.TEST_VIDLE_MIN) + ' V ... ' + str(p.TEST_VIDLE_MAX) + ' V.',logfile,'%')
-			printit ('* ' + p.LABEL + ' idle / pre-heat current = ' + str(p.TEST_IIDLE) + ' A',logfile,'%')
-			printit ('* ' + p.LABEL + ' max. idle / pre-heat power = ' + str(p.TEST_PIDLELIMIT) + ' W',logfile,'%')
+				print ('* ' + p.LABEL + ' idle / pre-heat voltage range = ' + str(p.TEST_VIDLE_MIN) + ' V ... ' + str(p.TEST_VIDLE_MAX) + ' V.')
+			print ('* ' + p.LABEL + ' idle / pre-heat current = ' + str(p.TEST_IIDLE) + ' A')
+			print ('* ' + p.LABEL + ' max. idle / pre-heat power = ' + str(p.TEST_PIDLELIMIT) + ' W')
 
-printit ('* Heaterblock temperature (current) = ' + str(HEATER.get_temperature_string()),logfile,'%')
-printit ('* Heaterblock temperature (target)  = ' + str(HEATER.get_target_temperature_string()),logfile,'%')
+print ('* Heaterblock temperature (current) = ' + str(HEATER.get_temperature_string()))
+print ('* Heaterblock temperature (target)  = ' + str(HEATER.get_target_temperature_string()))
 
-# Ask if okay to start the test
-input ('\nReady? Press ENTER to start testing or CTRL+C to abort...')
 
-# Print header / column labels:
-printit ('Column 1:  PSU1 nominal voltage setting (V)',logfile,'%')
-printit ('Column 2:  PSU1 nominal current setting (A)',logfile,'%')
-printit ('Column 3:  PSU1 voltage measurement (V)',logfile,'%')
-printit ('Column 4:  PSU1 current measurement (I)',logfile,'%')
-printit ('Column 5:  PSU1 limiter flag',logfile,'%')
-printit ('Column 6:  PSU2 nominal voltage setting (V)',logfile,'%')
-printit ('Column 7:  PSU2 nominal current setting (A)',logfile,'%')
-printit ('Column 8:  PSU2 voltage measurement (V)',logfile,'%')
-printit ('Column 9:  PSU2 current measurement (I)',logfile,'%')
-printit ('Column 10: PSU2 limiter flag',logfile,'%')
-printit ('Column 11: Heaterblock temperature (°C)',logfile,'%')
 
-print ('\n')
 
-# Turn the heater on (if possible/configured):
-HEATER.turn_on()
 
 AVGFUNCTION = 'MEAN'
 # AVGFUNCTION = 'MEDIAN'
 
-I1LIM = 0.0
-I2LIM = 0.0
+
+
+
+
+#? I1LIM = 0.0
+#? I2LIM = 0.0
 
 # determine voltage step values:
 V_steps = []
@@ -352,181 +357,222 @@ for p in [PSU1,PSU2]:
 			V_steps.append(u)
 
 try:
+	do_run = True
+	while do_run:
 
-	# if heaterblock is configured and turned on:
-	# make sure the heaterblock temperature is within tolerance before configuring the measurement,
-	HEATER.wait_for_stable_T(DUT_PSU_allowed_turn_off=None, terminal_output=True)
-	
-	# turn on PSU outputs:
-	for p in [PSU1, PSU2]:
-		if p.CONFIGURED:
-			p.setCurrent(0,False)
-			p.setVoltage(p.VMIN,False)
-			p.turnOn()
+		# Ask if okay to start the test
+		input ('\nReady for testing of ' + samplename + '? Press ENTER to start testing or CTRL+C to abort...')
 
-	# DUT break-in / pre-heat
-	if T_preheat > 0.0:
-		
-		print ('DUT break-in / pre-heat...\n')
-
-		# set idle conditions:
-		if TEMP_val != None:
-			do_TEMP_wait = True
+		# Print header / column labels:
+		printit('* Sample: ' + samplename,logfile,'%', terminal_output=False)
+		printit('* Date / time: ' + str(datetime.datetime.now()),logfile,'%', terminal_output=False)
+		if quick_mode:
+			printit ('* Running in quick mode (pre-heating only, no curve tracing)',logfile,'%', terminal_output=False)
 		else:
-			do_TEMP_wait = False
-		do_idle(PSU1,PSU2,T_preheat,file=logfile,wait_for_TEMP=do_TEMP_wait)
+			printit ('Column 1:  PSU1 nominal voltage setting (V)',logfile,'%', terminal_output=False)
+			printit ('Column 2:  PSU1 nominal current setting (A)',logfile,'%', terminal_output=False)
+			printit ('Column 3:  PSU1 voltage measurement (V)',logfile,'%', terminal_output=False)
+			printit ('Column 4:  PSU1 current measurement (I)',logfile,'%', terminal_output=False)
+			printit ('Column 5:  PSU1 limiter flag',logfile,'%', terminal_output=False)
+			printit ('Column 6:  PSU2 nominal voltage setting (V)',logfile,'%', terminal_output=False)
+			printit ('Column 7:  PSU2 nominal current setting (A)',logfile,'%', terminal_output=False)
+			printit ('Column 8:  PSU2 voltage measurement (V)',logfile,'%', terminal_output=False)
+			printit ('Column 9:  PSU2 current measurement (I)',logfile,'%', terminal_output=False)
+			printit ('Column 10: PSU2 limiter flag',logfile,'%', terminal_output=False)
+			printit ('Column 11: Heaterblock temperature (°C)',logfile,'%', terminal_output=False)
 
-	print ('Test started...\n')
+		print ('\n')
 
-	for V2 in V_steps[1]:
-	# outer loop (V2)
+		# Make sure the heater is turned on (if possible/configured):
+		HEATER.turn_on()
 
-		# get rid of numerical imprecisions (truncate values to voltage resolution of PSU):
-		# V2 = round(V2/PSU2.VRESSET) * PSU2.VRESSET
+		# if heaterblock is configured and turned on:
+		# make sure the heaterblock temperature is within tolerance before configuring the measurement,
+		HEATER.wait_for_stable_T(DUT_PSU_allowed_turn_off=None, terminal_output=True)
+		
+		# turn on PSU outputs:
+		for p in [PSU1, PSU2]:
+			if p.CONFIGURED:
+				p.setCurrent(0,False)
+				p.setVoltage(p.VMIN,False)
+				p.turnOn()
 
-		limit = 0 # number of CC events at a given step
-		limit_max = 2 # max. number of CC events before breaking from the loop
-
-
-		if PSU2.CONFIGURED:
-
-			# Determine PSU2 current limit (based on DUT limits):
-			if V2 > 0.0:
-				I2LIM = min (PSU2.TEST_ILIMIT,PSU2.TEST_PLIMIT/V2)
-			else:
-				I2LIM = PSU2.TEST_ILIMIT
-
-			# Check if current limit is within power capability of PSU2 (and adjust if necessary):
-			if (V2*I2LIM) > PSU2.PMAX:
-				I2LIM = PSU2.PMAX / V2
+		# DUT break-in / pre-heat
+		if T_preheat > 0.0:
 			
-			# set PSU2 voltage + current:
-			PSU2.setCurrent(I2LIM,False)
-			PSU2.setVoltage(V2,True)
+			print ('DUT break-in / pre-heat...\n')
 
-		for V1 in V_steps[0]:
-		# inner loop (V1)
+			# set idle conditions:
+			if TEMP_val != None:
+				do_TEMP_wait = True
+			else:
+				do_TEMP_wait = False
+			do_idle(PSU1,PSU2,HEATER,T_preheat,file=logfile,wait_for_TEMP=do_TEMP_wait)
 
-			# get rid of numerical imprecisions (truncate values to voltage resolution of PSU):
-			# V1 = round(V1/PSU1.VRESSET) * PSU1.VRESSET
+		if not quick_mode:
+			print ('Curve tracing started...\n')
 
-			# init measurement values		
-			V1MEAS = []
-			I1MEAS = []
-			LIMIT1 = 0
-			V2MEAS = []
-			I2MEAS = []
-			LIMIT2 = 0
-			T_HB   = []
+			for V2 in V_steps[1]:
+			# outer loop (V2)
 
-			# measurement loop:
-			for i in range(N_rep):
+				# get rid of numerical imprecisions (truncate values to voltage resolution of PSU):
+				# V2 = round(V2/PSU2.VRESSET) * PSU2.VRESSET
 
-				# if heaterblock is configured and turned on:
-				# make sure the heaterblock temperature is within tolerance before doing the measurement,
-				# allow turning off the DUT to prevent heat input from DUT to heaterblock
-				HEATER.wait_for_stable_T(DUT_PSU_allowed_turn_off=PSU1, terminal_output=True)
+				limit = 0 # number of CC events at a given step
+				limit_max = 2 # max. number of CC events before breaking from the loop
 
-				# idle (if configured)
-				if T_idle > 0.0:
-					do_idle(PSU1,PSU2,T_idle)
 
-					# return to required PSU2 output:
-					if PSU2.CONFIGURED:
-						PSU2.setCurrent(I2LIM,False)
-						PSU2.setVoltage(V2,True)
+				if PSU2.CONFIGURED:
 
-				# Determine PSU1 current limit:
-				if V1 > 0.0:
-					I1LIM = min (PSU1.TEST_ILIMIT,PSU1.TEST_PLIMIT/V1)
-				else:
-					I1LIM = PSU1.TEST_ILIMIT
-
-				# Check if current limit is within power capability of PSU1 (and adjust if necessary):
-				if (V1*I1LIM) > PSU1.PMAX:
-					I1LIM = PSU1.PMAX / V1
-
-				# set up PSU1 measurement conditions:
-				if PSU1.CONFIGURED:
-					PSU1.setCurrent(I1LIM,False) # set current limit at PSU1
-					PSU1.setVoltage(V1,True) # set voltage at PSU1
-
-				# wait a bit to get stable conditions before taking the reading:
-				time.sleep(0.2)
-
-				# read PSU output voltages and currents:
-				r = []
-				for p in [PSU1, PSU2]:
-					if p.CONFIGURED:
-						r.append(p.read(p.NSTABLEREADINGS))
+					# Determine PSU2 current limit (based on DUT limits):
+					if V2 > 0.0:
+						I2LIM = min (PSU2.TEST_ILIMIT,PSU2.TEST_PLIMIT/V2)
 					else:
-						r.append([0.0,0.0,'NONE'])
-				
-				V1MEAS.append(r[0][0])
-				I1MEAS.append(r[0][1])
-				V2MEAS.append(r[1][0])
-				I2MEAS.append(r[1][1])
-				if r[0][2] == 'CC':
-					LIMIT1 = LIMIT1 + 1
-				if r[1][2] == 'CC':
-					LIMIT2 = LIMIT2 + 1
+						I2LIM = PSU2.TEST_ILIMIT
 
-				# Determine heaterblock temperature:
-				T_HB.append(HEATER.get_temperature())
+					# Check if current limit is within power capability of PSU2 (and adjust if necessary):
+					if (V2*I2LIM) > PSU2.PMAX:
+						I2LIM = PSU2.PMAX / V2
+					
+					# set PSU2 voltage + current:
+					PSU2.setCurrent(I2LIM,False)
+					PSU2.setVoltage(V2,True)
 
-			# Determine median or mean of repeated readings:
-			if AVGFUNCTION == 'MEDIAN':
-				V1MEAS = np.median(V1MEAS)
-				I1MEAS = np.median(I1MEAS)
-				V2MEAS = np.median(V2MEAS)
-				I2MEAS = np.median(I2MEAS)
-				T_HB   = np.median(T_HB)
-			else:
-				V1MEAS = np.mean(V1MEAS)
-				I1MEAS = np.mean(I1MEAS)
-				V2MEAS = np.mean(V2MEAS)
-				I2MEAS = np.mean(I2MEAS)
-				T_HB   = np.mean(T_HB)
-				
-			# Check current limits (some PSUs are not very careful with this):
-			if I1MEAS > I1LIM:
-				LIMIT1 = 1
-			if I2MEAS > I2LIM:
-				LIMIT2 = 1
+				for V1 in V_steps[0]:
+				# inner loop (V1)
 
-			# Parse limiter flags:
-			if LIMIT1 > 0:
-				LIMIT1 = 1
-			else:
-				LIMIT1 = 0
-			if LIMIT2 > 0:
-				LIMIT2 = 1
-			else:
-				LIMIT2 = 0
+					# get rid of numerical imprecisions (truncate values to voltage resolution of PSU):
+					# V1 = round(V1/PSU1.VRESSET) * PSU1.VRESSET
 
-			# Check if current / power limit has been reached:
-			if (LIMIT1 == 0) and (LIMIT2 == 0):
-				limit = 0 # reset counter
-			else:
-				limit = limit + 1
-				if limit >= limit_max:
-					break # break out of the inner loop (V1 steps) and continue with the next V2 step
+					# init measurement values		
+					V1MEAS = []
+					I1MEAS = []
+					LIMIT1 = 0
+					V2MEAS = []
+					I2MEAS = []
+					LIMIT2 = 0
+					T_HB   = []
 
-			# Print results:
-			printit (	"{:10.6f}".format(V1*PSU1.TEST_POLARITY)	+ ' ' + 
-					"{:10.6f}".format(I1LIM*PSU1.TEST_POLARITY)	+ ' ' + 
-					"{:10.6f}".format(V1MEAS*PSU1.TEST_POLARITY)	+ ' ' +
-					"{:10.6f}".format(I1MEAS*PSU1.TEST_POLARITY)	+ ' ' + 
-					"{:5d}".format(LIMIT1)				+ ' ' +
-					"{:10.6f}".format(V2*PSU2.TEST_POLARITY)	+ ' ' +
-					"{:10.6f}".format(I2LIM*PSU2.TEST_POLARITY)	+ ' ' +
-					"{:10.6f}".format(V2MEAS*PSU2.TEST_POLARITY)	+ ' ' +
-					"{:10.6f}".format(I2MEAS*PSU2.TEST_POLARITY)	+ ' ' +
-					"{:5d}".format(LIMIT2)                          + ' ' +
-					"{:.2f}".format(T_HB) ,
-				logfile )
+					# measurement loop:
+					for i in range(N_rep):
 
-	print ('Test completed.')
+						# if heaterblock is configured and turned on:
+						# make sure the heaterblock temperature is within tolerance before doing the measurement,
+						# allow turning off the DUT to prevent heat input from DUT to heaterblock
+						HEATER.wait_for_stable_T(DUT_PSU_allowed_turn_off=PSU1, terminal_output=True)
+
+						# idle (if configured)
+						if T_idle > 0.0:
+							do_idle(PSU1,PSU2,HEATER,T_idle)
+
+							# return to required PSU2 output:
+							if PSU2.CONFIGURED:
+								PSU2.setCurrent(I2LIM,False)
+								PSU2.setVoltage(V2,True)
+
+						# Determine PSU1 current limit:
+						if V1 > 0.0:
+							I1LIM = min (PSU1.TEST_ILIMIT,PSU1.TEST_PLIMIT/V1)
+						else:
+							I1LIM = PSU1.TEST_ILIMIT
+
+						# Check if current limit is within power capability of PSU1 (and adjust if necessary):
+						if (V1*I1LIM) > PSU1.PMAX:
+							I1LIM = PSU1.PMAX / V1
+
+						# set up PSU1 measurement conditions:
+						if PSU1.CONFIGURED:
+							PSU1.setCurrent(I1LIM,False) # set current limit at PSU1
+							PSU1.setVoltage(V1,True) # set voltage at PSU1
+
+						# wait a bit to get stable conditions before taking the reading:
+						time.sleep(0.2)
+
+						# read PSU output voltages and currents:
+						r = []
+						for p in [PSU1, PSU2]:
+							if p.CONFIGURED:
+								r.append(p.read(p.NSTABLEREADINGS))
+							else:
+								r.append([0.0,0.0,'NONE'])
+						
+						V1MEAS.append(r[0][0])
+						I1MEAS.append(r[0][1])
+						V2MEAS.append(r[1][0])
+						I2MEAS.append(r[1][1])
+						if r[0][2] == 'CC':
+							LIMIT1 = LIMIT1 + 1
+						if r[1][2] == 'CC':
+							LIMIT2 = LIMIT2 + 1
+
+						# Determine heaterblock temperature:
+						T_HB.append(HEATER.get_temperature())
+
+					# Determine median or mean of repeated readings:
+					if AVGFUNCTION == 'MEDIAN':
+						V1MEAS = np.median(V1MEAS)
+						I1MEAS = np.median(I1MEAS)
+						V2MEAS = np.median(V2MEAS)
+						I2MEAS = np.median(I2MEAS)
+						T_HB   = np.median(T_HB)
+					else:
+						V1MEAS = np.mean(V1MEAS)
+						I1MEAS = np.mean(I1MEAS)
+						V2MEAS = np.mean(V2MEAS)
+						I2MEAS = np.mean(I2MEAS)
+						T_HB   = np.mean(T_HB)
+						
+					# Check current limits (some PSUs are not very careful with this):
+					if I1MEAS > I1LIM:
+						LIMIT1 = 1
+					if I2MEAS > I2LIM:
+						LIMIT2 = 1
+
+					# Parse limiter flags:
+					if LIMIT1 > 0:
+						LIMIT1 = 1
+					else:
+						LIMIT1 = 0
+					if LIMIT2 > 0:
+						LIMIT2 = 1
+					else:
+						LIMIT2 = 0
+
+					# Check if current / power limit has been reached:
+					if (LIMIT1 == 0) and (LIMIT2 == 0):
+						limit = 0 # reset counter
+					else:
+						limit = limit + 1
+						if limit >= limit_max:
+							break # break out of the inner loop (V1 steps) and continue with the next V2 step
+
+					# Print results:
+					printit (	"{:10.6f}".format(V1*PSU1.TEST_POLARITY)	+ ' ' + 
+							"{:10.6f}".format(I1LIM*PSU1.TEST_POLARITY)	+ ' ' + 
+							"{:10.6f}".format(V1MEAS*PSU1.TEST_POLARITY)	+ ' ' +
+							"{:10.6f}".format(I1MEAS*PSU1.TEST_POLARITY)	+ ' ' + 
+							"{:5d}".format(LIMIT1)				+ ' ' +
+							"{:10.6f}".format(V2*PSU2.TEST_POLARITY)	+ ' ' +
+							"{:10.6f}".format(I2LIM*PSU2.TEST_POLARITY)	+ ' ' +
+							"{:10.6f}".format(V2MEAS*PSU2.TEST_POLARITY)	+ ' ' +
+							"{:10.6f}".format(I2MEAS*PSU2.TEST_POLARITY)	+ ' ' +
+							"{:5d}".format(LIMIT2)                          + ' ' +
+							"{:.2f}".format(T_HB) ,
+						logfile )
+
+			print ('Curve tracing completed.')
+	
+		if batch_mode:
+			# prepare next step and file:
+			step += 1
+			
+			logging.debug('New step number: ' + str(step))
+			
+			x = start_new_logfile(batch_mode, basename, step)
+			logfile = x[0]
+			samplename = x[1]
+		else:
+			do_run = False
 
 except KeyboardInterrupt:
 	print ('\nCaught keyboard interrupt, exiting...\n')

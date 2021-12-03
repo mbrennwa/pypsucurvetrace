@@ -4,14 +4,14 @@ Function definitison for use with curvetrace programs
 
 # imports:
 # import traceback
-# import time
+import time
 # import math
 # import datetime
 # import configparser
 # import argparse
 # import numpy as np
 import os.path
-# import logging
+import logging
 
 ### from termcolor import colored
 import lib.powersupply as powersupply
@@ -50,21 +50,48 @@ def __get_number(text,allowNegative = False,allowZero = True,typ='float'):
 # start a new file for logging data output #
 ############################################
 
-def start_new_logfile():
+def start_new_logfile(do_batch=False, basename=None, step=None):
 
-	# ask for sample name:
-	samplename = ''
-	while not samplename:
-	    samplename = input('Enter sample name / label: ')
-	    samplename = samplename.strip()
-	    
-	    # name of data file:
-	    logfilename = samplename + '.dat'
-	    
-	    # check if data file exists:
-	    if os.path.exists(logfilename):
-	    	print('Data / log file ' + logfilename + ' already exists! Please use a different name...')
-	    	samplename = ''
+	logging.debug('setting up new file: do_batch ' + str(do_batch) + ', basename = ' + str(basename) + ', step = ' + str(step))
+
+	samplename = None
+	
+	while samplename is None:
+
+		# ask for sample name:
+		if basename is None:
+			if do_batch:
+				basename = input('Enter batch base name / label: ')
+				step = __get_number('Enter number of first step in batch: ', allowNegative=False, allowZero=False, typ='int')
+			else:
+				basename = input('Enter base name / label: ')
+				step = None
+		basename = basename.strip()
+
+		# determine step number:
+		if not do_batch:
+			step = None
+		else:
+			if step is None:
+				step = __get_number('Enter number of first step in batch: ', allowNegative=False, allowZero=False, typ='int')
+
+		# determine sample name:
+		if step is None:
+			samplename = basename
+		else:
+			samplename = basename + '_' + str(step)
+		
+		# name of data file:
+		logfilename = samplename + '.dat'
+		
+		# check if data file exists:
+		if os.path.exists(logfilename):
+			samplename = None
+			u = 'Data / log file ' + logfilename + ' exists!'
+			if do_batch and (basename is not None):
+				input (u + ' Try moving the file out of the way, then press ENTER...')
+			else:
+				print(u + ' Please try a different name...')
 
 	# start logfile:
 	logfile = open(logfilename,'w')
@@ -74,15 +101,16 @@ def start_new_logfile():
 	    print('Could not open log file!')
 	    exit()
 	    
-	return logfile, samplename
+	return logfile, samplename, basename, step
 
 
 #############################################################
 # function to print output both to console and to data file #
 #############################################################
 
-def printit(text,f='',comm=''):
-	print(text)
+def printit(text,f='',comm='', terminal_output=True):
+	if terminal_output:
+		print(text)
 	if f:
 		if len(comm):
 			text = comm + ' ' + text
@@ -297,7 +325,7 @@ def configure_idle_PSU(PSU,configDUT):
 # do idle / DUT break-in #
 ##########################
 
-def do_idle(PSU1,PSU2,seconds,file=None,wait_for_TEMP=False):
+def do_idle(PSU1,PSU2,HEATER,seconds,file=None,wait_for_TEMP=False):
 	
 	REG = None
 
@@ -360,8 +388,8 @@ def do_idle(PSU1,PSU2,seconds,file=None,wait_for_TEMP=False):
 			Ir = r[1]
 			
 			T_HB = HEATER.get_temperature_string()
-
-			t = "Idling ({:.1f}".format(time.time()-t0-heater_delays) + ' of ' + "{:.1f}".format(seconds) + ' s): ' + "U0={:.3f} V".format(Uf) + '  ' + "I0={:.3f} A".format(If) + '  ' + "Uc={:.3f} V".format(Ur) + '  ' + "Ic={:.3f} A".format(Ir) + '  ' + "T="+T_HB+" °C"
+			
+			t = "Idling ({:.1f}".format(time.time()-t0-heater_delays) + ' of ' + "{:.1f}".format(seconds) + ' s): ' + "U1={:10.6f} V".format(Uf) + '  ' + "I1={:10.6f} A".format(If) + '  ' + "U2={:10.6f} V".format(Ur) + '  ' + "I2={:10.6f} A".format(Ir) + '  ' + "T="+T_HB+" °C"
 			print (t, end="\r")
 
 			if f[2] == "CC":
@@ -388,4 +416,5 @@ def do_idle(PSU1,PSU2,seconds,file=None,wait_for_TEMP=False):
 
 		# write idle / preheat conditions to file:
 		if file is not None:
-			printit("* OPERATING POINT AT END OF PREHEAT / IDLE: " "U0={:.3f} V".format(Uf) + '  ' + "I0={:.3f} A".format(If) + '  ' + "Uc={:.3f} V".format(Ur) + '  ' + "Ic={:.3f} A".format(Ir) + '  ' + "T="+T_HB , file , '%')
+			printit("* OPERATING POINT AT END OF PREHEAT / IDLE: " "U1={:10.6f} V".format(Uf) + '  ' + "I1={:10.6f} A".format(If) + '  ' + "U2={:10.6f} V".format(Ur) + '  ' + "I2={:10.6f} A".format(Ir) + '  ' + "T="+T_HB , file , '%')
+			
