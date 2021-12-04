@@ -24,6 +24,7 @@ import lib.powersupply_BK as powersupply_BK
 #    .IRESSET               resolution of current setting (A)
 #    .VRESREAD              resolution of voltage readings (V)
 #    .IRESREAD              resolution of current readings (A)
+#    .VOFFSETMAX            max. offset of V read vs set
 #    .MAXSETTLETIME         max. time allowed to attain stable output values (will complain if output not stable after this time) (s)
 #    .READIDLETIME          idle time between readings for checking if output values of newly set voltage/current values are at set point, or when checking if consecutive measurement readings are consistent (s)
 #    .TEST_VSTART           start value for test (V)
@@ -62,6 +63,8 @@ class PSU:
 		self.PMAX = 0.0
 		self.VRESREAD = 0.0
 		self.IRESREAD = 0.0
+		self.VOFFSETMAX = 0.0
+		self.IOFFSETMAX = 0.0
 		self.TEST_VSTART = 0.0
 		self.TEST_VEND = 0.0
 		self.TEST_ILIMIT = 0.0
@@ -134,9 +137,11 @@ class PSU:
 			self.READIDLETIME = self._PSU[k].READIDLETIME
 
 			for k in range(num_PSU):
-				self.VMIN = self.VMIN + self._PSU[k].VMIN
-				self.VMAX = self.VMAX + self._PSU[k].VMAX
-				self.PMAX = self.PMAX + self._PSU[k].PMAX
+				self.VMIN += self._PSU[k].VMIN
+				self.VMAX += self._PSU[k].VMAX
+				self.PMAX += self._PSU[k].PMAX
+				self.VOFFSETMAX += self._PSU[k].VOFFSETMAX
+				self.IOFFSETMAX += self._PSU[k].IOFFSETMAX
 				if self.IMAX > self._PSU[k].IMAX:
 					self.IMAX = self._PSU[k].IMAX;
 				if self.VRESSET < self._PSU[k].VRESSET:
@@ -215,13 +220,16 @@ class PSU:
 			t0 = time.time() # start time (now)
 
 			r = self.read()
+			
+			delta = None
 
 			while not time.time() > t0+self.MAXSETTLETIME:
 				if r[2] == "CC":
 					limit = limit + 1
 					if limit > limit_max:
 						break
-				if abs(r[0] - value) <= 1.3*self.VRESREAD:
+				delta = abs(r[0] - value)
+				if delta <= 1.3*self.VRESREAD + self.VOFFSETMAX:
 					stable = True
 					break
 				time.sleep(self.READIDLETIME)
@@ -232,7 +240,7 @@ class PSU:
 					pass
 					### print(self.LABEL + ': voltage setpoint running into current limit mode. Skip waiting for stable output voltage...')
 				else:
-					print (self.LABEL + ' warning: voltage setpoint not reached after ' + str(self.MAXSETTLETIME) + ' s!')
+					print (self.LABEL + ' warning: voltage setpoint not reached after ' + str(self.MAXSETTLETIME) + ' s! Offset = ' + str(delta) + ' V')
 
 
 	########################################################################################################
@@ -283,7 +291,7 @@ class PSU:
 				if r[2] == "CV":
 					print(self.LABEL + ': current setpoint running into voltage limit mode. Skip waiting for stable output current...')
 				else:
-					print (self.LABEL + ' warning: current setpoint not reached after ' + str(self.MAXSETTLETIME) + ' s!')
+					print (self.LABEL + ' warning: current setpoint not reached after ' + str(self.MAXSETTLETIME) + ' s! Offset = ' + str(delta) + ' A')
 
 
 	########################################################################################################

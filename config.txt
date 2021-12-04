@@ -6,17 +6,20 @@
 [PSU1]
 COMPORT = /dev/serial/by-id/usb-Prolific_Technology_Inc._USB-Serial_Controller-if00-port0
 TYPE = BK
-NUMSTABLEREAD = 2
+### NUMSTABLEREAD = 2
+NUMSTABLEREAD = 1
 
 ### COMPORT = /dev/serial/by-id/usb-nuvoton_KORAD_USB_Mode_48EA53743933-if00
 ### TYPE = KORAD
 ### NUMSTABLEREAD = 3
+### NUMSTABLEREAD = 1
 
 
 [PSU2]
 COMPORT = /dev/serial/by-id/usb-nuvoton_KORAD_USB_Mode_48DB467A3733-if00
 TYPE = KORAD
-NUMSTABLEREAD = 3
+### NUMSTABLEREAD = 3
+NUMSTABLEREAD = 1
 
 
 

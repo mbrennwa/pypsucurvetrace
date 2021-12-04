@@ -57,13 +57,14 @@ def start_new_logfile(do_batch=False, basename=None, step=None):
 	while samplename is None:
 
 		# ask for sample name:
-		if basename is None:
+		while basename is None:
 			if do_batch:
 				basename = input('Enter batch base name / label: ')
-				step = __get_number('Enter number of first step in batch: ', allowNegative=False, allowZero=False, typ='int')
 			else:
 				basename = input('Enter base name / label: ')
-				step = None
+			if basename == '':
+				print('Name must not be empty!')
+				basename = None
 		basename = basename.strip()
 
 		# determine step number:
@@ -74,22 +75,22 @@ def start_new_logfile(do_batch=False, basename=None, step=None):
 				step = __get_number('Enter number of first step in batch: ', allowNegative=False, allowZero=False, typ='int')
 
 		# determine sample name:
-		if step is None:
-			samplename = basename
-		else:
-			samplename = basename + '_' + str(step)
+		samplename = basename
+		if step != None:
+			samplename = samplename + '_' + str(step)
 		
 		# name of data file:
 		logfilename = samplename + '.dat'
 		
 		# check if data file exists:
 		if os.path.exists(logfilename):
-			samplename = None
 			u = 'Data / log file ' + logfilename + ' exists!'
-			if do_batch and (basename is not None):
+			if do_batch:
 				input (u + ' Try moving the file out of the way, then press ENTER...')
 			else:
 				print(u + ' Please try a different name...')
+			samplename = None
+			basename = None
 
 	# start logfile:
 	logfile = open(logfilename,'w')
@@ -387,7 +388,7 @@ def do_idle(PSU1,PSU2,HEATER,seconds,file=None,wait_for_TEMP=False):
 			
 			T_HB = HEATER.get_temperature_string()
 			
-			t = "Idling ({:.1f}".format(time.time()-t0-heater_delays) + ' of ' + "{:.1f}".format(seconds) + ' s): ' + "U1={:10.6f} V".format(Uf) + '  ' + "I1={:10.6f} A".format(If) + '  ' + "U2={:10.6f} V".format(Ur) + '  ' + "I2={:10.6f} A".format(Ir) + '  ' + "T="+T_HB+" °C"
+			t = "Idling ({:.1f}".format(time.time()-t0-heater_delays) + ' of ' + "{:.1f}".format(seconds) + ' s): ' + "U0={:10.6f} V".format(FIX.TEST_POLARITY*Uf) + '  ' + "I0={:10.6f} A".format(FIX.TEST_POLARITY*If) + '  ' + "Uc={:10.6f} V".format(REG.TEST_POLARITY*Ur) + '  ' + "Ic={:10.6f} A".format(REG.TEST_POLARITY*Ir) + '  ' + "T="+T_HB+" °C"
 			print (t, end="\r")
 
 			if f[2] == "CC":
@@ -414,5 +415,5 @@ def do_idle(PSU1,PSU2,HEATER,seconds,file=None,wait_for_TEMP=False):
 
 		# write idle / preheat conditions to file:
 		if file is not None:
-			printit("* OPERATING POINT AT END OF PREHEAT / IDLE: " "U1={:10.6f} V".format(Uf) + '  ' + "I1={:10.6f} A".format(If) + '  ' + "U2={:10.6f} V".format(Ur) + '  ' + "I2={:10.6f} A".format(Ir) + '  ' + "T="+T_HB , file , '%')
+			printit("* OPERATING POINT AT END OF PREHEAT / IDLE: " "U0={:10.6f} V".format(FIX.TEST_POLARITY*Uf) + '  ' + "I0={:10.6f} A".format(FIX.TEST_POLARITY*If) + '  ' + "Uc={:10.6f} V".format(REG.TEST_POLARITY*Ur) + '  ' + "Ic={:10.6f} A".format(REG.TEST_POLARITY*Ir) + '  ' + "T="+T_HB , file , '%')
 			

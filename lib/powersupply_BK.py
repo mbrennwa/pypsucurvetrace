@@ -7,11 +7,12 @@ import sys
 import time
 
 
-# Python dictionary of known B&K power supply models (Vmin,Vmax,Imax,Pmax,VresolutionSet,IresolutionSet,VresolutionRead,IresolutionRead,MaxSettleTime)
+# Python dictionary of known B&K power supply models (Vmin,Vmax,Imax,Pmax,VresolutionSet,IresolutionSet,VresolutionRead,IresolutionRead,VoffsetMax,IoffsetMax,MaxSettleTime)
 BK_SPECS = {
-		"9185B_HIGH":	( 0.0, 610.0,  0.35, 210,  0.02,    0.00001, 0.3,    0.0015,  2.0 ),  # 9185B in "HIGH" setting, confirmed working
-		"9185B_LOW":	( 0.0, 400.0,  0.5 , 210,  0.02,    0.00001, 0.3,    0.0015,  2.0 ),  # 9185B in "LOW" setting, confirmed working
-		"9120A":	    ( 0.0, 32.0,   3.0 , 96,   0.0005,  0.0001,  0.0001, 0.00001, 2.0 )   # 9120A, currently testing / under construction
+		"9185B_HIGH":	( 0.0, 610.0,  0.35, 210,  0.02,    0.00001, 0.3,    0.0015, 0.02, 0.0, 2.0 ),  # 9185B in "HIGH" setting, confirmed working
+		"9185B_LOW":	( 0.0, 400.0,  0.5 , 210,  0.02,    0.00001, 0.3,    0.0015, 0.02, 0.0, 2.0 ),  # 9185B in "LOW" setting, confirmed working
+		# "9120A":	    ( 0.0, 32.0,   3.0 , 96,   0.0005,  0.0001,  0.0001, 0.00001, 2.0 )   # 9120A, currently testing / under construction
+		"9120A":	    ( 0.0, 32.0,   3.0 , 96,   0.0005,  0.0001,  0.0001, 0.00001, 0.012, 0.0002, 2.0 )   # 9120A, currently testing / under construction
 }
 
 BK_TIMEOUT = 2.0
@@ -32,6 +33,8 @@ def _BK_debug(s):
 #    .IRESSET
 #    .VRESREAD
 #    .IRESREAD
+#    .VOFFSETMAX
+#    .IOFFSETMAX
 #    .MAXSETTLETIME
 #    .READIDLETIME
 #    .MODEL
@@ -112,8 +115,14 @@ class BK(object):
 			self.IRESSET = v[5]
 			self.VRESREAD = v[6]
 			self.IRESREAD = v[7]
-			self.MAXSETTLETIME = v[8]
+			self.VOFFSETMAX = v[8]
+			self.IOFFSETMAX = v[9]
+			self.MAXSETTLETIME = v[10]
 			self.READIDLETIME = self.MAXSETTLETIME/50
+			
+			# helper fields to work around the issue with the readdout of the CV/CC limiter:
+			self._VLIMITSETTING = None
+			self._ILIMITSETTING = None
 
 			# Clear status and errors:
 			self._query('*CLS',answer=False)
@@ -141,21 +150,19 @@ class BK(object):
 			if self._debug:
 				_BK_debug('*** Retrying (attempt ' + str(attempt) + ')...')
 
-		# just in case, make sure the buffers are empty before doing anything
-		self._Serial.reset_output_buffer()
-		self._Serial.reset_input_buffer()
-		time.sleep(0.03)
-
-		if self._debug: _BK_debug('B&K <- %s\n' % cmd)
+		if self._debug:
+			_BK_debug('B&K <- %s\n' % cmd)
 		self._Serial.write((cmd + '\n').encode())
 		
 		if not answer:
 			ans = None
 		else:
 			ans = self._Serial.readline().decode('utf-8').rstrip("\n\r")
-			if self._debug: _BK_debug('B&K -> %s\n' % ans)
+			if self._debug:
+				_BK_debug('B&K -> %s\n' % ans)
 			if ans == '':
-				### _BK_debug('*** No answer from B&K PSU! Command: ' + cmd)
+				if self._debug:
+					_BK_debug('*** No answer from B&K PSU! Command: ' + cmd)
 				self._Serial.flushOutput()			
 				time.sleep(0.1)
 				self._Serial.flushInput()
@@ -163,6 +170,7 @@ class BK(object):
 				ans = self._query(cmd,True,attempt+1, max_attempts)
 
 		return ans
+		
 
 	def output(self, state):
 		"""
@@ -186,6 +194,7 @@ class BK(object):
 			volt = self.VMIN
 		volt = round (volt/self.VRESSET) * self.VRESSET
 		self._query('SOURCE:VOLTAGE ' + str(volt),answer=False)
+		self._VLIMITSETTING = volt
 
 
 	def current(self, current):
@@ -198,19 +207,24 @@ class BK(object):
 			current = 0.0
 		current = round (current/self.IRESSET) * self.IRESSET
 		self._query('SOURCE:CURRENT ' + str(current),answer=False)
-
+		self._ILIMITSETTING = current
 
 	def reading(self):
 		"""
 		read applied output voltage and current and if PS is in "CV" or "CC" mode
 		"""
-
+		
+		self._query('*CLS', answer=False)
+		
 		# read voltage:
 		k = 1
 		while True:
 			try:
 				if k > 10:
 					raise RuntimeException("Could not read voltage from B&K PSU!")
+					
+				### # read voltage TWICE, as some units sometimes return awkward numbers with the first reading
+				### V = float (self._query('MEASURE:VOLTAGE?'))
 				V = float (self._query('MEASURE:VOLTAGE?'))
 				break
 			except:
@@ -227,6 +241,11 @@ class BK(object):
 				if k > 10:
 					raise RuntimeException("Could not read current from B&K PSU!")
 				I = float (self._query('MEASURE:CURRENT?'))
+				### if I > 1.1*self.IMAX:
+				### 	# The BK 9120A sometimes reports wrong current numbers that are way higher than the possible max value, so try one more time!
+				### 	k = k+1
+				### else:
+				### 	break
 				break
 			except:
 				k = k+1
@@ -236,23 +255,44 @@ class BK(object):
 				pass
 
 		# read output limit status:
-		k = 1
-		while True:
-			try:
-				if k > 10:
-					raise RuntimeException("Could not read output limit status from B&K PSU!")					
-				S = int(self._query('STATus:OPERation:CONDition?'))
-				if S&8 != 0:
+		### k = 1
+		### while True:
+		### 	try:
+		### 		if k > 10:
+		### 			raise RuntimeException("Could not read output limit status from B&K PSU!")
+		### 			
+		### 		# THIS SOMEHOW MESSES UP THE COMMUNICATION WITH THE PSU:				
+		### 		S = int(self._query('STATus:OPERation:CONDition?'))
+		### 		
+		### 		if S&8 != 0:
+		### 			S = 'CC'
+		### 		elif S&4 != 0:
+		### 			S = 'CV'
+		### 		else:
+		### 			S = None
+		### 			print('BK PSU: Could not determine CV or CC condition.')
+		### 		break
+		### 	except:
+		### 		k = k+1
+		### 		self._Serial.reset_output_buffer()
+		### 		self._Serial.reset_input_buffer()
+		### 		time.sleep(0.05)
+		### 		pass
+		
+		# Reading the CV/CC mode from the PSU unit messes up the communication with the PSU
+		# Try to determine the CV/CC mode from the V and I readings:
+		
+		S = 'CV'
+		if self._ILIMITSETTING is None:
+			# ILIMITSETTING has not yet been set in self.current()
+			print('_ILIMITSETTING is None.')
+			S = '?'
+		else:
+			if I >= self._ILIMITSETTING - self.IRESREAD - self.IOFFSETMAX:
+				# the current reading is close to the ILIMITSETTING value
+				if V < self._VLIMITSETTING - self.VRESREAD - self.VOFFSETMAX:
+					# the voltage reading is clearly lower to the VLIMITSETTING value
 					S = 'CC'
-				else:
-					S = 'CV'
-				break
-			except:
-				k = k+1
-				self._Serial.reset_output_buffer()
-				self._Serial.reset_input_buffer()
-				time.sleep(0.05)
-				pass
 
 		return (V, I, S)
 

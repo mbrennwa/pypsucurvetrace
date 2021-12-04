@@ -41,6 +41,8 @@ def _pps_debug(s):
 #    .IRESSET
 #    .VRESREAD
 #    .IRESREAD
+#    .VOFFSETMAX
+#    .VOFFSETMAX
 #    .MAXSETTLETIME
 #    .READIDLETIME
 #    .MODEL
@@ -99,6 +101,8 @@ class VOLTCRAFT(object):
 		# self.VRESREAD = 0.12
 		self.VRESREAD = 0.1
 		self.IRESREAD = 0.01
+		self.VOFFSETMAX = 0.0
+		self.IOFFSETMAX = 0.0
 		self.MAXSETTLETIME = 5
 		self.READIDLETIME = 0.2
 		self.PMAX = math.floor(self.VMAX * self.IMAX)

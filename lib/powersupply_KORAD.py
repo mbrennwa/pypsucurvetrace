@@ -11,17 +11,18 @@ import serial
 import sys
 import time
 
-# Python dictionary of known KORAD (RND) power supply models (Vmin,Vmax,Imax,Pmax,VresolutionSet,IresolutionSet,VresolutionRead,IresolutionRead,MaxSettleTime)
+# Python dictionary of known KORAD (RND) power supply models (Vmin,Vmax,Imax,Pmax,VresolutionSet,IresolutionSet,VresolutionRead,IresolutionRead,VoffsetMax,IoffsetMax,MaxSettleTime)
+
 KORAD_SPECS = {
-		"KA3003P":	( 0.0, 31.0,  3.0,  90,  0.01,  0.001, 0.01,  0.001, 2.0 ) , # not confirmed
-		"KA3005P":	( 0.0, 31.0,  5.1, 150,  0.01,  0.001, 0.01,  0.001, 2.0 ) , # confirmed (with the RND incarnation of the KA3005P)
-		"KD3005P":	( 0.0, 31.0,  5.1, 150,  0.01,  0.001, 0.01,  0.001, 2.0 ) , # not confirmed
-		"KA3010P":	( 0.0, 31.0, 10.0, 300,  0.01,  0.001, 0.01,  0.001, 2.0 ) , # not confirmed
-		"KA6002P":	( 0.0, 60.0,  2.0, 120,  0.01,  0.001, 0.01,  0.001, 2.0 ) , # not confirmed
-		"KA6003P":	( 0.0, 60.0,  3.0, 180,  0.01,  0.001, 0.01,  0.001, 2.0 ) , # not confirmed
-		"KA6005P":	( 0.0, 31.0,  5.0, 300,  0.01,  0.001, 0.01,  0.001, 2.0 ) , # not confirmed
-		"KD6005P":	( 0.0, 31.0,  5.0, 300,  0.01,  0.001, 0.01,  0.001, 2.0 ) , # not confirmed
-		"KWR103":	( 0.0, 60.5, 15.0, 300, 0.001,  0.001, 0.001, 0.001, 2.0 )   # confirmed (with the RND incarnation of the KWR103
+		"KA3003P":	( 0.0, 31.0,  3.0,  90,  0.01,  0.001, 0.01,  0.001, 0.0, 0.0, 2.0 ) , # not confirmed
+		"KA3005P":	( 0.0, 31.0,  5.1, 150,  0.01,  0.001, 0.01,  0.001, 0.0, 0.0, 2.0 ) , # confirmed (with the RND incarnation of the KA3005P)
+		"KD3005P":	( 0.0, 31.0,  5.1, 150,  0.01,  0.001, 0.01,  0.001, 0.0, 0.0, 2.0 ) , # not confirmed
+		"KA3010P":	( 0.0, 31.0, 10.0, 300,  0.01,  0.001, 0.01,  0.001, 0.0, 0.0, 2.0 ) , # not confirmed
+		"KA6002P":	( 0.0, 60.0,  2.0, 120,  0.01,  0.001, 0.01,  0.001, 0.0, 0.0, 2.0 ) , # not confirmed
+		"KA6003P":	( 0.0, 60.0,  3.0, 180,  0.01,  0.001, 0.01,  0.001, 0.0, 0.0, 2.0 ) , # not confirmed
+		"KA6005P":	( 0.0, 31.0,  5.0, 300,  0.01,  0.001, 0.01,  0.001, 0.0, 0.0, 2.0 ) , # not confirmed
+		"KD6005P":	( 0.0, 31.0,  5.0, 300,  0.01,  0.001, 0.01,  0.001, 0.0, 0.0, 2.0 ) , # not confirmed
+		"KWR103":	( 0.0, 60.5, 15.0, 300, 0.001,  0.001, 0.001, 0.001, 0.0, 0.0, 2.0 )   # confirmed (with the RND incarnation of the KWR103
 }
 
 KORAD_TIMEOUT = 2.0
@@ -42,6 +43,9 @@ def _KORAD_debug(s):
 #    .IRESSET
 #    .VRESREAD
 #    .IRESREAD
+#    .VOFFSETMAX
+#    .VOFFSETMAX
+#    .IOFFSETMAX
 #    .MAXSETTLETIME
 #    .READIDLETIME
 #    .MODEL
@@ -114,7 +118,9 @@ class KORAD(object):
 			self.IRESSET = v[5]
 			self.VRESREAD = v[6]
 			self.IRESREAD = v[7]
-			self.MAXSETTLETIME = v[8]
+			self.VOFFSETMAX = v[8]
+			self.IOFFSETMAX = v[9]
+			self.MAXSETTLETIME = v[10]
 			self.READIDLETIME = self.MAXSETTLETIME/50
 
 		except serial.SerialTimeoutException:
