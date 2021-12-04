@@ -293,10 +293,6 @@ def configure_idle_PSU(PSU,configDUT):
 				PSU.TEST_IDLE_GM = float(configDUT['IDLE_GM']) # unknown transconductance (delta-I1 / delta-U2 or delta-U2 / delta-I1 in A/V)
 			PSU.TEST_IIDLE = float(configDUT['IIDLE'])
 
-
-			print(PSU.TEST_VIDLE_MAX)
-			print('*******************************************')
-
 		else:
 			print ('\n' + 'configure ' + PSU.LABEL + ' idle settings:')
 			PSU.TEST_VIDLE = __get_number('* ' + PSU.LABEL + ' idle voltage (V): ',allowZero=True,allowNegative=False,typ='float')
