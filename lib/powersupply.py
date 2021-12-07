@@ -5,6 +5,7 @@ Classes of specific real-world power supplies will derive from this class.
 
 import time
 import numpy as np
+from numpy.polynomial.polynomial import polyval
 import lib.powersupply_VOLTCRAFT as powersupply_VOLTCRAFT
 import lib.powersupply_KORAD as powersupply_KORAD
 import lib.powersupply_BK as powersupply_BK
@@ -27,6 +28,10 @@ import lib.powersupply_BK as powersupply_BK
 #    .VOFFSETMAX            max. offset of V read vs set
 #    .MAXSETTLETIME         max. time allowed to attain stable output values (will complain if output not stable after this time) (s)
 #    .READIDLETIME          idle time between readings for checking if output values of newly set voltage/current values are at set point, or when checking if consecutive measurement readings are consistent (s)
+#    .V_SET_CALPOLY         tuple of polynomial coefficients ai, such that for a desired voltage output x the correct setpoint y is given by y(x) = a0 + a1*x + a2*x^2 + ...
+#    .V_READ_CALPOLY        tuple of polynomial coefficients ai, such that for a given voltage reading the true input voltage y is given by y(x) = a0 + a1*x + a2*x^2 + ...
+#    .I_SET_CALPOLY         same as I_SET_CALPOLY, but for I setting
+#    .I_READ_CALPOLY        same as V_READ_CALPOLY, but for I reading
 #    .TEST_VSTART           start value for test (V)
 #    .TEST_VEND             end value for test (V)
 #    .TEST_ILIMIT           current limit for test (A)
@@ -45,7 +50,7 @@ class PSU:
 	Abstract power supply (PSU) class
 	"""
 
-	def __init__(self, port=None, commandset=None, label=None):
+	def __init__(self, port=None, commandset=None, label=None, V_SET_CALPOLY=None, V_READ_CALPOLY=None, I_SET_CALPOLY=None, I_READ_CALPOLY=None):
 		'''
 		PSU(port, type, label)
 		port : serial port (string, example: port = '/dev/serial/by-id/XYZ_123_abc')
@@ -65,6 +70,34 @@ class PSU:
 		self.IRESREAD = 0.0
 		self.VOFFSETMAX = 0.0
 		self.IOFFSETMAX = 0.0
+
+		# CALPOLY fields:
+		if V_SET_CALPOLY is None:
+			self.V_SET_CALPOLY = (0, 1)
+		else:
+			self.V_SET_CALPOLY = V_SET_CALPOLY
+		if V_READ_CALPOLY is None:
+			self.V_READ_CALPOLY = (0, 1)
+		else:
+			self.V_READ_CALPOLY = V_READ_CALPOLY
+		if I_SET_CALPOLY is None:
+			self.I_SET_CALPOLY = (0, 1)
+		else:
+			self.I_SET_CALPOLY = I_SET_CALPOLY
+		if I_READ_CALPOLY is None:
+			self.I_READ_CALPOLY = (0, 1)
+		else:
+			self.I_READ_CALPOLY = I_READ_CALPOLY
+			
+		print('***********************************************')
+		print('***********************************************')
+		print('***********************************************')
+		print('***********************************************')
+		print('***********************************************')
+		print('***********************************************')
+		print(type(self.I_SET_CALPOLY))
+		
+		# TEST config:
 		self.TEST_VSTART = 0.0
 		self.TEST_VEND = 0.0
 		self.TEST_ILIMIT = 0.0
@@ -208,7 +241,13 @@ class PSU:
 
 		for k in range(len(self._PSU)):
 			if self._PSU[k].COMMANDSET in [ 'KORAD' , 'VOLTCRAFT' , 'BK' ]:
-				self._PSU[k].voltage(V[k])
+				
+				# determine corrected voltage setpoint:
+				VV = polyval(V[k], self.V_SET_CALPOLY)
+				
+				# set voltage at the PSU:
+				self._PSU[k].voltage(VV)
+				
 			else:
 				raise RuntimeError('Cannot set voltage on power supply with ' + self.COMMANDSET + ' command set.')
 
@@ -266,7 +305,13 @@ class PSU:
 
 		for k in range(len(self._PSU)):
 			if self._PSU[k].COMMANDSET in [ 'KORAD' , 'VOLTCRAFT' , 'BK' ]:
-				self._PSU[k].current(value)
+			
+							
+				# determine corrected current setpoint:
+				VV = polyval(value, self.I_SET_CALPOLY)
+				
+				# set current at the PSU:
+				self._PSU[k].current(VV)
 			else:
 				raise RuntimeError('Cannot set current on power supply with ' + self.COMMANDSET + ' command set.')
 
@@ -383,6 +428,12 @@ class PSU:
 			for k in range(len(self._PSU)):
 				if self._PSU[k].COMMANDSET in [ 'KORAD' , 'VOLTCRAFT' , 'BK' ]:
 					vv,ii,ll = self._PSU[k].reading()
+					
+					# determine corrected reading values:
+					vv = polyval(vv, self.V_READ_CALPOLY)
+					ii = polyval(ii, self.V_READ_CALPOLY)
+
+					# add values to the list:					
 					v.append(vv)
 					i.append(ii)
 					l.append(ll)

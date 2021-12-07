@@ -562,6 +562,11 @@ try:
 						logfile )
 
 			print ('Curve tracing completed.')
+			
+		# Turn off PSUs:
+		for p in [PSU1, PSU2]:
+			if p.CONNECTED:
+				p.turnOff()
 	
 		if batch_mode:
 			# prepare next step and file:

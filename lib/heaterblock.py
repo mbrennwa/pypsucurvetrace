@@ -24,18 +24,23 @@ class heater:
 
 	def __init__(self, config, target_temperature=0.0, init_on = False):
 		
+		# set / init all fields before trying to read from config file (which may not have all fields):
+		self._PSU   = None
+		self._TSENS = None
+		self._power_is_on = False
+		self._target_T = target_temperature
+
+		# thread to read T sensor and for PID control:
+		self._controller = heater_control_thread(self)
+
+
 		# try to connect / configure PSU and TSENSOR, and start controller thread:
 		try:
 
-			self._PSU   = None
-			self._TSENS = None
-
+			# read from config file and set up heater accordingly:
 			self._T_buffer         = tuple(None for i in range(int(config['HEATERBLOCK']['TBUFFER_NUM'])))
 			self._T_buffer_seconds = float(config['HEATERBLOCK']['TBUFFER_INTERVAL'])
 			self._T_buffer_last    = time.time() - self._T_buffer_seconds
-
-			self._target_T = target_temperature
-
 			if config['HEATERBLOCK']['TEMPSENS_TYPE'].upper() != 'DS1820':
 				raise ValueError('Unknown T sensor type ' + config['HEATERBLOCK']['TEMPSENS_TYPE'] + '.')
 			
@@ -64,9 +69,7 @@ class heater:
 			self._PID_Ki = float(config['HEATERBLOCK']['KI'])
 			self._PID_Kd = float(config['HEATERBLOCK']['KD'])
 
-			# thread to read T sensor and for PID control:
-			### self._controller = heater_control_thread( self, float(config['HEATERBLOCK']['CONTROLLER_SECONDS']))
-			self._controller = heater_control_thread(self)
+			# start heater controller thread:
 			self._controller.start()
 
 			# turn heater on (if required):
@@ -257,10 +260,15 @@ class heater_control_thread(Thread):
 		### self._interval = interval_seconds
 		
 		# Init and configure PID controller:
-		self._pid = PID(Kp=self._heaterblock._PID_Kp, Ki=self._heaterblock._PID_Ki, Kd=self._heaterblock._PID_Kd)
-		self._pid.output_limits = (0, self._heaterblock.max_power)
-
-		self._do_run = True
+		self._pid = None
+		self._do_run = False
+		try:
+			self._pid = PID(Kp=self._heaterblock._PID_Kp, Ki=self._heaterblock._PID_Ki, Kd=self._heaterblock._PID_Kd)
+			self._pid.output_limits = (0, self._heaterblock.max_power)
+			self._do_run = True
+		except:
+			# may fail if heaterblock is not really set up
+			pass
 		self._is_running = False
 	
 		

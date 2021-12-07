@@ -118,6 +118,14 @@ def printit(text,f='',comm='', terminal_output=True):
 	return
 
 
+
+def __convert_str_tuple(x):
+	# convert string x = "(1,2,3)" to tuple of floats y = (1.0, 2.0, 3.0)
+	return tuple(float(s) for s in x.strip("()").split(","))
+
+
+
+
 ###########################
 # connect to power supply #
 ###########################
@@ -162,10 +170,32 @@ def connect_PSU(configTESTER,label):
 			except ValueError:
 				print("Could not parse TYPEs of stacked PSUs.")
 				exit()
+				
+		# read "calibration curves" (polynomials), if specified:
+		try:
+			V_SET_CALPOLY = __convert_str_tuple(configTESTER[label]['V_SET_CALPOLY'])
+		except:
+			V_SET_CALPOLY = (0, 1)
+			pass
+		try:
+			V_READ_CALPOLY = __convert_str_tuple(configTESTER[label]['V_READ_CALPOLY'])
+		except:
+			V_READ_CALPOLY = (0, 1)
+			pass
+		try:
+			I_SET_CALPOLY = __convert_str_tuple(configTESTER[label]['I_SET_CALPOLY'])
+		except:
+			I_SET_CALPOLY = (0, 1)
+			pass
+		try:
+			I_READ_CALPOLY = __convert_str_tuple(configTESTER[label]['I_SET_CALPOLY'])
+		except:
+			I_READ_CALPOLY = (0, 1)
+			pass
 
 		# connect to PSU(s):
 		print ('Connecting to power supply ' + label + '...')
-		P = powersupply.PSU(port,commandset,label)
+		P = powersupply.PSU(port, commandset, label, V_SET_CALPOLY, V_READ_CALPOLY, I_SET_CALPOLY, I_READ_CALPOLY)
 
 		# set number of consistent readings for measurements (optional):
 		if 'NUMSTABLEREAD' in configTESTER[label]:
