@@ -4,9 +4,9 @@
 
 
 [PSU1]
+# BK 9120A
 COMPORT = /dev/serial/by-id/usb-Prolific_Technology_Inc._USB-Serial_Controller-if00-port0
 TYPE = BK
-### NUMSTABLEREAD = 2
 NUMSTABLEREAD = 1
 
 
@@ -21,6 +21,7 @@ NUMSTABLEREAD = 1
 
 
 [PSU2]
+### KORAD/RND KWR103, PSU LABEL #1
 COMPORT = /dev/serial/by-id/usb-nuvoton_KORAD_USB_Mode_48EA53743933-if00
 TYPE = KORAD
 ### NUMSTABLEREAD = 3
@@ -37,7 +38,7 @@ I_READ_CALPOLY = (0,1)
 ###     (optional -- delete if not used)     ###
 ################################################
 
-[DEACTIVATED_HEATERBLOCK]
+[HEATERBLOCK]
 
 # PSU for heater:
 PSU_COMPORT = /dev/serial/by-id/usb-Silicon_Labs_CP2102_USB_to_UART_Bridge_Controller_0010-if00-port0

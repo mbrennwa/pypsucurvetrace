@@ -31,7 +31,7 @@ class heater:
 		self._target_T = target_temperature
 
 		# thread to read T sensor and for PID control:
-		self._controller = heater_control_thread(self)
+		self._controller = None
 
 
 		# try to connect / configure PSU and TSENSOR, and start controller thread:
@@ -68,8 +68,9 @@ class heater:
 			self._PID_Kp = float(config['HEATERBLOCK']['KP'])
 			self._PID_Ki = float(config['HEATERBLOCK']['KI'])
 			self._PID_Kd = float(config['HEATERBLOCK']['KD'])
-
-			# start heater controller thread:
+			
+			# heater controller thread:
+			self._controller = heater_control_thread(self)
 			self._controller.start()
 
 			# turn heater on (if required):
@@ -221,7 +222,7 @@ class heater:
 				T_tgt, T_tol = self.get_target_temperature()
 				T_now        = self.get_temperature(do_read=True)
 				
-				if T_now + T_tgt + T_tol:
+				if T_now > T_tgt + T_tol:
 					if DUT_PSU_allowed_turn_off is not None:
 						if DUT_PSU_allowed_turn_off.CONFIGURED:
 							DUT_PSU_allowed_turn_off.turnOff()
@@ -263,15 +264,16 @@ class heater_control_thread(Thread):
 		
 		# Init and configure PID controller:
 		self._pid = None
+		self._is_running = False
 		self._do_run = False
 		try:
 			self._pid = PID(Kp=self._heaterblock._PID_Kp, Ki=self._heaterblock._PID_Ki, Kd=self._heaterblock._PID_Kd)
 			self._pid.output_limits = (0, self._heaterblock.max_power)
 			self._do_run = True
-		except:
+		except :
 			# may fail if heaterblock is not really set up
+			logging.warning('Could not initialize heaterblock: ' + traceback.format_exc())
 			pass
-		self._is_running = False
 	
 		
 	def run(self):
