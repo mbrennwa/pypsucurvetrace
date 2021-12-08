@@ -27,7 +27,7 @@ logging.basicConfig(level=logging.DEBUG)
 import lib.powersupply as powersupply
 import lib.heaterblock as heaterblock
 
-from lib.curvetrace_tools import printit, connect_PSU, configure_test_PSU, configure_idle_PSU, do_idle, start_new_logfile
+from lib.curvetrace_tools import printit, connect_PSU, configure_test_PSU, configure_idle_PSU, do_idle, start_new_logfile, format_PSU_reading
 
 
 
@@ -515,13 +515,21 @@ try:
 						I1MEAS = np.median(I1MEAS)
 						V2MEAS = np.median(V2MEAS)
 						I2MEAS = np.median(I2MEAS)
-						T_HB   = np.median(T_HB)
+						try:
+							T_HB   = np.median(T_HB)
+						except:
+							T_HB = None
+							pass
 					else:
 						V1MEAS = np.mean(V1MEAS)
 						I1MEAS = np.mean(I1MEAS)
 						V2MEAS = np.mean(V2MEAS)
 						I2MEAS = np.mean(I2MEAS)
-						T_HB   = np.mean(T_HB)
+						try:
+							T_HB   = np.mean(T_HB)
+						except:
+							T_HB = None
+							pass
 						
 					# Check current limits (some PSUs are not very careful with this):
 					if I1MEAS > I1LIM:
@@ -548,18 +556,24 @@ try:
 							break # break out of the inner loop (V1 steps) and continue with the next V2 step
 
 					# Print results:
-					printit (	"{:10.6f}".format(V1*PSU1.TEST_POLARITY)	+ ' ' + 
-							"{:10.6f}".format(I1LIM*PSU1.TEST_POLARITY)	+ ' ' + 
-							"{:10.6f}".format(V1MEAS*PSU1.TEST_POLARITY)	+ ' ' +
-							"{:10.6f}".format(I1MEAS*PSU1.TEST_POLARITY)	+ ' ' + 
-							"{:5d}".format(LIMIT1)				+ ' ' +
-							"{:10.6f}".format(V2*PSU2.TEST_POLARITY)	+ ' ' +
-							"{:10.6f}".format(I2LIM*PSU2.TEST_POLARITY)	+ ' ' +
-							"{:10.6f}".format(V2MEAS*PSU2.TEST_POLARITY)	+ ' ' +
-							"{:10.6f}".format(I2MEAS*PSU2.TEST_POLARITY)	+ ' ' +
-							"{:5d}".format(LIMIT2)                          + ' ' +
-							"{:.2f}".format(T_HB) ,
-						logfile )
+					try:
+						T_HB = "{:.2f}".format(T_HB)
+					except:
+						T_HB = "NA"
+						pass
+					
+					t =  format_PSU_reading(V1*PSU1.TEST_POLARITY, PSU1.VRESSET)      + ' ' + \
+					     format_PSU_reading(I1LIM*PSU1.TEST_POLARITY, PSU1.IRESSET)   + ' ' + \
+					     format_PSU_reading(V1MEAS*PSU1.TEST_POLARITY, PSU1.VRESREAD) + ' ' + \
+					     format_PSU_reading(I1MEAS*PSU1.TEST_POLARITY, PSU1.IRESREAD) + ' ' + \
+					     "{:1d}".format(LIMIT1)				          + ' ' + \
+					     format_PSU_reading(V2*PSU2.TEST_POLARITY, PSU2.VRESSET)      + ' ' + \
+					     format_PSU_reading(I2LIM*PSU2.TEST_POLARITY, PSU2.IRESSET)   + ' ' + \
+					     format_PSU_reading(V2MEAS*PSU2.TEST_POLARITY, PSU2.VRESREAD) + ' ' + \
+					     format_PSU_reading(I2MEAS*PSU2.TEST_POLARITY, PSU2.IRESREAD) + ' ' + \
+					     "{:1d}".format(LIMIT2)                                       + ' ' + \
+					     T_HB
+					printit(t, logfile )
 
 			print ('Curve tracing completed.')
 			

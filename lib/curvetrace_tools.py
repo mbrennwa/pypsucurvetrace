@@ -5,7 +5,7 @@ Function definitison for use with curvetrace programs
 # imports:
 # import traceback
 import time
-# import math
+import math
 # import datetime
 # import configparser
 # import argparse
@@ -44,6 +44,21 @@ def __get_number(text,allowNegative = False,allowZero = True,typ='float'):
 			print ('  Invalid input! Try again...')
 	
 	return val
+
+
+#############################################################
+# format PSU reading as string (according to PSU resolution #
+#############################################################
+
+def format_PSU_reading(value, resolution):
+	
+	# number of digits:
+	digits = math.ceil(-math.log10(resolution)) # number of digits corresponding to PSU resolution
+	
+	# value string:	
+	fmt = "{:." + str(digits) + "f}"
+	s = fmt.format(value)
+	return s
 
 
 ############################################
@@ -413,8 +428,14 @@ def do_idle(PSU1,PSU2,HEATER,seconds,file=None,wait_for_TEMP=False):
 			Ir = r[1]
 			
 			T_HB = HEATER.get_temperature_string()
-			
-			t = "Idling ({:.1f}".format(time.time()-t0-heater_delays) + ' of ' + "{:.1f}".format(seconds) + ' s): ' + "U0={:10.6f} V".format(FIX.TEST_POLARITY*Uf) + '  ' + "I0={:10.6f} A".format(FIX.TEST_POLARITY*If) + '  ' + "Uc={:10.6f} V".format(REG.TEST_POLARITY*Ur) + '  ' + "Ic={:10.6f} A".format(REG.TEST_POLARITY*Ir) + '  ' + "T="+T_HB+" °C"
+
+			# output string / line			
+			t = "Idling ({:.1f}".format(time.time()-t0-heater_delays) + ' of ' + "{:.1f}".format(seconds) + ' s): ' + \
+			    "U0 = " + format_PSU_reading(FIX.TEST_POLARITY*Uf, FIX.VRESREAD) + " V" + '  ' + \
+			    "I0 = " + format_PSU_reading(FIX.TEST_POLARITY*If, FIX.IRESREAD) + " A" + '  ' + \
+			    "Uc = " + format_PSU_reading(REG.TEST_POLARITY*Ur, REG.VRESREAD) + " V" + '  ' + \
+			    "Ic = " + format_PSU_reading(REG.TEST_POLARITY*Ir, REG.IRESREAD) + " A" + '  ' + \
+			    "T = " + T_HB + " °C"
 			print (t, end="\r")
 
 			if f[2] == "CC":
@@ -441,5 +462,10 @@ def do_idle(PSU1,PSU2,HEATER,seconds,file=None,wait_for_TEMP=False):
 
 		# write idle / preheat conditions to file:
 		if file is not None:
-			printit("* OPERATING POINT AT END OF PREHEAT / IDLE: " "U0={:10.6f} V".format(FIX.TEST_POLARITY*Uf) + '  ' + "I0={:10.6f} A".format(FIX.TEST_POLARITY*If) + '  ' + "Uc={:10.6f} V".format(REG.TEST_POLARITY*Ur) + '  ' + "Ic={:10.6f} A".format(REG.TEST_POLARITY*Ir) + '  ' + "T="+T_HB , file , '%')
-			
+			t = '* OPERATING POINT AT END OF PREHEAT / IDLE: ' + \
+			    "U0 = " + format_PSU_reading(FIX.TEST_POLARITY*Uf, FIX.VRESREAD) + " V" + '  ' + \
+			    "I0 = " + format_PSU_reading(FIX.TEST_POLARITY*If, FIX.IRESREAD) + " A" + '  ' + \
+			    "Uc = " + format_PSU_reading(REG.TEST_POLARITY*Ur, REG.VRESREAD) + " V" + '  ' + \
+			    "Ic = " + format_PSU_reading(REG.TEST_POLARITY*Ir, REG.IRESREAD) + " A" + '  ' + \
+			    "T = " + T_HB + " °C"
+			printit(t, file , '%')

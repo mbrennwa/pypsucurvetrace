@@ -117,7 +117,9 @@ class heater:
 					self._T_buffer = self._T_buffer[1:] + (temp,)
 					self._T_buffer_last = now
 
-		return self._T_buffer[-1] # return last entry in T_buffer
+			temp = self._T_buffer[-1] # return last entry in T_buffer
+
+		return temp
 		
 
 	def get_temperature_string(self, do_read = True):
