@@ -421,10 +421,6 @@ class PSU:
 				if self._PSU[k].COMMANDSET in [ 'KORAD' , 'VOLTCRAFT' , 'BK' ]:
 					vv,ii,ll = self._PSU[k].reading()
 					
-					# determine corrected reading values:
-					vv = polyval(vv, self.V_READ_CALPOLY)
-					ii = polyval(ii, self.V_READ_CALPOLY)
-
 					# add values to the list:					
 					v.append(vv)
 					i.append(ii)
@@ -489,6 +485,9 @@ class PSU:
 				else:
 					L = "CV"
 					
-		# add external offset voltage (if any)
+		# determine corrected reading values:
+		V = polyval(V, self.V_READ_CALPOLY)
+		I = polyval(I, self.I_READ_CALPOLY)
+
 
 		return (V,I,L)

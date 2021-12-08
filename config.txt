@@ -8,6 +8,11 @@
 COMPORT = /dev/serial/by-id/usb-Prolific_Technology_Inc._USB-Serial_Controller-if00-port0
 TYPE = BK
 NUMSTABLEREAD = 1
+V_SET_CALPOLY  = (-0.00075,1.0)
+V_READ_CALPOLY = (-0.00001,1.0)
+I_SET_CALPOLY  = (0.0,1.0)
+% I_READ_CALPOLY = (-1.9677e-04,1.0)
+I_READ_CALPOLY = (0.0005,1.0)
 
 
 ### COMPORT = /dev/serial/by-id/usb-nuvoton_KORAD_USB_Mode_48DB467A3733-if00
@@ -19,17 +24,15 @@ NUMSTABLEREAD = 1
 ### I_SET_CALPOLY  = (0,1)
 ### I_READ_CALPOLY = (0,1)
 
-
 [PSU2]
 ### KORAD/RND KWR103, PSU LABEL #1
 COMPORT = /dev/serial/by-id/usb-nuvoton_KORAD_USB_Mode_48EA53743933-if00
 TYPE = KORAD
-### NUMSTABLEREAD = 3
 NUMSTABLEREAD = 1
-V_SET_CALPOLY  = (0,1)
-V_READ_CALPOLY = (0,1)
-I_SET_CALPOLY  = (0,1)
-I_READ_CALPOLY = (0,1)
+V_SET_CALPOLY  = (-3.9870e-03,9.9993e-01)
+V_READ_CALPOLY = (3.9884e-03,1.0001)
+I_SET_CALPOLY  = (-1.9984e-03,9.9927e-01)
+I_READ_CALPOLY = (2.0002e-03,1.0007)
 
 
 
@@ -38,7 +41,7 @@ I_READ_CALPOLY = (0,1)
 ###     (optional -- delete if not used)     ###
 ################################################
 
-[HEATERBLOCK]
+[XHEATERBLOCK]
 
 # PSU for heater:
 PSU_COMPORT = /dev/serial/by-id/usb-Silicon_Labs_CP2102_USB_to_UART_Bridge_Controller_0010-if00-port0

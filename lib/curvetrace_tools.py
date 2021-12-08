@@ -203,7 +203,7 @@ def connect_PSU(configTESTER,label):
 			I_SET_CALPOLY = (0, 1)
 			pass
 		try:
-			I_READ_CALPOLY = __convert_str_tuple(configTESTER[label]['I_SET_CALPOLY'])
+			I_READ_CALPOLY = __convert_str_tuple(configTESTER[label]['I_READ_CALPOLY'])
 		except:
 			I_READ_CALPOLY = (0, 1)
 			pass
@@ -427,7 +427,7 @@ def do_idle(PSU1,PSU2,HEATER,seconds,file=None,wait_for_TEMP=False):
 			Ur = r[0]
 			Ir = r[1]
 			
-			T_HB = HEATER.get_temperature_string()
+			T_HB = HEATER.get_temperature_string(do_read=False)
 
 			# output string / line			
 			t = "Idling ({:.1f}".format(time.time()-t0-heater_delays) + ' of ' + "{:.1f}".format(seconds) + ' s): ' + \

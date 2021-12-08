@@ -125,7 +125,7 @@ class heater:
 
 	def get_temperature_string(self, do_read = True):
 		try:
-			T_HB = float(self.get_temperature()) # this will fail if T_HB cannot be converted to a proper number
+			T_HB = float(self.get_temperature(do_read)) # this will fail if T_HB cannot be converted to a proper number
 			T_HB = "{:.2f}".format(T_HB) # convert and format numeric value to string
 		except:
 			T_HB = "NA"
