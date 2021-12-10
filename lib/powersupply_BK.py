@@ -150,10 +150,16 @@ class BK(object):
 			if self._debug:
 				_BK_debug('*** Retrying (attempt ' + str(attempt) + ')...')
 
+		# clean the pipes:
+		self._Serial.flushOutput()
+		self._Serial.flushInput()
+		
+		# send command to PSU:
 		if self._debug:
 			_BK_debug('B&K <- %s\n' % cmd)
 		self._Serial.write((cmd + '\n').encode())
 		
+		# read answer (if requested):
 		if not answer:
 			ans = None
 		else:
