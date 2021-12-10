@@ -394,8 +394,8 @@ def do_idle(PSU1,PSU2,HEATER,seconds,file=None,wait_for_TEMP=False):
 		dt = 0.0
 
 		# Set output limits at the fixed PSU:
-		PSU1.setCurrent(IFIXLIM,False)
-		PSU1.setVoltage(FIX.TEST_VIDLE,True)
+		FIX.setCurrent(IFIXLIM,False)
+		FIX.setVoltage(FIX.TEST_VIDLE,True)
 
 		# Set output at the regulating PSU:
 		REG.setCurrent(REG.TEST_IIDLE,False) # current limit
@@ -410,12 +410,6 @@ def do_idle(PSU1,PSU2,HEATER,seconds,file=None,wait_for_TEMP=False):
 			# wait for heaterblock to reach prescribed temperature (if configured/available/required):
 			if wait_for_TEMP:
 				heater_delays += HEATER.wait_for_stable_T(DUT_PSU_allowed_turn_off=None, terminal_output=True)
-				### heater_delays += HEATER.wait_for_stable_T(DUT_PSU_allowed_turn_off=PSU1, terminal_output=True)
-				
-				# make sure PSU1 is back on required settings (it may have been turned off to speed up stabilizing the HEATER temperature):
-				### PSU1.setCurrent(IFIXLIM,False)
-				### PSU1.setVoltage(FIX.TEST_VIDLE,True)
-
 
 			# read and print voltages and currents at FIX and REG outputs:
 			f = FIX.read()

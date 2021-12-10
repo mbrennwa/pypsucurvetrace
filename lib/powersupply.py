@@ -159,7 +159,11 @@ class PSU:
 			self.VRESREAD = self._PSU[0].VRESREAD
 			self.IRESREAD = self._PSU[0].IRESREAD
 			self.MAXSETTLETIME = self._PSU[0].MAXSETTLETIME
-			self.READIDLETIME = self._PSU[k].READIDLETIME
+			self.READIDLETIME = self._PSU[0].READIDLETIME
+			if num_PSU == 1:
+				self.MODEL = self._PSU[0].MODEL
+			else:
+				self.MODEL = 'COMPOSITE'
 
 			for k in range(num_PSU):
 				self.VMIN += self._PSU[k].VMIN
@@ -186,7 +190,6 @@ class PSU:
 				self.PMAX = min (self.PMAX,self.VMAX*self.IMAX)
 
 			self.CONNECTED = True
-
 
 
 	########################################################################################################
@@ -249,17 +252,15 @@ class PSU:
 			limit = 0 	# number of readings with current limiter ON
 			limit_max = 2	# max. allowed number of current limit ON readings
 			t0 = time.time() # start time (now)
-
 			r = self.read()
-			
-			delta = None
-
+			delta = abs(r[0] - value)
 			while not time.time() > t0+self.MAXSETTLETIME:
+
+				delta = abs(r[0] - value)
 				if r[2] == "CC":
 					limit = limit + 1
 					if limit > limit_max:
 						break
-				delta = abs(r[0] - value)
 				if delta <= 1.3*self.VRESREAD + self.VOFFSETMAX:
 					stable = True
 					break
@@ -488,6 +489,5 @@ class PSU:
 		# determine corrected reading values:
 		V = polyval(V, self.V_READ_CALPOLY)
 		I = polyval(I, self.I_READ_CALPOLY)
-
 
 		return (V,I,L)

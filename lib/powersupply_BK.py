@@ -5,6 +5,7 @@ Python class to control B&K power supplies
 import serial
 import sys
 import time
+from math import ceil, log10
 
 
 # Python dictionary of known B&K power supply models (Vmin,Vmax,Imax,Pmax,VresolutionSet,IresolutionSet,VresolutionRead,IresolutionRead,VoffsetMax,IoffsetMax,MaxSettleTime)
@@ -51,6 +52,8 @@ class BK(object):
 		voltagemode: some models can work in LOW and HIGH voltage range
 		debug: flag for debugging info (bool)
 		'''
+
+		self.MODEL = '?'
 
 		# open and configure serial port:
 		baud_rates = ( 57600, 38400, 19200, 14400, 9600, 4800 )
@@ -118,7 +121,7 @@ class BK(object):
 			self.VOFFSETMAX = v[8]
 			self.IOFFSETMAX = v[9]
 			self.MAXSETTLETIME = v[10]
-			self.READIDLETIME = self.MAXSETTLETIME/50
+			self.READIDLETIME = 0.02
 			
 			# helper fields to work around the issue with the readdout of the CV/CC limiter:
 			self._VLIMITSETTING = None
@@ -158,7 +161,7 @@ class BK(object):
 		if self._debug:
 			_BK_debug('B&K <- %s\n' % cmd)
 		self._Serial.write((cmd + '\n').encode())
-		
+
 		# read answer (if requested):
 		if not answer:
 			ans = None
@@ -198,8 +201,20 @@ class BK(object):
 			volt = self.VMAX
 		if volt < self.VMIN:
 			volt = self.VMIN
-		volt = round (volt/self.VRESSET) * self.VRESSET
-		self._query('SOURCE:VOLTAGE ' + str(volt),answer=False)
+
+		# round to closest setting value resolved by the PSU
+		# (this may not exist / be resolved by the float type, so the float may have more digits than allowed!)
+		volt = round(volt/self.VRESSET) * self.VRESSET
+		
+		# number of digits to be used in the command string:
+		digits = ceil(-log10(self.VRESSET))
+	
+		# command string:
+		fmt = "{:." + str(digits) + "f}"
+		cmd = 'SOURCE:VOLTAGE ' + fmt.format(volt)
+
+		# send command to PSU:
+		self._query(cmd,answer=False)
 		self._VLIMITSETTING = volt
 
 
@@ -211,10 +226,23 @@ class BK(object):
 			current = self.IMAX
 		if current < 0.0:
 			current = 0.0
-		current = round (current/self.IRESSET) * self.IRESSET
-		self._query('SOURCE:CURRENT ' + str(current),answer=False)
-		self._ILIMITSETTING = current
 
+		# round to closest setting value resolved by the PSU
+		# (this may not exist / be resolved by the float type, so the float may have more digits than allowed!)
+		current = round (current/self.IRESSET) * self.IRESSET
+		
+		# number of digits to be used in the command string:
+		digits = ceil(-log10(self.IRESSET))
+
+		# command string:
+		fmt = "{:." + str(digits) + "f}"
+		cmd = 'SOURCE:CURRENT ' + fmt.format(current)
+		
+		# send command to PSU:
+		self._query(cmd,answer=False)
+		self._ILIMITSETTING = current
+		
+		
 	def reading(self):
 		"""
 		read applied output voltage and current and if PS is in "CV" or "CC" mode

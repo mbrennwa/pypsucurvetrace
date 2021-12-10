@@ -77,7 +77,7 @@ VIDLE_MAX = 15.0
 
 # - The DUT transconductance value (in A/V) to be used for regulation of the I1 idle current by adjusting the V2 voltage:
 #   (IDLE_GM = delta-I1 / delta-U2 ratio of the DUT at the idle point)
-IDLE_GM   = -1.8
+IDLE_GM   = -3
 
 # - Max. allowed idle current during the test (this is way more than necessary for the DUT, but a larger value helps achieving quick regulation of the PSU output):
 IIDLE     = 1
