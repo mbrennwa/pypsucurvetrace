@@ -1,9 +1,19 @@
 [PSU1]
-VSTART = 0
-VEND   = 3
-VSTEP  = 0.01
+VSTART = 15
+VEND   = 32
+VSTEP  = 1.0
 IMAX   = 5
-PMAX   = 10
+PMAX   = 100
+VIDLE  = 0
+IIDLE  = 1
+POLARITY = 1
+
+[PSU2]
+VSTART = 0
+VEND   = 1
+VSTEP  = 0.5
+IMAX   = 1
+PMAX   = 1
 VIDLE  = 0
 IIDLE  = 1
 POLARITY = 1

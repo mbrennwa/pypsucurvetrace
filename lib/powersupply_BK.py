@@ -130,8 +130,8 @@ class BK(object):
 			# Clear status and errors:
 			self._query('*CLS',answer=False)
 
-			# Reset to factory default:
-			self._query('SYStEM:RECALL:DEFAULT',answer=False)
+			# Reset to default:
+			self._query('*RST',answer=False)
 
 			# Set voltage range
 			if self.MODEL == '9185B_HIGH':
@@ -156,11 +156,12 @@ class BK(object):
 		# clean the pipes:
 		self._Serial.flushOutput()
 		self._Serial.flushInput()
-		
+
 		# send command to PSU:
 		if self._debug:
 			_BK_debug('B&K <- %s\n' % cmd)
 		self._Serial.write((cmd + '\n').encode())
+		self._Serial.flush() # wait until all data is written to the serial port
 
 		# read answer (if requested):
 		if not answer:
@@ -177,7 +178,7 @@ class BK(object):
 				self._Serial.flushInput()
 				time.sleep(0.1)			
 				ans = self._query(cmd,True,attempt+1, max_attempts)
-
+				
 		return ans
 		
 
@@ -256,9 +257,6 @@ class BK(object):
 			try:
 				if k > 10:
 					raise RuntimeException("Could not read voltage from B&K PSU!")
-					
-				### # read voltage TWICE, as some units sometimes return awkward numbers with the first reading
-				### V = float (self._query('MEASURE:VOLTAGE?'))
 				V = float (self._query('MEASURE:VOLTAGE?'))
 				break
 			except:
@@ -275,11 +273,6 @@ class BK(object):
 				if k > 10:
 					raise RuntimeException("Could not read current from B&K PSU!")
 				I = float (self._query('MEASURE:CURRENT?'))
-				### if I > 1.1*self.IMAX:
-				### 	# The BK 9120A sometimes reports wrong current numbers that are way higher than the possible max value, so try one more time!
-				### 	k = k+1
-				### else:
-				### 	break
 				break
 			except:
 				k = k+1
@@ -322,11 +315,12 @@ class BK(object):
 			print('_ILIMITSETTING is None.')
 			S = '?'
 		else:
-			if I >= self._ILIMITSETTING - self.IRESREAD - self.IOFFSETMAX:
+			if I >= 0.975*self._ILIMITSETTING:
 				# the current reading is close to the ILIMITSETTING value
-				if V < self._VLIMITSETTING - self.VRESREAD - self.VOFFSETMAX:
+				if V < 0.975*self._VLIMITSETTING:
 					# the voltage reading is clearly lower to the VLIMITSETTING value
 					S = 'CC'
+
 
 		return (V, I, S)
 
