@@ -8,7 +8,7 @@ For two-terminal devices under test (DUTs) like resistors or diodes you need onl
 Currently supported power supply types:
 * Voltcraft PPS
 * Korad / RND (confirmed: models KA3005P and KWR103, other models not tested)
-* BK Precision (confirmed: model BK9185B, other models not tested)
+* BK Precision (confirmed: model BK9185B, 9120A, other models not tested)
 
 Power supply types on the radar for future support:
 * Units with a SCPI interface
@@ -24,7 +24,13 @@ The following figure shows the basic test setup for a three-terminal DUT with tw
 
 For two-terminal DUTs, only PSU1 is needed and PSU2 can be ignored. If negative voltages are required at the DUT terminals, the respective PSU terminals are connected with inverted polarity.
 
-Tests are run using the `curvetrace` program. `curvetrace` tests the DUT by varying the voltages V1 and V2 at the PSU terminals, and by reading the corresponding currents I1 and I2. The results are shown on the screen and saved in an ASCII data file for further processing. `curvetrace` optionally inserts idle periods in between the individual readings, or a "pre-heat" period before starting the test, where the voltages (V1, V2) and currents (I1, I2) applied to the DUT are set to predefined ``idle'' values (this can be useful to control the temperature of the DUT during the test).
+Tests are run using the `curvetrace` program. `curvetrace` tests the DUT by varying the voltages V1 and V2 at the PSU terminals, and by reading the corresponding currents I1 and I2. The results are shown on the screen and saved in an ASCII data file for further processing.
+
+`curvetrace` also provides different methods to control the DUT temperature during the test. Firstly, `curvetrace` may insert idle periods in between the individual readings, or a "pre-heat" period before starting the test, where the voltages (V1, V2) and currents (I1, I2) applied to the DUT are set to predefined ``idle'' values. Secondly, `curvetrace` can use a heater block equipped with a heater element and temperature sensor for active temperature control (full heaterblock documentation is pending).
+
+`curvetrace` also offers some special operation modes:
+* "batch": sequential measurement of parts using the same DUT configuration
+* "quick": run "pre-heat" only, skip the curve tracing (can be useful for matching parts based on the idle operating point)
 
 The procedure implemented in the `curvetrace` program is as follows:
 1. Read a configuration file with the types and serial ports of the programmable PSUs, and then establish the serial connection to the PSUs.
@@ -36,9 +42,13 @@ The procedure implemented in the `curvetrace` program is as follows:
 * Optional: number of readings at each voltage step (results will be averaged)
 * Optional: idle time and pre-heat time
 * If idle or pre-heat times are not zero: idle voltage and current conditions for the PSUs
+* Optional: DUT temperature
 4. Check the test configuration versus the limits of the PSUs, and adjust the configuration where needed.
 5. Show a summary of the test configuration and ask the user if it's okay to start the test.
-6. Run the test. The voltages are stepped in two nested loops. Voltage V1 is varied in the inner loop, V2 is varied in the outer loop. The measured data are shown on the screen and saved to the data file.
+6. Run the test:
+* If a heaterblock is used: wait until the DUT has attained the specified temperature.
+* The voltages are stepped in two nested loops. Voltage V1 is varied in the inner loop, V2 is varied in the outer loop.
+* The measured data are shown on the screen and saved to the data file.
 7. Once the test is completed, turn off the PSUs.
 
 ### Details

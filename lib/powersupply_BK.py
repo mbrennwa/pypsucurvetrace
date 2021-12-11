@@ -216,6 +216,10 @@ class BK(object):
 
 		# send command to PSU:
 		self._query(cmd,answer=False)
+		err = self._query('SYST:ERR?')		
+		print(err)
+
+		
 		self._VLIMITSETTING = volt
 
 
