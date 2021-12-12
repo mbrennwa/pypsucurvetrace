@@ -19,7 +19,7 @@ if ~exist('save_PDF', 'var')
 end
 
 if filespath(end) != filesep
-	filespath = [ filespath filesp ];
+	filespath = [ filespath filesep ];
 end
 files = glob([ filespath '*.dat' ]);
 
