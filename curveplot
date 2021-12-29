@@ -118,6 +118,14 @@ if args.linestyle:
 if args.linewidth:
 	linewidth = float(args.linewidth)
 
+
+print('************* for multiple data / overlays: determine different colors automagically.')
+# >>> import matplotlib.colors as c
+# >>> c.to_rgb('r')
+# (1.0, 0.0, 0.0)
+
+
+
 # grid lines:
 grid_on = True
 gridcolor = 'lightgray'

@@ -40,6 +40,17 @@ def plot_curves( data,			# measurement_data object (or tuple of measurement_data
                 ):
 
 
+
+
+
+
+	print('****************** CHECK THAT len(linecolor) = len(linestyle) = len(data)')
+
+
+
+
+
+
 	# data scaling
 	if xscale == 'mu':
 		xscale = 'µ'
