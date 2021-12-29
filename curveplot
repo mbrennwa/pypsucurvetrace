@@ -34,8 +34,9 @@ from lib.curvetrace_tools import say_hello
 
 # parse input arguments (if any):
 parser = argparse.ArgumentParser(description='curveplot is a Python program for plotting of PyPSUcurvetrace data.')
-parser.add_argument('datafile')
-parser.add_argument('-t','--type', help='Plot type. Format: <X><Y><C>, where X is the x-axis parameter, Y is the y-axis parameter, and C is the curves parameter; parameters are U1, I1, U2, I2. Example: -type U1I1U2. Default (if not format is not specified): type = U1I1U2')
+parser.add_argument('datafiles', nargs='+', help='Names (and paths) of PyPSUcurvetrace data files. A list of multiple files can be used for an overlay plot.')
+
+parser.add_argument('--type', help='Plot type. Format: <X><Y><C>, where X is the x-axis parameter, Y is the y-axis parameter, and C is the curves parameter; parameters are U1, I1, U2, I2. Example: -type U1I1U2. Default (if not format is not specified): type = U1I1U2')
 
 parser.add_argument('--width', help='Width of the figure')
 parser.add_argument('--height', help='Height of the figure')
@@ -65,8 +66,8 @@ args = parser.parse_args()
 # Say Hello:
 say_hello('curveplot', 'Plotting of PyPSUcurvetrace data')
 
-# determine data file:
-datafile = args.datafile
+# determine data file(s):
+datafiles = args.datafiles
 
 # determine plot type:
 plot_type = 'U1I1U2' # default
@@ -125,8 +126,18 @@ if args.nogrid:
 if args.gridcolor:
 	gridcolor = args.gridcolor
 
-# load data from file:
-data, label, preheat = read_datafile(datafile)
+# load data from files:
+data = label = preheat = tuple( )
+for i in range(len(datafiles)):
+	d, l, p = read_datafile(datafiles[i])
+	data    += (d,)
+	label   += (l,)
+	preheat += (p,)
+
+
+
+print('******************* ADD PYPSU LABEL BRANDING ')
+
 
 # determine font size and name:
 fontsize = None # default
@@ -136,12 +147,16 @@ if args.fontsize:
 if args.fontname:
 	fontname = args.fontname
 
-# load data from file:
-data, label, preheat = read_datafile(datafile)
+# plot title:
+if title is None:
+	title = ''
+	for i in range(len(label)):
+		if i == 0:
+			title = label[0]
+		else:
+			title += ', ' + label[i]
 
 # plot data:
-if title is None:
-	title = label
 plt.figure(figsize=(width, height))
 plot_curves( data = data,
              xlimit = xlimit,

@@ -30,6 +30,7 @@ class measurement_data:
 	def __init__ (self,datafile):
 		self.rawdata = np.loadtxt(datafile, comments='%')
 		self.CC_on = np.where( self.rawdata[:,4]+self.rawdata[:,9] == 0)
+		self.datafile = datafile
 	
 	def get_U1_meas (self,exclude_CC):
 		if exclude_CC:

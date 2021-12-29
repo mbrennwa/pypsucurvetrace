@@ -18,42 +18,27 @@ import matplotlib.pyplot as plt
 # plot curves #
 ###############
 
-def plot_curves( data,
-                 plot_type='U1I1U2',
-                 exclude_CC = True,
-                 x_reverse_neg = True,
-                 y_reverse_neg = True,
-                 linecolor = 'k',
-                 linestyle = '-',
-                 linewidth = 2.0,
-                 gridcolor = 'gray',
-                 grid_on = True,
-                 fontname = None,
-                 fontsize = None,
-                 title=None,
-                 xlabel='X DATA',
-                 ylabel='Y DATA',
-                 xlimit=None,
-                 ylimit=None,
-                 xscale=None,
-                 yscale=None):
+def plot_curves( data,			# measurement_data object (or tuple of measurement_data objects)
+                 plot_type='U1I1U2',    # type of curve plot
+                 exclude_CC = True,     # exclude data with current limiter on
+                 x_reverse_neg = True,  # reverse x axis for "negative" DUTs
+                 y_reverse_neg = True,  # reverse y axis for "negative" DUTs
+                 linecolor = 'k',       # line color of the curves (or tuple of line colors)
+                 linestyle = '-',       # line style of the curves (or tuple of line colors)
+                 linewidth = 2.0,       # line width of the curves (or tuple of line colors)
+                 grid_on = True,        # use grid lines
+                 gridcolor = 'gray',    # color of the grid lines
+                 fontname = None,       # name of the font used in the plot
+                 fontsize = None,       # size of the font used in the plot (base value)
+                 title=None,            # plot title
+                 xlabel='X DATA',       # x-axis label
+                 ylabel='Y DATA',       # y-axis label
+                 xlimit=None,           # x-axis data limit (absolute value)
+                 ylimit=None,           # y-axis data limit (absolute value)
+                 xscale=None,           # x-axis multiplier prefix (G, M, k, m, µ, n, p, f)
+                 yscale=None            # y-axis multiplier prefix (G, M, k, m, µ, n, p, f)
+                ):
 
-	# parse data for plot:
-	if plot_type == 'U1I1U2':
-		print('Plot type: X = U1, Y = I1, C = U2')
-		X = data.get_U1_meas(exclude_CC) # measured U1 value
-		Y = data.get_I1_meas(exclude_CC) # measured I1 value
-		C = data.get_U2_set(exclude_CC)  # U2 set value
-		if xlabel is None:
-			xlabel = 'U1'
-		if ylabel is None:
-			ylabel = 'I1'
-		xunit = 'V'
-		yunit = 'A'
-		
-	else:
-		print('Plot type ' + plot_type + ' not supported.')
-		sys.exit()
 
 	# data scaling
 	if xscale == 'mu':
@@ -71,8 +56,7 @@ def plot_curves( data,
 		yunit = yscale + yunit
 	except:
 		ysc = 1.0
-	X = X / xsc
-	Y = Y / ysc
+
 	try:
 		xlimit = xlimit / xsc
 	except:
@@ -81,6 +65,29 @@ def plot_curves( data,
 		ylimit = ylimit / ysc
 	except:
 		pass
+
+	# parse data for plot:
+	X = Y = C = tuple( ) # init empty tuples
+	if plot_type == 'U1I1U2':
+		print('Plot type: X = U1, Y = I1, C = U2')
+		if type(data) is not tuple:
+			data = ( data, )
+		for i in range(len(data)):
+			# append tuple elements:
+			X += (data[i].get_U1_meas(exclude_CC)/xsc,) # measured U1 value
+			Y += (data[i].get_I1_meas(exclude_CC)/ysc,) # measured I1 value
+			C += (data[i].get_U2_set(exclude_CC),)  # U2 set value
+			
+		if xlabel is None:
+			xlabel = 'U1'
+		if ylabel is None:
+			ylabel = 'I1'
+		xunit = 'V'
+		yunit = 'A'
+		
+	else:
+		print('Plot type ' + plot_type + ' not supported.')
+		sys.exit()
 		
 	# prepare fonts:
 	if fontname is None:
@@ -101,29 +108,49 @@ def plot_curves( data,
 	plt.rc('lines', solid_joinstyle='round')
 	plt.rc('lines', solid_capstyle='round')
 	
-	# plot every single curve:
-	CC = np.unique(C)
-	for k in range(len(CC)):
-		kk = np.where(C == CC[k])
-		x = X[kk]
-		y = Y[kk]
+	# loop over all data files:
+	for i in range(len(data)):
 		
-		if xlimit is not None:
-			kk = np.where(abs(x) < abs(xlimit))[0]
-			if kk[-1] < len(x)-1:
-				yend = np.interp(xlimit, x[[kk[-1],kk[-1]+1]], y[[kk[-1],kk[-1]+1]])
-				x = np.append(x[kk], xlimit)
-				y = np.append(y[kk], yend)
-		if ylimit is not None:
-			kk = np.where(abs(y) < abs(ylimit))[0]
-			if kk[-1] < len(y)-1:
-				xend = np.interp(ylimit, y[[kk[-1],kk[-1]+1]], x[[kk[-1],kk[-1]+1]])
-				x = np.append(x[kk], xend)
-				y = np.append(y[kk], ylimit)
-		
-		plt.plot(x, y, color=linecolor, linestyle=linestyle, linewidth=lw_base)
-		s = f'{CC[k]}'
-		plt.text(x[-1], y[-1], s, fontsize=fs_small, bbox={'facecolor':'white','alpha':1,'edgecolor':'none','pad':1}, ha='center', va='center')
+		XX = X[i]
+		YY = Y[i]
+		CC = C[i]
+		C0 = np.unique(CC)
+
+		# loop over all curve lines:
+		for k in range(len(C0)):
+			kk = np.where(CC == C0[k])
+			x = XX[kk]
+			y = YY[kk]
+			
+			if xlimit is not None:
+				kk = np.where(abs(x) < abs(xlimit))[0]
+				if kk[-1] < len(x)-1:
+					yend = np.interp(xlimit, x[[kk[-1],kk[-1]+1]], y[[kk[-1],kk[-1]+1]])
+					x = np.append(x[kk], xlimit)
+					y = np.append(y[kk], yend)
+			if ylimit is not None:
+				kk = np.where(abs(y) < abs(ylimit))[0]
+				if kk[-1] < len(y)-1:
+					xend = np.interp(ylimit, y[[kk[-1],kk[-1]+1]], x[[kk[-1],kk[-1]+1]])
+					x = np.append(x[kk], xend)
+					y = np.append(y[kk], ylimit)
+			
+			try:
+				lc = linecolor[i]
+			except:
+				lc = linecolor[0]
+			try:
+				ls = linestyle[i]
+			except:
+				ls = linestyle[0]
+			
+			plt.plot(x, y, color=lc, linestyle=ls, linewidth=lw_base)
+				
+			if C0[k] == -0.0:
+				s = f'{0.0}'
+			else:
+				s = f'{C0[k]}'
+			plt.text(x[-1], y[-1], s, fontsize=fs_small, bbox={'facecolor':'white','alpha':1,'edgecolor':'none','pad':1}, ha='center', va='center')
 
 	# format the plot:
 	if x_reverse_neg:
