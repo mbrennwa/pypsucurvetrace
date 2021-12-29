@@ -36,15 +36,22 @@ def plot_curves( data,			# measurement_data object (or tuple of measurement_data
                  xlimit=None,           # x-axis data limit (absolute value)
                  ylimit=None,           # y-axis data limit (absolute value)
                  xscale=None,           # x-axis multiplier prefix (G, M, k, m, µ, n, p, f)
-                 yscale=None            # y-axis multiplier prefix (G, M, k, m, µ, n, p, f)
+                 yscale=None,           # y-axis multiplier prefix (G, M, k, m, µ, n, p, f)
+                 nobranding=False       # do not add PyPSUcurvetrace "branding" to the plot
                 ):
 
 
+	if len(linecolor) != len(data):
+		print('ERROR: number of linecolors does not match number of datafiles!')
+		exit()
+
+	if len(linestyle) != len(data):
+		print('ERROR: number of linestyles does not match number of datafiles!')
+		exit()
 
 
 
-
-	print('****************** CHECK THAT len(linecolor) = len(linestyle) = len(data)')
+	print('****************** CHECK THAT len(linestyle) = len(data)')
 
 
 
@@ -59,15 +66,16 @@ def plot_curves( data,			# measurement_data object (or tuple of measurement_data
 	sc = { 'G': 9, 'M': 6, 'k': 3, 'm': -3, 'µ': -6, 'n': -9, 'p': -12, 'f': -15 }
 	try:
 		xsc = float(10**sc[xscale])
-		xunit = xscale + xunit
+		xunitprfix = xscale
 	except:
 		xsc = 1.0
+		xunitprfix = ''		
 	try:
 		ysc = float(10**sc[yscale])
-		yunit = yscale + yunit
+		yunitprfix = yscale
 	except:
 		ysc = 1.0
-
+		yunitprfix = ''
 	try:
 		xlimit = xlimit / xsc
 	except:
@@ -76,6 +84,9 @@ def plot_curves( data,			# measurement_data object (or tuple of measurement_data
 		ylimit = ylimit / ysc
 	except:
 		pass
+
+
+	print(ysc)
 
 	# parse data for plot:
 	X = Y = C = tuple( ) # init empty tuples
@@ -93,8 +104,8 @@ def plot_curves( data,			# measurement_data object (or tuple of measurement_data
 			xlabel = 'U1'
 		if ylabel is None:
 			ylabel = 'I1'
-		xunit = 'V'
-		yunit = 'A'
+		xunit = xunitprfix + 'V'
+		yunit = yunitprfix + 'A'
 		
 	else:
 		print('Plot type ' + plot_type + ' not supported.')
@@ -146,16 +157,7 @@ def plot_curves( data,			# measurement_data object (or tuple of measurement_data
 					x = np.append(x[kk], xend)
 					y = np.append(y[kk], ylimit)
 			
-			try:
-				lc = linecolor[i]
-			except:
-				lc = linecolor[0]
-			try:
-				ls = linestyle[i]
-			except:
-				ls = linestyle[0]
-			
-			plt.plot(x, y, color=lc, linestyle=ls, linewidth=lw_base)
+			plt.plot(x, y, color=linecolor[i], linestyle=linestyle[i], linewidth=lw_base)
 				
 			if C0[k] == -0.0:
 				s = f'{0.0}'
@@ -188,3 +190,12 @@ def plot_curves( data,			# measurement_data object (or tuple of measurement_data
 	for axis in ['top','bottom','left','right']:
 		ax.spines[axis].set_linewidth(lw_base)
 		ax.spines[axis].set_capstyle('round')
+	
+	if not nobranding:
+		plt.text( 0.98, 0.98,'PyPSUcurvetrace',
+			  fontsize=fs_small,
+			  bbox={'facecolor':'white','alpha':1,'edgecolor':'none','pad':1},
+			  horizontalalignment='right', verticalalignment='top',
+			  transform = ax.transAxes
+			)
+
