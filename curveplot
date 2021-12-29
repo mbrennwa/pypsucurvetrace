@@ -37,6 +37,9 @@ parser = argparse.ArgumentParser(description='curveplot is a Python program for 
 parser.add_argument('datafile')
 parser.add_argument('-t','--type', help='Plot type. Format: <X><Y><C>, where X is the x-axis parameter, Y is the y-axis parameter, and C is the curves parameter; parameters are U1, I1, U2, I2. Example: -type U1I1U2. Default (if not format is not specified): type = U1I1U2')
 
+parser.add_argument('--width', help='Width of the figure')
+parser.add_argument('--height', help='Height of the figure')
+
 parser.add_argument('--xlimit', help='Max. x-axis value')
 parser.add_argument('--ylimit', help='Max. y-axis value')
 parser.add_argument('--xscale', help='x-axis multiplier prefix (G, M, k, m, µ, n, p, f)')
@@ -69,6 +72,14 @@ datafile = args.datafile
 plot_type = 'U1I1U2' # default
 if args.type:
 	plot_type = args.type.upper()
+
+# determine figure size:
+width = 10 # default
+height = 7 # default
+if args.width:
+	width = float(args.width)
+if args.height:
+	height = float(args.height)
 
 # determine data limits and scales:
 xlimit = None # default
@@ -131,7 +142,7 @@ data, label, preheat = read_datafile(datafile)
 # plot data:
 if title is None:
 	title = label
-plt.figure(figsize=(10, 7))
+plt.figure(figsize=(width, height))
 plot_curves( data = data,
              xlimit = xlimit,
              ylimit = ylimit,
