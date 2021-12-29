@@ -13,9 +13,6 @@ import numpy as np
 # import os.path
 import matplotlib.pyplot as plt
 
-FONTSIZE_NORMAL = 18
-FONTSIZE_SMALL = 12
-plt.rc('font', size=18)          # controls default text sizes
 
 ###############
 # plot curves #
@@ -23,11 +20,16 @@ plt.rc('font', size=18)          # controls default text sizes
 
 def plot_curves( data,
                  plot_type='U1I1U2',
-                 linecolor = 'k',
-                 linestyle = '-',
                  exclude_CC = True,
                  x_reverse_neg = True,
                  y_reverse_neg = True,
+                 linecolor = 'k',
+                 linestyle = '-',
+                 linewidth = 2.0,
+                 gridcolor = 'gray',
+                 grid_on = True,
+                 fontname = None,
+                 fontsize = None,
                  title=None,
                  xlabel='X DATA',
                  ylabel='Y DATA',
@@ -51,7 +53,25 @@ def plot_curves( data,
 		print('Plot type ' + plot_type + ' not supported.')
 		sys.exit()
 
-
+	# prepare fonts:
+	if fontname is None:
+		fontname = 'Sans'
+	if fontsize is None:
+		fs_base = 18
+	else:
+		fs_base = fontsize
+	fs_small = fs_small = 0.7*fs_base
+	plt.rc('font', size=fs_base)
+	plt.rc('font', family=fontname)
+	
+	# prepare line formats:
+	lw_base = linewidth
+	lw_thin = 0.5*lw_base
+	plt.rc('lines', dash_joinstyle='round')
+	plt.rc('lines', dash_capstyle='round')
+	plt.rc('lines', solid_joinstyle='round')
+	plt.rc('lines', solid_capstyle='round')
+	
 	# plot every single curve:
 	CC = np.unique(C)
 	for k in range(len(CC)):
@@ -72,10 +92,11 @@ def plot_curves( data,
 				x = np.append(x[kk], xend)
 				y = np.append(y[kk], ylimit)
 		
-		plt.plot(x, y, color=linecolor, linestyle=linestyle)
+		plt.plot(x, y, color=linecolor, linestyle=linestyle, linewidth=lw_base)
 		s = f'{CC[k]}'
-		plt.text(x[-1], y[-1], s, fontsize=FONTSIZE_SMALL, bbox={'facecolor':'white','alpha':1,'edgecolor':'none','pad':1}, ha='center', va='center')
+		plt.text(x[-1], y[-1], s, fontsize=fs_small, bbox={'facecolor':'white','alpha':1,'edgecolor':'none','pad':1}, ha='center', va='center')
 
+	# format the plot:
 	if x_reverse_neg:
 		r = plt.gca().axes.get_xlim()
 		if abs(r[0]) > abs(r[1]):
@@ -88,4 +109,15 @@ def plot_curves( data,
 	plt.title(title)
 	plt.xlabel(xlabel + ' ('+xunit+')')
 	plt.ylabel(ylabel + ' ('+yunit+')')
-	plt.grid()
+	ax = plt.gca()
+	if grid_on:
+		plt.grid(True, color=gridcolor, linewidth=lw_thin) 
+		ax.tick_params(axis="x",length=0)
+		ax.tick_params(axis="y",length=0)
+	else:
+		plt.grid(False) 
+	
+
+	for axis in ['top','bottom','left','right']:
+		ax.spines[axis].set_linewidth(lw_base)
+		ax.spines[axis].set_capstyle('round')

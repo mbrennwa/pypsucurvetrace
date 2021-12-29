@@ -46,7 +46,14 @@ parser.add_argument('--xlabel', help='x-axis label')
 parser.add_argument('--ylabel', help='y-axis label')
 
 parser.add_argument('--linecolor', help='Color of curves (any of the Matplotlib color specs)')
-parser.add_argument('--linestyle', help='Line style of curves (solid, dashed, dashdot, dotted')
+parser.add_argument('--linestyle', help='Line style of curves (solid, dashed, dashdot, dotted)')
+parser.add_argument('--linewidth', help='Line width of curves and plot frame')
+
+parser.add_argument('--gridcolor', help='Grid line color')
+parser.add_argument('--nogrid', action='store_true', help='Turn off grid lines')
+
+parser.add_argument('--fontsize', help='Font size')
+parser.add_argument('--fontname', help='Font name')
 
 args = parser.parse_args()
 
@@ -80,13 +87,35 @@ if args.xlabel:
 if args.ylabel:
 	ylabel = args.ylabel
 
-# determine line color and style:
+# determine line parameters:
 linecolor = 'k' # default
 linestyle = '-' # default
+linewidth = 2.0 # default
 if args.linecolor:
 	linecolor = args.linecolor
 if args.linestyle:
 	linestyle = args.linestyle
+if args.linewidth:
+	linewidth = float(args.linewidth)
+
+# grid lines:
+grid_on = True
+gridcolor = 'lightgray'
+if args.nogrid:
+	grid_on = False
+if args.gridcolor:
+	gridcolor = args.gridcolor
+
+# load data from file:
+data, label, preheat = read_datafile(datafile)
+
+# determine font size and name:
+fontsize = None # default
+fontname = None # default
+if args.fontsize:
+	fontsize = args.fontsize
+if args.fontname:
+	fontname = args.fontname
 
 # load data from file:
 data, label, preheat = read_datafile(datafile)
@@ -101,9 +130,14 @@ plot_curves( data = data,
              plot_type = plot_type,
              linecolor = linecolor,
              linestyle = linestyle,
+             linewidth = linewidth,
+             gridcolor = gridcolor,
+             grid_on   = grid_on,
              title  = title,
              xlabel = xlabel,
-             ylabel = ylabel)
+             ylabel = ylabel,
+             fontsize = fontsize,
+             fontname = fontname)
 
 # Show the plot:
 print('Close plot window to exit.')
