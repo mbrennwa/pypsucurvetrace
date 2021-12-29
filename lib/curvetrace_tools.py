@@ -1,21 +1,25 @@
 """
-Function definitison for use with curvetrace programs
+Helper functions for use with curvetrace programs
 """
 
-# imports:
-# import traceback
 import time
 import math
-# import datetime
-# import configparser
-# import argparse
-# import numpy as np
 import os.path
 import logging
-
-### from termcolor import colored
 import lib.powersupply as powersupply
 import lib.heaterblock as heaterblock
+
+
+#############
+# say hello #
+#############
+
+def say_hello(progname, purpose):
+	print('\n')
+	print('***** ' + progname + ' (PyPSUcurvetrace)')
+	print('***** ' + purpose)
+	print('***** Disclaimer: NO WARRANTIES OF ANY KIND! Users are advised to study the code in order to understand how this program works.')
+	print('\n')
 
 
 ##########################################

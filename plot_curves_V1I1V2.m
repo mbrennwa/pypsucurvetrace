@@ -14,6 +14,7 @@ function h = plot_curves_V1I1V2 (f)
 % EXAMPLE (plot 2SJ79 curves and save to PDF file):
 %
 % >> graphics_toolkit ('fltk')
+% >> set (0, "defaultaxesfontname", "RoutedGothic", "defaulttextfontname", "RoutedGothic")
 % >> h = plot_curves_V1I1V2('examples/data/2SJ79.dat');
 % >> set(h(:),'marker','none','linewidth',1.5); grid('on')
 % >> legend('boxoff')

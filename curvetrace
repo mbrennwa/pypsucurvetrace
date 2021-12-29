@@ -27,7 +27,7 @@ logging.basicConfig(level=logging.DEBUG)
 import lib.powersupply as powersupply
 import lib.heaterblock as heaterblock
 
-from lib.curvetrace_tools import printit, connect_PSU, configure_test_PSU, configure_idle_PSU, do_idle, start_new_logfile, format_PSU_reading
+from lib.curvetrace_tools import say_hello, printit, connect_PSU, configure_test_PSU, configure_idle_PSU, do_idle, start_new_logfile, format_PSU_reading
 
 
 
@@ -65,19 +65,14 @@ def cleanup_exit():
 ################
 
 # parse input arguments (if any):
-parser = argparse.ArgumentParser(description='PyPSUcurvetrace is a Python program for I-V curve tracing of electronic parts using programmable power supplies.')
+parser = argparse.ArgumentParser(description='curvetrace (PyPSUcurvetrace) is a Python program for I-V curve tracing of electronic parts using programmable power supplies.')
 parser.add_argument('-c', help='configuration file with test parameters [name/path]')
 parser.add_argument('-b', action='store_true', help='Batch mode (loop of repeated test tuns)')
 parser.add_argument('-q', action='store_true', help='Quick mode (pre-heating only, no curve tracing)')
 args = parser.parse_args()
 
 # Say Hello:
-print('\n')
-print('***** PyPSUcurvetrace')
-print('***** Python program for I-V curve tracing of electronic parts using programmable power supplies')
-print('***** Disclaimer: NO WARRANTIES OF ANY KIND!!!')
-print('***** Disclaimer: Users are advised to study the code in order to understand how this program works.')
-print('\n')
+say_hello('curvetrace', 'I-V curve tracing of electronic parts using programmable power supplies')
 
 # read PSU config file:
 configTESTER = configparser.ConfigParser()

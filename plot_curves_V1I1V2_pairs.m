@@ -1,4 +1,4 @@
-function h = plot_curves_V1I1V2_pairs (filespath, save_PDF)
+function h = plot_curves_V1I1V2_pairs (filespath, save_PDF, axlabels)
 
 % function h = plot_curves_V1I1V2_pairs (filespath, save_PDF)
 %
@@ -6,7 +6,8 @@ function h = plot_curves_V1I1V2_pairs (filespath, save_PDF)
 %
 % INPUT:
 % filespath: path of directory containing the data files (string)
-% save_PDF: graphics are saved to PDF file in current working directory (boolean). If save_PDF = false, the program will interactively ask before plotting the next pair of curves.
+% save_PDF (optional): graphics are saved to PDF file in current working directory (boolean, default=false). If save_PDF = false, the program will interactively ask before plotting the next pair of curves.
+% axlabels (optional): labels for x and y axes (cellstring)
 %
 % EXAMPLE (plot THF51 curve pairs and save to PDF files):
 %
@@ -24,7 +25,7 @@ end
 files = glob([ filespath '*.dat' ]);
 
 N = numel(files);
-k = 0; NN = (N^2+N)/2;
+k = 0; NN = (N^2+N)/2-N;
 lw = 2; fs = 12;
 
 figure();
@@ -43,7 +44,11 @@ for j=i+1:N
 	set(gca, 'linewidth', lw, 'fontsize',fs);
 	[~, name1] = fileparts (files{i});
 	[~, name2] = fileparts (files{j});
-	title(sprintf('Blue: %s\n Red: %s',strrep(name1,'_','-'),strrep(name2,'_','-')));
+	title(sprintf('Blue: %s\n Red: %s',strrep(name1,'_','\_'),strrep(name2,'_','\_')));
+	if exist('axlabels','var')
+		xlabel(axlabels{1})
+		ylabel(axlabels{2})
+	end
 	if save_PDF
 		f = sprintf('%s_%s.pdf',name1,name2);
 		disp(sprintf('Saving plot to %s...',f))
