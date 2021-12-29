@@ -30,7 +30,9 @@ def plot_curves( data,
                  y_reverse_neg = True,
                  title=None,
                  xlabel='X DATA',
-                 ylabel='Y DATA'):
+                 ylabel='Y DATA',
+                 xlimit=None,
+                 ylimit=None):
 
 	# parse data for plot:
 	if plot_type == 'U1I1U2':
@@ -56,6 +58,20 @@ def plot_curves( data,
 		kk = np.where(C == CC[k])
 		x = X[kk]
 		y = Y[kk]
+		
+		if xlimit is not None:
+			kk = np.where(abs(x) < abs(xlimit))[0]
+			if kk[-1] < len(x)-1:
+				yend = np.interp(xlimit, x[[kk[-1],kk[-1]+1]], y[[kk[-1],kk[-1]+1]])
+				x = np.append(x[kk], xlimit)
+				y = np.append(y[kk], yend)
+		if ylimit is not None:
+			kk = np.where(abs(y) < abs(ylimit))[0]
+			if kk[-1] < len(y)-1:
+				xend = np.interp(ylimit, y[[kk[-1],kk[-1]+1]], x[[kk[-1],kk[-1]+1]])
+				x = np.append(x[kk], xend)
+				y = np.append(y[kk], ylimit)
+		
 		plt.plot(x, y, color=linecolor, linestyle=linestyle)
 		s = f'{CC[k]}'
 		plt.text(x[-1], y[-1], s, fontsize=FONTSIZE_SMALL, bbox={'facecolor':'white','alpha':1,'edgecolor':'none','pad':1}, ha='center', va='center')

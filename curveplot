@@ -37,11 +37,17 @@ parser = argparse.ArgumentParser(description='curveplot is a Python program for 
 parser.add_argument('datafile')
 parser.add_argument('-t','--type', help='Plot type. Format: <X><Y><C>, where X is the x-axis parameter, Y is the y-axis parameter, and C is the curves parameter; parameters are U1, I1, U2, I2. Example: -type U1I1U2. Default (if not format is not specified): type = U1I1U2')
 
-parser.add_argument('--linecolor', help='color of curves (any of the Matplotlib color specs)')
-parser.add_argument('--linestyle', help='line style of curves (solid, dashed, dashdot, dotted')
+parser.add_argument('--xlimit', help='Max. x-axis value')
+parser.add_argument('--ylimit', help='Max. y-axis value')
 
-parser.add_argument('-x','--xlabel', help='x-axis label')
-parser.add_argument('-y','--ylabel', help='y-axis label')
+parser.add_argument('--title', help='Plot title')
+
+parser.add_argument('--xlabel', help='x-axis label')
+parser.add_argument('--ylabel', help='y-axis label')
+
+parser.add_argument('--linecolor', help='Color of curves (any of the Matplotlib color specs)')
+parser.add_argument('--linestyle', help='Line style of curves (solid, dashed, dashdot, dotted')
+
 args = parser.parse_args()
 
 # Say Hello:
@@ -55,9 +61,20 @@ plot_type = 'U1I1U2' # default
 if args.type:
 	plot_type = args.type.upper()
 
-# determine axis labels:
+# determine data limits:
+xlimit = None # default
+ylimit = None # default
+if args.xlimit:
+	xlimit = float(args.xlimit)
+if args.ylimit:
+	ylimit = float(args.ylimit)
+
+# determine axis labels and plot title:
 xlabel = None # default
 ylabel = None # default
+title  = None # default
+if args.title:
+	title = args.title
 if args.xlabel:
 	xlabel = args.xlabel
 if args.ylabel:
@@ -75,12 +92,16 @@ if args.linestyle:
 data, label, preheat = read_datafile(datafile)
 
 # plot data:
+if title is None:
+	title = label
 plt.figure(figsize=(10, 7))
 plot_curves( data = data,
+             xlimit = xlimit,
+             ylimit = ylimit,
              plot_type = plot_type,
              linecolor = linecolor,
              linestyle = linestyle,
-             title = label,
+             title  = title,
              xlabel = xlabel,
              ylabel = ylabel)
 
