@@ -34,7 +34,9 @@ def plot_curves( data,
                  xlabel='X DATA',
                  ylabel='Y DATA',
                  xlimit=None,
-                 ylimit=None):
+                 ylimit=None,
+                 xscale=None,
+                 yscale=None):
 
 	# parse data for plot:
 	if plot_type == 'U1I1U2':
@@ -53,6 +55,33 @@ def plot_curves( data,
 		print('Plot type ' + plot_type + ' not supported.')
 		sys.exit()
 
+	# data scaling
+	if xscale == 'mu':
+		xscale = 'µ'
+	if yscale == 'mu':
+		yscale = 'µ'
+	sc = { 'G': 9, 'M': 6, 'k': 3, 'm': -3, 'µ': -6, 'n': -9, 'p': -12, 'f': -15 }
+	try:
+		xsc = float(10**sc[xscale])
+		xunit = xscale + xunit
+	except:
+		xsc = 1.0
+	try:
+		ysc = float(10**sc[yscale])
+		yunit = yscale + yunit
+	except:
+		ysc = 1.0
+	X = X / xsc
+	Y = Y / ysc
+	try:
+		xlimit = xlimit / xsc
+	except:
+		pass
+	try:
+		ylimit = ylimit / ysc
+	except:
+		pass
+		
 	# prepare fonts:
 	if fontname is None:
 		fontname = 'Sans'

@@ -39,6 +39,8 @@ parser.add_argument('-t','--type', help='Plot type. Format: <X><Y><C>, where X i
 
 parser.add_argument('--xlimit', help='Max. x-axis value')
 parser.add_argument('--ylimit', help='Max. y-axis value')
+parser.add_argument('--xscale', help='x-axis multiplier prefix (G, M, k, m, µ, n, p, f)')
+parser.add_argument('--yscale', help='y-axis multiplier prefix (G, M, k, m, µ, n, p, f)')
 
 parser.add_argument('--title', help='Plot title')
 
@@ -68,14 +70,20 @@ plot_type = 'U1I1U2' # default
 if args.type:
 	plot_type = args.type.upper()
 
-# determine data limits:
+# determine data limits and scales:
 xlimit = None # default
 ylimit = None # default
+xscale = None
+yscale = None
 if args.xlimit:
 	xlimit = float(args.xlimit)
 if args.ylimit:
 	ylimit = float(args.ylimit)
-
+if args.xscale:
+	xscale = args.xscale
+if args.yscale:
+	yscale = args.yscale
+	
 # determine axis labels and plot title:
 xlabel = None # default
 ylabel = None # default
@@ -136,6 +144,8 @@ plot_curves( data = data,
              title  = title,
              xlabel = xlabel,
              ylabel = ylabel,
+             xscale = xscale,
+             yscale = yscale,
              fontsize = fontsize,
              fontname = fontname)
 
