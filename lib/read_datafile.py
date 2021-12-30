@@ -95,6 +95,7 @@ def read_datafile(datafile):
 	for i,line in enumerate(lines):
 		if '* Sample: ' in line:
 			label = line.split(': ')[1]
+			break # break from the loop
 
 	# find operating point after pre-heat/idle:
 	ph = preheat()
@@ -110,6 +111,7 @@ def read_datafile(datafile):
 				ph.T = float(u[5].split('°C')[0])
 			except:
 				ph.T = None
+			break # break from the loop
 
 	# load measurement data from file:
 	data = measurement_data(datafile)

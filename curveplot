@@ -39,13 +39,13 @@ parser.add_argument('datafiles', nargs='+', help='Names (and paths) of PyPSUcurv
 
 parser.add_argument('--type', help='Plot type. Format: <X><Y><C>, where X is the x-axis parameter, Y is the y-axis parameter, and C is the curves parameter; parameters are U1, I1, U2, I2. Example: -type U1I1U2. Default (if not format is not specified): type = U1I1U2')
 
-parser.add_argument('--width', help='Width of the figure')
-parser.add_argument('--height', help='Height of the figure')
+parser.add_argument('--width', type=float, help='Width of the figure')
+parser.add_argument('--height', type=float, help='Height of the figure')
 
 parser.add_argument('--pairs', action='store_true', help='Plot overlays of all datafile pairs in the datafiles directory (specify the directory only, without a filename)')
 
-parser.add_argument('--xlimit', help='Max. x-axis value')
-parser.add_argument('--ylimit', help='Max. y-axis value')
+parser.add_argument('--xlimit', type=float, help='Max. x-axis value')
+parser.add_argument('--ylimit', type=float, help='Max. y-axis value')
 parser.add_argument('--xscale', help='x-axis multiplier prefix (G, M, k, m, µ, n, p, f)')
 parser.add_argument('--yscale', help='y-axis multiplier prefix (G, M, k, m, µ, n, p, f)')
 
@@ -56,14 +56,14 @@ parser.add_argument('--ylabel', help='y-axis label')
 
 parser.add_argument('--linecolor', help='Color of curves (any of the Matplotlib color specs)')
 parser.add_argument('--linestyle', help='Line style of curves (solid, dashed, dashdot, dotted)')
-parser.add_argument('--linewidth', help='Line width of curves and plot frame')
+parser.add_argument('--linewidth', type=float, help='Line width of curves and plot frame')
 
 parser.add_argument('--gridcolor', help='Grid line color')
 parser.add_argument('--nogrid', action='store_true', help='Turn off grid lines')
 
 parser.add_argument('--nobranding', action='store_true', help='Hide PyPSUcurvetrace label')
 
-parser.add_argument('--fontsize', help='Font size')
+parser.add_argument('--fontsize', type=float, help='Font size')
 parser.add_argument('--fontname', help='Font name')
 
 args = parser.parse_args()
@@ -73,8 +73,6 @@ say_hello('curveplot', 'Plotting of PyPSUcurvetrace data')
 
 # determine data file(s):
 datafiles = args.datafiles
-## for i in range(len(datafiles)):
-## 	print(glob.glob(datafiles[i]))
 
 # pairs option:
 pairs = False
@@ -93,9 +91,9 @@ if args.type:
 width = 10 # default
 height = 7 # default
 if args.width:
-	width = float(args.width)
+	width = args.width
 if args.height:
-	height = float(args.height)
+	height = args.height
 
 # determine data limits and scales:
 xlimit = None # default
@@ -103,9 +101,9 @@ ylimit = None # default
 xscale = None
 yscale = None
 if args.xlimit:
-	xlimit = float(args.xlimit)
+	xlimit = args.xlimit
 if args.ylimit:
-	ylimit = float(args.ylimit)
+	ylimit = args.ylimit
 if args.xscale:
 	xscale = args.xscale
 if args.yscale:
@@ -125,7 +123,7 @@ if args.ylabel:
 # determine line width:
 linewidth = 2.0 # default
 if args.linewidth:
-	linewidth = float(args.linewidth)
+	linewidth = args.linewidth
 
 # determine line color:
 if len(datafiles) == 1:
@@ -174,11 +172,6 @@ for i in range(len(datafiles)):
 	data    += (d,)
 	label   += (l,)
 	preheat += (p,)
-
-
-
-print('******************* ADD PYPSU LABEL BRANDING ')
-
 
 # determine font size and name:
 fontsize = None # default

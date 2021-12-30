@@ -49,15 +49,6 @@ def plot_curves( data,			# measurement_data object (or tuple of measurement_data
 		print('ERROR: number of linestyles does not match number of datafiles!')
 		exit()
 
-
-
-	print('****************** CHECK THAT len(linestyle) = len(data)')
-
-
-
-
-
-
 	# data scaling
 	if xscale == 'mu':
 		xscale = 'µ'
@@ -84,9 +75,6 @@ def plot_curves( data,			# measurement_data object (or tuple of measurement_data
 		ylimit = ylimit / ysc
 	except:
 		pass
-
-
-	print(ysc)
 
 	# parse data for plot:
 	X = Y = C = tuple( ) # init empty tuples
@@ -118,7 +106,7 @@ def plot_curves( data,			# measurement_data object (or tuple of measurement_data
 		fs_base = 18
 	else:
 		fs_base = fontsize
-	fs_small = fs_small = 0.7*fs_base
+	fs_small = 0.7*fs_base
 	plt.rc('font', size=fs_base)
 	plt.rc('font', family=fontname)
 	
@@ -158,12 +146,17 @@ def plot_curves( data,			# measurement_data object (or tuple of measurement_data
 					y = np.append(y[kk], ylimit)
 			
 			plt.plot(x, y, color=linecolor[i], linestyle=linestyle[i], linewidth=lw_base)
-				
-			if C0[k] == -0.0:
-				s = f'{0.0}'
-			else:
-				s = f'{C0[k]}'
-			plt.text(x[-1], y[-1], s, fontsize=fs_small, bbox={'facecolor':'white','alpha':1,'edgecolor':'none','pad':1}, ha='center', va='center')
+			
+			# add label to curve (only for first datafile):
+			if i == 0:
+				if C0[k] == -0.0:
+					s = f'{0.0}'
+				else:
+					s = f'{C0[k]}'
+				plt.text( x[-1], y[-1], s,
+				          fontsize=fs_small,
+				          bbox={'facecolor':'white','alpha':1,'edgecolor':'none','pad':0.5},
+				          ha='center', va='center')
 
 	# format the plot:
 	if x_reverse_neg:
@@ -186,12 +179,13 @@ def plot_curves( data,			# measurement_data object (or tuple of measurement_data
 	else:
 		plt.grid(False) 
 	
-
 	for axis in ['top','bottom','left','right']:
 		ax.spines[axis].set_linewidth(lw_base)
 		ax.spines[axis].set_capstyle('round')
 	
 	if not nobranding:
+		r = ax.get_ylim()
+		ax.set_ylim([r[0], r[0]+1.05*(r[1]-r[0])])
 		plt.text( 0.98, 0.98,'PyPSUcurvetrace',
 			  fontsize=fs_small,
 			  bbox={'facecolor':'white','alpha':1,'edgecolor':'none','pad':1},
