@@ -101,7 +101,8 @@ def read_datafile(datafile):
 	ph = preheat()
 	for i,line in enumerate(lines):
 		if '* OPERATING POINT AT END OF PREHEAT ' in line:
-			u = line.split(': ')[1]
+			u = line.replace("Uc = U0=", "U0=") # workaround for buggy output from curvetrace
+			u = u.split(': ')[1]
 			u = u.split('=')
 			ph.U0 = float(u[1].split('V')[0])
 			ph.I0 = float(u[2].split('A')[0])
