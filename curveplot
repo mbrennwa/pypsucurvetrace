@@ -49,6 +49,9 @@ parser.add_argument('--ylimit', type=float, help='Max. y-axis value')
 parser.add_argument('--xscale', help='x-axis multiplier prefix (G, M, k, m, µ, n, p, f)')
 parser.add_argument('--yscale', help='y-axis multiplier prefix (G, M, k, m, µ, n, p, f)')
 
+parser.add_argument('--xreverseneg', action='store_true', help='Do not reverse x-axis direction for negative DUTs')
+parser.add_argument('--yreverseneg', action='store_true', help='Do not reverse y-axis direction for negative DUTs')
+
 parser.add_argument('--title', help='Plot title')
 
 parser.add_argument('--xlabel', help='x-axis label')
@@ -100,6 +103,8 @@ xlimit = None # default
 ylimit = None # default
 xscale = None
 yscale = None
+xreverseneg = True
+yreverseneg = True
 if args.xlimit:
 	xlimit = args.xlimit
 if args.ylimit:
@@ -108,6 +113,10 @@ if args.xscale:
 	xscale = args.xscale
 if args.yscale:
 	yscale = args.yscale
+if args.xreverseneg:
+	xreverseneg = False
+if args.yreverseneg:
+	yreverseneg = False
 	
 # determine axis labels and plot title:
 xlabel = None # default
@@ -207,6 +216,8 @@ plot_curves( data = data,
              ylabel = ylabel,
              xscale = xscale,
              yscale = yscale,
+             x_reverse_neg = xreverseneg,
+             y_reverse_neg = yreverseneg,
              fontsize = fontsize,
              fontname = fontname)
 

@@ -118,7 +118,10 @@ def plot_curves( data,			# measurement_data object (or tuple of measurement_data
 	plt.rc('lines', solid_joinstyle='round')
 	plt.rc('lines', solid_capstyle='round')
 	
-	# loop over all data files:
+	# init tuples to deal with curve labels:
+	s = xl = yl = dx = dy = xx = yy = tuple( )
+	
+	# plot curves, loop over all data files:
 	for i in range(len(data)):
 		
 		XX = X[i]
@@ -134,30 +137,97 @@ def plot_curves( data,			# measurement_data object (or tuple of measurement_data
 			
 			if xlimit is not None:
 				kk = np.where(abs(x) < abs(xlimit))[0]
+				if not kk.any():
+					continue # skip this curve, continue to the next curve
 				if kk[-1] < len(x)-1:
+					xlimit = np.sign(x[kk[-1]]) * abs(xlimit) # make sure polarity is right
 					yend = np.interp(xlimit, x[[kk[-1],kk[-1]+1]], y[[kk[-1],kk[-1]+1]])
 					x = np.append(x[kk], xlimit)
 					y = np.append(y[kk], yend)
 			if ylimit is not None:
 				kk = np.where(abs(y) < abs(ylimit))[0]
+				if not kk.any():
+					continue # skip this curve, continue to the next curve
 				if kk[-1] < len(y)-1:
+					ylimit = np.sign(y[kk[-1]]) * abs(ylimit) # make sure polarity is right
 					xend = np.interp(ylimit, y[[kk[-1],kk[-1]+1]], x[[kk[-1],kk[-1]+1]])
 					x = np.append(x[kk], xend)
 					y = np.append(y[kk], ylimit)
 			
 			plt.plot(x, y, color=linecolor[i], linestyle=linestyle[i], linewidth=lw_base)
 			
-			# add label to curve (only for first datafile):
+			# determine curve label things (only for first datafile):
 			if i == 0:
-				if C0[k] == -0.0:
-					s = f'{0.0}'
-				else:
-					s = f'{C0[k]}'
-				plt.text( x[-1], y[-1], s,
-				          fontsize=fs_small,
-				          bbox={'facecolor':'white','alpha':1,'edgecolor':'none','pad':0.5},
-				          ha='center', va='center')
 
+				# determine label string:
+				if C0[k] == -0.0:
+					s += (f'{0.0}', )
+				else:
+					s += (f'{C0[k]}', )
+				
+				# last curve point for label coordinates:
+				xl += (x[-1],)
+				yl += (y[-1],)
+
+				# curve slope:
+				dx += (x[-1] - x[-2], )
+				dy += (y[-1] - y[-2], )
+				
+
+
+
+
+
+
+
+
+
+	# add curve labels (after plotting all curves, otherwise coordinate scaling gets screwed up):
+	for i in range(len(s)):
+	
+		# draw label centered on endpoint of each curve:
+		lbl = plt.text( xl[i], yl[i], s[i],
+				fontsize=fs_small,
+				bbox={'facecolor':'white','alpha':1,'edgecolor':'none','pad':0.0},
+				ha='center', va='center'
+		              )
+		
+		# determine size of the text label:
+		plt.gcf().canvas.draw() # need to actually draw the label to get the dimensions
+		b = lbl.get_window_extent().transformed(plt.gca().transData.inverted())
+		w = 1.5 * b.width
+		h = 1.5 * b.height
+				
+		# extrapolate curve line and determine new label position (xl,yl)
+		if dx[i] == 0:
+			# curve is vertical
+			x = xl[i]
+			y = yl[i] + np.sign(dy[i])*h/2
+		elif abs(dy[i]/dx[i]) >= h/w:
+			# curve is steeper than diagonals of text box
+			x = xl[i] + np.sign(dx[i]) * dx[i]/dy[i] * h/2
+			y = yl[i] + np.sign(dy[i]) * h/2
+		else:
+			# curve is flatter than diagonals of text box
+			x = xl[i] + np.sign(dx[i]) * w/2
+			y = yl[i] + np.sign(dy[i]) * dy[i]/dx[i] * w/2
+		
+		# move the text label to the new position to avoid overlap with the curve data:
+		lbl.set_position((x, y))
+		
+		# keep track of x and y extent of text labels:
+		xx += (x-w/2, x+w/1.5, )
+		yy += (y-h/2, y+h/1.5, )
+	
+	# get plot axes:
+	ax = plt.gca()
+	
+	# make sure text labels are within axes ranges:
+	r = ax.get_xlim()
+	ax.set_xlim([ min([min(xx), r[0]]), max([max(xx), r[1]]) ])
+	r = ax.get_ylim()
+	ax.set_ylim([ min([min(yy), r[0]]), max([max(yy), r[1]]) ])
+	
 	# format the plot:
 	if x_reverse_neg:
 		r = plt.gca().axes.get_xlim()
@@ -171,7 +241,6 @@ def plot_curves( data,			# measurement_data object (or tuple of measurement_data
 	plt.title(title)
 	plt.xlabel(xlabel + ' ('+xunit+')')
 	plt.ylabel(ylabel + ' ('+yunit+')')
-	ax = plt.gca()
 	if grid_on:
 		plt.grid(True, color=gridcolor, linewidth=lw_thin) 
 		ax.tick_params(axis="x",length=0)
@@ -185,7 +254,7 @@ def plot_curves( data,			# measurement_data object (or tuple of measurement_data
 	
 	if not nobranding:
 		r = ax.get_ylim()
-		ax.set_ylim([r[0], r[0]+1.05*(r[1]-r[0])])
+		ax.set_ylim([r[0], r[0]+1.08*(r[1]-r[0])])
 		plt.text( 0.98, 0.98,'PyPSUcurvetrace',
 			  fontsize=fs_small,
 			  bbox={'facecolor':'white','alpha':1,'edgecolor':'none','pad':1},
