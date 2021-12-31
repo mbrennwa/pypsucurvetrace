@@ -17,13 +17,13 @@
 
 import traceback
 import sys
-import glob
+import os
+# import glob
 import argparse
-# import configparser
-# import datetime
 import numpy as np
-# import time
 import matplotlib.pyplot as plt
+from pathlib import Path
+import tempfile
 
 from lib.read_datafile import read_datafile
 from lib.plot_curves import plot_curves
@@ -33,41 +33,55 @@ from lib.curvetrace_tools import say_hello
 # main program #
 ################
 
-# parse input arguments (if any):
+# input arguments:
 parser = argparse.ArgumentParser(description='curveplot is a Python program for plotting of PyPSUcurvetrace data.')
 parser.add_argument('datafiles', nargs='+', help='Names (and paths) of PyPSUcurvetrace data files. A list of multiple files can be used for an overlay plot. Files can also be specified using wildcards.')
 
+# plot type:
 parser.add_argument('--type', help='Plot type. Format: <X><Y><C>, where X is the x-axis parameter, Y is the y-axis parameter, and C is the curves parameter; parameters are U1, I1, U2, I2. Example: -type U1I1U2. Default (if not format is not specified): type = U1I1U2')
 
+# size of plot figure:
 parser.add_argument('--width', type=float, help='Width of the figure')
 parser.add_argument('--height', type=float, help='Height of the figure')
 
-parser.add_argument('--pairs', action='store_true', help='Plot overlays of all datafile pairs in the datafiles directory (specify the directory only, without a filename)')
-
+# data limits:
 parser.add_argument('--xlimit', type=float, help='Max. x-axis value')
 parser.add_argument('--ylimit', type=float, help='Max. y-axis value')
 parser.add_argument('--xscale', help='x-axis multiplier prefix (G, M, k, m, µ, n, p, f)')
 parser.add_argument('--yscale', help='y-axis multiplier prefix (G, M, k, m, µ, n, p, f)')
 
+# axis direction for "negative" parts:
 parser.add_argument('--xreverseneg', action='store_true', help='Do not reverse x-axis direction for negative DUTs')
 parser.add_argument('--yreverseneg', action='store_true', help='Do not reverse y-axis direction for negative DUTs')
 
-parser.add_argument('--title', help='Plot title')
-
+# title / labels:
+parser.add_argument('--title', help='Plot title (see also --saveXYZ and --pairs options)')
 parser.add_argument('--xlabel', help='x-axis label')
 parser.add_argument('--ylabel', help='y-axis label')
 
+# line formats:
 parser.add_argument('--linecolor', help='Color of curves (any of the Matplotlib color specs)')
 parser.add_argument('--linestyle', help='Line style of curves (solid, dashed, dashdot, dotted)')
 parser.add_argument('--linewidth', type=float, help='Line width of curves and plot frame')
 
+# grid:
 parser.add_argument('--gridcolor', help='Grid line color')
 parser.add_argument('--nogrid', action='store_true', help='Turn off grid lines')
 
-parser.add_argument('--nobranding', action='store_true', help='Hide PyPSUcurvetrace label')
-
+# fonts:
 parser.add_argument('--fontsize', type=float, help='Font size')
 parser.add_argument('--fontname', help='Font name')
+
+# logo / branding on/off:
+parser.add_argument('--nobranding', action='store_true', help='Hide PyPSUcurvetrace label')
+
+# program flow:
+parser.add_argument('--pairs', action='store_true', help='Plot overlays of all dataset pairs in datafiles list (useful for parts matching). The plot title is determined from the datafile names.')
+parser.add_argument('--savepdf', action='store_true', help='Save plot to PDF file. The filename is determined from the --title (if set) or from the datafile name(s). WARNING: existing files with the same name will be overwritten!')
+parser.add_argument('--savesvg', action='store_true', help='Save plot to SVG file (see also --savepdf)')
+parser.add_argument('--savepng', action='store_true', help='Save plot to PNG file (see also --savepdf)')
+parser.add_argument('--nodisplay', action='store_true', help='Do not show the figure(s) on screen, only save to file (this requires at lease one of the --saveXYZ options to be set)')
+
 
 args = parser.parse_args()
 
@@ -77,13 +91,40 @@ say_hello('curveplot', 'Plotting of PyPSUcurvetrace data')
 # determine data file(s):
 datafiles = args.datafiles
 
-# pairs option:
+
+
+
+
+
+
+
+
+
+
+
+# program flow:
 pairs = False
 if args.pairs:
 	pairs = True
-if pairs:
-	print('******** --pairs option not yet implemented!')
-
+savefig = False
+savePDF = False
+saveSVG = False
+savePNG = False
+if args.savepdf:
+	savefig = True
+	savePDF = True
+if args.savesvg:
+	savefig = True
+	saveSVG = True
+if args.savepng:
+	savefig = True
+	savePNG = True
+dodisplay = True
+if args.nodisplay:
+	if savefig:
+		dodisplay = False
+	else:
+		print('WARNING: --saveXYZ not set, ignoring --nodisplay!')
 
 # determine plot type:
 plot_type = 'U1I1U2' # default
@@ -172,55 +213,130 @@ if args.gridcolor:
 nobranding = False
 if args.nobranding:
 	nobranding = True
+	
 
 # load data from files:
-data = label = preheat = tuple( )
+data = label = preheat = ls = lc = tuple( )
 
 for i in range(len(datafiles)):
 	d, l, p = read_datafile(datafiles[i])
-	data    += (d,)
-	label   += (l,)
-	preheat += (p,)
+	if len(d.rawdata) == 0:
+		print('WARNING: datafile ' + datafiles[i] + ' contains no curve data. Skipping this file...')
+	else:
+		data    += (d,)
+		label   += (l,)
+		preheat += (p,)
+		ls      += (linestyle[i],)
+		lc      += (linecolor[i],)
+linestyle = ls
+linecolor = lc
 
-# determine font size and name:
-fontsize = None # default
-fontname = None # default
-if args.fontsize:
-	fontsize = args.fontsize
-if args.fontname:
-	fontname = args.fontname
+if len(data) == 0:
+	print('No curve data for plotting.')
+	
+else:
+	# determine font size and name:
+	fontsize = None # default
+	fontname = None # default
+	if args.fontsize:
+		fontsize = args.fontsize
+	if args.fontname:
+		fontname = args.fontname
 
-# plot title:
-if title is None:
-	title = ''
-	for i in range(len(label)):
-		if i == 0:
-			title = label[0]
-		else:
-			title += ', ' + label[i]
+	if pairs:
+		datapairs = tuple( )
+		for i in range(0,len(data)-1):
+			for j in range(i+1,len(data)):
+				datapairs += ( ( data[i], data[j], ), )
+		datapairs = list(datapairs)
+		linecolor = [ 'r', 'b' ]
+		linestyle = [ 'solid', 'solid' ]
+		Nplots = len(datapairs)
+	else:
+		Nplots = 1
 
-# plot data:
-plt.figure(figsize=(width, height))
-plot_curves( data = data,
-             xlimit = xlimit,
-             ylimit = ylimit,
-             plot_type = plot_type,
-             linecolor = linecolor,
-             linestyle = linestyle,
-             linewidth = linewidth,
-             gridcolor = gridcolor,
-             grid_on   = grid_on,
-             nobranding = nobranding,
-             title  = title,
-             xlabel = xlabel,
-             ylabel = ylabel,
-             xscale = xscale,
-             yscale = yscale,
-             x_reverse_neg = xreverseneg,
-             y_reverse_neg = yreverseneg,
-             fontsize = fontsize,
-             fontname = fontname)
+	for i in range(Nplots):
+		if pairs:
+			data = datapairs[i]
+			title = Path(data[0].datafile).stem + ' (red) vs. ' + Path(data[1].datafile).stem + ' (blue)'
+		
+		# plot title:
+		if title is None:
+			title = ''
+			for i in range(len(label)):
+				if i == 0:
+					title = label[0]
+				else:
+					title += ', ' + label[i]
 
-# Show the plot:
-print('Close plot window to exit.')
-plt.show()
+		# plot data:
+		fig = plt.figure(figsize=(width, height))
+		try:
+			plot_curves( data = data,
+				     xlimit = xlimit,
+				     ylimit = ylimit,
+				     plot_type = plot_type,
+				     linecolor = linecolor,
+				     linestyle = linestyle,
+				     linewidth = linewidth,
+				     gridcolor = gridcolor,
+				     grid_on   = grid_on,
+				     nobranding = nobranding,
+				     title  = title,
+				     xlabel = xlabel,
+				     ylabel = ylabel,
+				     xscale = xscale,
+				     yscale = yscale,
+				     x_reverse_neg = xreverseneg,
+				     y_reverse_neg = yreverseneg,
+				     fontsize = fontsize,
+				     fontname = fontname)
+		except:
+			# plot failed for some reason, skip this plot and try the next one
+			continue
+			
+		if savefig:
+		
+			# determine filename:
+			if title is not None:
+				figname = title
+			else:
+				figname = ''
+				for dd in data:
+					figname += Path(dd.datafile).stem
+			specialChars = " %/,;.:\\*" 
+			for c in specialChars:
+				figname = figname.replace(c, '_')
+			if len(figname) > os.pathconf('/', 'PC_NAME_MAX')-4:
+				figname = figname[0:os.pathconf('/', 'PC_NAME_MAX')-4]
+			
+			# save figure file(s):		
+			if Nplots > 1:
+				nn = ' ' + str(i+1) + '/' + str(Nplots) + ' '
+			else:
+				nn = ' '
+			meta = {'Creator': 'PyPSUcurvetrace', 'Title': title}
+			f = tuple( )
+			if savePDF:
+				f += ( figname+'.pdf', )
+			if saveSVG:
+				f += ( figname+'.svg', )
+			if savePNG:
+				f += ( figname+'.png', )
+			for ff in f:
+
+				print('Saving figure' + nn + 'to file ' + ff + '...')
+				fig.savefig(ff, metadata=meta)
+
+		if dodisplay:
+
+			if i < Nplots-1:
+				print('Close plot window for next plot...')
+			else:
+				print('Close plot window to exit.')
+
+			# Show the plot:
+			plt.show()
+			
+		# close the figure
+		plt.close(fig)

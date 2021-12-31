@@ -29,42 +29,60 @@ class measurement_data:
 
 	def __init__ (self,datafile):
 		self.rawdata = np.loadtxt(datafile, comments='%')
-		self.CC_on = np.where( self.rawdata[:,4]+self.rawdata[:,9] == 0)
+		if len(self.rawdata.shape) == 1:
+			# one data line only
+			if len(self.rawdata) == 0:
+				# empty data
+				self.CC_on = self.rawdata
+			else:
+				# only one data line
+				if self.rawdata[4]+self.rawdata[9] == 0:
+					self.CC_on = [0] # index to first line
+				else:
+					self.CC_on = [] # empty index
+		else:
+			# two or more data lines
+			self.CC_on = np.where( self.rawdata[:,4]+self.rawdata[:,9] == 0)
+		
+		# replace "-0.0" values by "0.0"	
+		self.rawdata = np.where(self.rawdata==-0.0, 0.0, self.rawdata) 	
+		
 		self.datafile = datafile
+		
+	def __get_column(self,column,exclude_CC):
+		if len(self.rawdata.shape) == 1:
+			# one data line only
+			x = self.rawdata[column]
+			if exclude_CC:
+				if len(self.CC_on) == 0: # empty index
+					x = []
+			x = np.array(x)
+		else:
+			# two or more data lines
+			if exclude_CC:
+				x = self.rawdata[:,column][self.CC_on]
+			else:
+				x = self.rawdata[:,column][:]
+		return x
 	
 	def get_U1_meas (self,exclude_CC):
-		if exclude_CC:
-			x = self.rawdata[self.CC_on,2]
-		else:
-			x = self.rawdata[:,2]
-		return x
+		return self.__get_column(2,exclude_CC)
 		
 	def get_I1_meas (self,exclude_CC):
-		if exclude_CC:
-			x = self.rawdata[self.CC_on,3]
-		else:
-			x = self.rawdata[:,3]
-		return x
-		
+		return self.__get_column(3,exclude_CC)
+				
 	def get_U2_set (self,exclude_CC):
-		if exclude_CC:
-			x = self.rawdata[self.CC_on,5]
-		else:
-			x = self.rawdata[:,5]
-		return x
-		
+		return self.__get_column(5,exclude_CC)
+				
 	def get_T (self,exclude_CC):
-		if exclude_CC:
-			try:
-				x = self.rawdata[self.CC_on,10]
-			except:
-				x = np.matlib.repmat(None, len(exclude_CC))
-		else:
-			try:
-				x = self.rawdata[:,10]
-			except:
-				x = np.matlib.repmat(None, len(self.rawdata[:,1]))
-		return x		
+		try:
+			T = self.__get_column(10,exclude_CC)
+		except:
+			if exclude_CC:
+				T = np.matlib.repmat(None, len(exclude_CC))
+			else:
+				T = np.matlib.repmat(None, len(self.rawdata[:,1]))
+		return T		
 
 
 ############################

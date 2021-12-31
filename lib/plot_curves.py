@@ -40,13 +40,19 @@ def plot_curves( data,			# measurement_data object (or tuple of measurement_data
                  nobranding=False       # do not add PyPSUcurvetrace "branding" to the plot
                 ):
 
+	if type(data) is not tuple:
+		data = tuple(data)
+	if type(linecolor) is not tuple:
+		linecolor = tuple(linecolor)
+	if type(linestyle) is not tuple:
+		linestyle = tuple(linestyle)
 
 	if len(linecolor) != len(data):
-		print('ERROR: number of linecolors does not match number of datafiles!')
+		print('ERROR: number of linecolors (' + str(len(linecolor)) + ') does not match number of datafiles (' + str(len(data)) + ') !')
 		exit()
 
 	if len(linestyle) != len(data):
-		print('ERROR: number of linestyles does not match number of datafiles!')
+		print('ERROR: number of linestyles (' + str(len(linestyle)) + ') does not match number of datafiles (' + str(len(data)) + ') !')
 		exit()
 
 	# data scaling
@@ -78,16 +84,15 @@ def plot_curves( data,			# measurement_data object (or tuple of measurement_data
 
 	# parse data for plot:
 	X = Y = C = tuple( ) # init empty tuples
-	if plot_type == 'U1I1U2':
-		print('Plot type: X = U1, Y = I1, C = U2')
-		if type(data) is not tuple:
-			data = ( data, )
+	
+	if plot_type == 'U1I1U2': # Plot type: X = U1, Y = I1, C = U2
+	
 		for i in range(len(data)):
 			# append tuple elements:
 			X += (data[i].get_U1_meas(exclude_CC)/xsc,) # measured U1 value
 			Y += (data[i].get_I1_meas(exclude_CC)/ysc,) # measured I1 value
 			C += (data[i].get_U2_set(exclude_CC),)  # U2 set value
-			
+
 		if xlabel is None:
 			xlabel = 'U1'
 		if ylabel is None:
@@ -98,7 +103,7 @@ def plot_curves( data,			# measurement_data object (or tuple of measurement_data
 	else:
 		print('Plot type ' + plot_type + ' not supported.')
 		sys.exit()
-		
+
 	# prepare fonts:
 	if fontname is None:
 		fontname = 'Sans'
@@ -121,9 +126,11 @@ def plot_curves( data,			# measurement_data object (or tuple of measurement_data
 	# init tuples to deal with curve labels:
 	s = xl = yl = dx = dy = xx = yy = tuple( )
 	
+	
+	
 	# plot curves, loop over all data files:
 	for i in range(len(data)):
-		
+	
 		XX = X[i]
 		YY = Y[i]
 		CC = C[i]
@@ -131,7 +138,8 @@ def plot_curves( data,			# measurement_data object (or tuple of measurement_data
 
 		# loop over all curve lines:
 		for k in range(len(C0)):
-			kk = np.where(CC == C0[k])
+			
+			kk = np.where(CC == C0[k])[0]
 			x = XX[kk]
 			y = YY[kk]
 			
@@ -156,14 +164,13 @@ def plot_curves( data,			# measurement_data object (or tuple of measurement_data
 			
 			plt.plot(x, y, color=linecolor[i], linestyle=linestyle[i], linewidth=lw_base)
 			
+			has_curves = True
+			
 			# determine curve label things (only for first datafile):
 			if i == 0:
 
 				# determine label string:
-				if C0[k] == -0.0:
-					s += (f'{0.0}', )
-				else:
-					s += (f'{C0[k]}', )
+				s += (f'{C0[k]}', )
 				
 				# last curve point for label coordinates:
 				xl += (x[-1],)
@@ -173,15 +180,6 @@ def plot_curves( data,			# measurement_data object (or tuple of measurement_data
 				dx += (x[-1] - x[-2], )
 				dy += (y[-1] - y[-2], )
 				
-
-
-
-
-
-
-
-
-
 	# add curve labels (after plotting all curves, otherwise coordinate scaling gets screwed up):
 	for i in range(len(s)):
 	
@@ -190,7 +188,7 @@ def plot_curves( data,			# measurement_data object (or tuple of measurement_data
 				fontsize=fs_small,
 				bbox={'facecolor':'white','alpha':1,'edgecolor':'none','pad':0.0},
 				ha='center', va='center'
-		              )
+			      )
 		
 		# determine size of the text label:
 		plt.gcf().canvas.draw() # need to actually draw the label to get the dimensions
@@ -218,7 +216,7 @@ def plot_curves( data,			# measurement_data object (or tuple of measurement_data
 		# keep track of x and y extent of text labels:
 		xx += (x-w/2, x+w/1.5, )
 		yy += (y-h/2, y+h/1.5, )
-	
+
 	# get plot axes:
 	ax = plt.gca()
 	
