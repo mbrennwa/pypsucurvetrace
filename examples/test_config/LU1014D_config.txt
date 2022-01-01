@@ -92,8 +92,8 @@ IIDLE     = 2
 [EXTRA]
 
 # DUT temperature (target and tolerance values, deg.C):
-T_TARGET = 30
-T_TOL    = 0.2
+T_TARGET = 40
+T_TOL    = 0.5
 
 # Duration of idle periods between readings (seconds):
 ## IDLESECS    = 2
@@ -101,7 +101,7 @@ IDLESECS    = 0
 
 # Duration of pre-heat / warmup period before starting the test (seconds):
 ## PREHEATSECS = 300
-PREHEATSECS = 20
+PREHEATSECS = 12
 
 
 # number of repeated readings at each measurement step:

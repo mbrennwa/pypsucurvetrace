@@ -148,7 +148,7 @@ else:
 	try:
 		N_rep = int(input('\nOPTIONAL: Number of repeats per reading [default=1]: '))
 	except ValueError:
-		logger.info(('  Using default: single reading.')
+		logger.info('  Using default: single reading.')
 		N_rep = 1
 if N_rep <= 0:
 	raise ValueError('Number of repeats must be positive.')
