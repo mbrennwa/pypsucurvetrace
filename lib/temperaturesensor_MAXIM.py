@@ -29,6 +29,16 @@ try:
 except ImportError as e:
 	print (e)
 	raise
+	
+# set up logger:
+logger = logging.getLogger('powersupply_VOLTCRAFT')
+logger.setLevel(logging.DEBUG)
+ch = logging.StreamHandler()
+ch.setLevel(logging.DEBUG)
+formatter = logging.Formatter('%(levelname)s (%(name)s): %(message)s')
+ch.setFormatter(formatter)
+logger.addHandler(ch)
+
 
 # check Python version and print warning if we're running version < 3:
 if ( sys.version_info[0] < 3 ):
@@ -64,27 +74,23 @@ class temperaturesensor_MAXIM:
 			r = AddressableDevice(UART_Adapter(serialport)).get_connected_ROMs()
 
 			if r is None:
-				print ( 'Couldn not find any 1-wire devices on ' + serialport )
+				logger.error ( 'Couldn not find any 1-wire devices on ' + serialport )
 			else:
 				bus = UART_Adapter(serialport)
 				if romcode == '':
 					if len(r) == 1:
-						# print ('Using 1-wire device ' + r[0] + '\n')
 						self._sensor = DS18B20(bus)
 						self._ROMcode = r[0]
 					else:
-						print ( 'Too many 1-wire devices to choose from! Try again with specific ROM code...' )
+						logger.error ( 'Too many 1-wire devices to choose from! Try again with specific ROM code...' )
 						for i in range(1,len(r)):
-							print ( 'Device ' + i + ' ROM code: ' + r[i-1] +'\n' )
+							logger.info ( 'Device ' + i + ' ROM code: ' + r[i-1] +'\n' )
 				else:
 					self._sensor = DS18B20(bus, rom=romcode)
 					self._ROMcode = romcode
 				
 				self._UART_locked = False
 
-			### if hasattr(self,'_sensor'):
-			### 	print ( 'Successfully configured DS18B20 temperature sensor (ROM code ' + self._ROMcode + ')' )
-			### else:
 			if not hasattr(self,'_sensor'):
 				self.warning( 'Could not initialize MAXIM DS1820 temperature sensor.' )
 
@@ -188,7 +194,7 @@ class temperaturesensor_MAXIM:
 		(none)
 		'''
 		
-		print ('WARNING from temperaturesensor_MAXIM: ' + msg)
+		logger.warning (msg)
 		
 		
 	########################################################################################################
