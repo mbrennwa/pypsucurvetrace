@@ -16,19 +16,27 @@
 # along with PyPSUcurvetrace.  If not, see <http://www.gnu.org/licenses/>.
 
 import traceback
+import sys
 import argparse
 import configparser
 import datetime
 import numpy as np
 import time
 import logging
-logging.basicConfig(level=logging.DEBUG)
+# logging.basicConfig(level=logging.DEBUG)
 
 import lib.powersupply as powersupply
 import lib.heaterblock as heaterblock
-
 from lib.curvetrace_tools import say_hello, printit, connect_PSU, configure_test_PSU, configure_idle_PSU, do_idle, start_new_logfile, format_PSU_reading
 
+# set up logger:
+logger = logging.getLogger('curvetrace')
+logger.setLevel(logging.DEBUG)
+ch = logging.StreamHandler()
+ch.setLevel(logging.DEBUG)
+formatter = logging.Formatter('%(levelname)s (%(name)s): %(message)s')
+ch.setFormatter(formatter)
+logger.addHandler(ch)
 
 
 
@@ -81,25 +89,25 @@ configTESTER.read('config.txt')
 # check for batch mode:
 batch_mode = False
 if args.b:
-	print ('Running in batch mode (loop of repeated test tuns)...\n')
+	logger.info('Running in batch mode (loop of repeated test tuns)...')
 	batch_mode = True
 
 # check for quick mode:
 quick_mode = False
 if args.q:
-	print ('Running in quick mode (pre-heating only, no curve tracing)...\n')
+	logger.info('Running in quick mode (pre-heating only, no curve tracing)...')
 	quick_mode = True
 
 # read DUT configTESTER file (if any):
 configDUT = []
 if args.c:
-	print ('Reading DUT configuration in file ' + args.c + '...\n')
+	logger.info('Reading DUT configuration in file ' + args.c + '...')
 	configDUT = configparser.ConfigParser()
 	configDUT.read(args.c)
 	
 # connect to PSUs:
-PSU1 = connect_PSU(configTESTER,'PSU1'); print( )
-PSU2 = connect_PSU(configTESTER,'PSU2'); print( )
+PSU1 = connect_PSU(configTESTER,'PSU1');
+PSU2 = connect_PSU(configTESTER,'PSU2');
 
 
 # set up heaterblock:
@@ -121,8 +129,8 @@ else:
 # check if at least one of the power supplies is configured:	
 if not PSU1.CONFIGURED:
 	if not PSU2.CONFIGURED:
-		print('No power supply configured. Good bye.')
-		exit()
+		logger.error('No power supply configured.')
+		sys.exit()
 
 # set up temperature control (optional, may be missing in DUT config file):
 TEMP_val = None
@@ -141,7 +149,7 @@ else:
 	try:
 		N_rep = int(input('\nOPTIONAL: Number of repeats per reading [default=1]: '))
 	except ValueError:
-		print ('  Using default: single reading.')
+		logger.info(('  Using default: single reading.')
 		N_rep = 1
 if N_rep <= 0:
 	raise ValueError('Number of repeats must be positive.')
@@ -153,7 +161,7 @@ else:
 	try:
 		T_idle = float(input('\nOPTIONAL: idle time between readings (s) [default=0]: '))
 	except ValueError:
-		print ('  Using default: no idle time.')
+		logger.info('  Using default: no idle time.')
 		T_idle = 0.0
 if T_idle < 0:
 	raise ValueError('Idle time must not be negative.')
@@ -165,7 +173,7 @@ else:
 	try:
 		T_preheat = float(input('\nOPTIONAL: pre-heat time before starting the test (s) [default=0]: '))
 	except ValueError:
-		print ('  Using default: no pre-heating.')
+		logger.info('  Using default: no pre-heating.')
 		T_preheat = 0.0
 if T_preheat < 0:
 	raise ValueError('Pre-heat time must not be negative.')
@@ -185,86 +193,86 @@ if (T_idle > 0.0) or (T_preheat > 0.0):
 
 	if PSU1.CONNECTED and PSU2.CONNECTED:
 		if (not PSU1.TEST_VIDLE_MAX == PSU1.TEST_VIDLE_MIN) and (not PSU2.TEST_VIDLE_MAX == PSU2.TEST_VIDLE_MIN):
-			print('Both PSUs are configured with variable idle voltages. This cannot work. Goodbye!')
-			exit()
+			logger.error('Both PSUs are configured with variable idle voltages. This cannot work.')
+			sys.exit()
 
 # check voltage / power / current limits (and fix where possible and necessary):
-print ('\nChecking voltage / current settings...')
+logger.info('Checking voltage / current settings...')
 for p in [PSU1,PSU2]:
 	if p.CONNECTED:
 		if p.TEST_VSTART < p.VMIN:
-			print ('  ' + p.LABEL + ': Adjusting start voltage to min. value possible with the power supply (' + str(p.VMIN) + ' V).')
+			logger.info('  ' + p.LABEL + ': Adjusting start voltage to min. value possible with the power supply (' + str(p.VMIN) + ' V).')
 			p.TEST_VSTART = p.VMIN
 		if p.TEST_VSTART > p.VMAX:
-			print ('  ' + p.LABEL + ': Adjusting start voltage to max. value possible with the power supply (' + str(p.VMAX) + ' V).')
+			logger.info('  ' + p.LABEL + ': Adjusting start voltage to max. value possible with the power supply (' + str(p.VMAX) + ' V).')
 			p.TEST_VSTART = p.VMAX
 		if p.TEST_VEND < p.VMIN:
-			print ('  ' + p.LABEL + ': Adjusting end voltage to min. value possible with the power supply (' + str(p.VMIN) + ' V).')
+			logger.info('  ' + p.LABEL + ': Adjusting end voltage to min. value possible with the power supply (' + str(p.VMIN) + ' V).')
 			p.TEST_VEND = p.VMIN
 		if p.TEST_VEND > p.VMAX:
-			print ('  ' + p.LABEL + ': Adjusting end voltage to max. value possible with the power supply (' + str(p.VMAX) + ' V).')
+			logger.info('  ' + p.LABEL + ': Adjusting end voltage to max. value possible with the power supply (' + str(p.VMAX) + ' V).')
 			p.TEST_VEND = p.VMAX
 		if p.TEST_VEND == p.TEST_VSTART:
-			# print ('  ' + p.LABEL + ': Same start and end voltage, test will run at fixed voltage (' + str(p.TEST_VSTART) + ' V).')
+			# logger.info('  ' + p.LABEL + ': Same start and end voltage, test will run at fixed voltage (' + str(p.TEST_VSTART) + ' V).')
 			p.TEST_VSTEP = 0
 		if abs(p.TEST_VEND-p.TEST_VSTART) < p.VRESSET:
-			print ('  ' + p.LABEL + ': Test voltage range is less than voltage setting resolution of the PSU. Test will run at fixed voltage (' + str(p.TEST_VSTART) + ' V).')
+			logger.info('  ' + p.LABEL + ': Test voltage range is less than voltage setting resolution of the PSU. Test will run at fixed voltage (' + str(p.TEST_VSTART) + ' V).')
 			p.TEST_VSTEP = 0
 			p.TEST_VEND = p.TEST_VSTART
 		if p.TEST_VSTEP > 0.0:
 			if p.TEST_VSTEP > abs(p.TEST_VEND-p.TEST_VSTART):
 				p.TEST_VSTEP = abs(p.TEST_VEND-p.TEST_VSTART)
-				print ('  ' + p.LABEL + ': Voltage step size exceeds test voltage range. Adjusting step size to ' + str(p.TEST_VSTEP) + ' V.')
+				logger.info('  ' + p.LABEL + ': Voltage step size exceeds test voltage range. Adjusting step size to ' + str(p.TEST_VSTEP) + ' V.')
 			if p.TEST_VSTEP < p.VRESSET:
-				print ('  ' + p.LABEL + ': Voltage step size is less than PSU resolution of voltage setting. Adjusting step size to ' + str(p.VRESSET) + ' V.')
+				logger.info('  ' + p.LABEL + ': Voltage step size is less than PSU resolution of voltage setting. Adjusting step size to ' + str(p.VRESSET) + ' V.')
 				p.TEST_VSTEP = p.VRESSET
 			if p.TEST_VSTEP/p.VRESSET < p.VRESSET:
-				print ('  ' + p.LABEL + ': Voltage step size is less than PSU resolution of voltage setting. Adjusting step size to ' + str(p.VRESSET) + ' V.')
+				logger.info('  ' + p.LABEL + ': Voltage step size is less than PSU resolution of voltage setting. Adjusting step size to ' + str(p.VRESSET) + ' V.')
 				p.TEST_VSTEP = p.VRESSET
 			if not ( p.TEST_VSTEP / p.VRESSET == round(p.TEST_VSTEP / p.VRESSET) ):
 				u = p.TEST_VSTEP
 				p.TEST_VSTEP = round(p.TEST_VSTEP / p.VRESSET) * p.VRESSET
-				print ('  ' + p.LABEL + ': Voltage step size (' + str(u) + ' V) is not consistent with PSU resolution of voltage setting. Adjusting step size to ' + str(p.TEST_VSTEP) + ' V.')
+				logger.info('  ' + p.LABEL + ': Voltage step size (' + str(u) + ' V) is not consistent with PSU resolution of voltage setting. Adjusting step size to ' + str(p.TEST_VSTEP) + ' V.')
 		if p.TEST_ILIMIT > p.IMAX:
-			print ('  ' + p.LABEL + ': Adjusting current limit to max. value possible with the power supply (' + str(p.IMAX) + ' A).')
+			logger.info('  ' + p.LABEL + ': Adjusting current limit to max. value possible with the power supply (' + str(p.IMAX) + ' A).')
 			p.TEST_ILIMIT = p.IMAX
 		if p.TEST_PLIMIT > p.PMAX:
-			print ('  ' + p.LABEL + ': Adjusting power limit to max. value possible with the power supply (' + str(p.PMAX) + ' W).')
+			logger.info('  ' + p.LABEL + ': Adjusting power limit to max. value possible with the power supply (' + str(p.PMAX) + ' W).')
 			p.TEST_PLIMIT = p.PMAX
 		if (T_idle > 0.0) or (T_preheat > 0.0):
 			if p.TEST_PIDLELIMIT > p.PMAX:
-				print ('  ' + p.LABEL + ': Adjusting idle power limit to max. value possible with the power supply (' + str(p.PMAX) + ' W).')
+				logger.info('  ' + p.LABEL + ': Adjusting idle power limit to max. value possible with the power supply (' + str(p.PMAX) + ' W).')
 				p.TEST_PIDLELIMIT = p.PMAX
 			if p.TEST_VIDLE > p.VMAX:
-				print ('  ' + p.LABEL + ': Adjusting idle voltage to max. value possible with the power supply (' + str(p.VMAX) + ' V).')
+				logger.info('  ' + p.LABEL + ': Adjusting idle voltage to max. value possible with the power supply (' + str(p.VMAX) + ' V).')
 				p.TEST_VIDLE = p.VMAX
 			if p.TEST_VIDLE < p.VMIN:
-				print ('  ' + p.LABEL + ': Adjusting idle voltage to min. value possible with the power supply (' + str(p.VMIN) + ' V).')
+				logger.info('  ' + p.LABEL + ': Adjusting idle voltage to min. value possible with the power supply (' + str(p.VMIN) + ' V).')
 				p.TEST_VIDLE = p.VMIN
 			if p.TEST_VIDLE_MAX > p.VMAX:
-				print ('  ' + p.LABEL + ': Adjusting max.-idle voltage to max. value possible with the power supply (' + str(p.VMAX) + ' V).')
+				logger.info('  ' + p.LABEL + ': Adjusting max.-idle voltage to max. value possible with the power supply (' + str(p.VMAX) + ' V).')
 				p.TEST_VIDLE_MAX = p.VMAX
 			if p.TEST_VIDLE_MAX < p.VMIN:
-				print ('  ' + p.LABEL + ': Adjusting max.-idle voltage to min. value possible with the power supply (' + str(p.VMIN) + ' V).')
+				logger.info('  ' + p.LABEL + ': Adjusting max.-idle voltage to min. value possible with the power supply (' + str(p.VMIN) + ' V).')
 				p.TEST_VIDLE_MAX = p.VMIN
 			if p.TEST_VIDLE_MIN > p.VMAX:
-				print ('  ' + p.LABEL + ': Adjusting min.-idle voltage to max. value possible with the power supply (' + str(p.VMAX) + ' V).')
+				logger.info('  ' + p.LABEL + ': Adjusting min.-idle voltage to max. value possible with the power supply (' + str(p.VMAX) + ' V).')
 				p.TEST_VIDLE_MIN = p.VMAX
 			if p.TEST_VIDLE_MIN < p.VMIN:
-				print ('  ' + p.LABEL + ': Adjusting min.-idle voltage to min. value possible with the power supply (' + str(p.VMIN) + ' V).')
+				logger.info('  ' + p.LABEL + ': Adjusting min.-idle voltage to min. value possible with the power supply (' + str(p.VMIN) + ' V).')
 				p.TEST_VIDLE_MIN = p.VMIN
 			if p.TEST_VIDLE_MIN > p.TEST_VIDLE_MAX:
-				print ('  ' + p.LABEL + ': Adjusting min.-idle voltage to ' + str(p.TEST_VIDLE) + ' V).')
+				logger.info('  ' + p.LABEL + ': Adjusting min.-idle voltage to ' + str(p.TEST_VIDLE) + ' V).')
 				p.TEST_VIDLE_MIN = p.TEST_VIDLE
 			if p.TEST_VIDLE_MAX < p.TEST_VIDLE_MIN:
-				print ('  ' + p.LABEL + ': Adjusting max.-idle voltage to ' + str(p.TEST_VIDLE) + ' V).')
+				logger.info('  ' + p.LABEL + ': Adjusting max.-idle voltage to ' + str(p.TEST_VIDLE) + ' V).')
 				p.TEST_VIDLE_MAX = p.TEST_VIDLE
 			if p.TEST_IIDLE > p.IMAX:
-				print ('  ' + p.LABEL + ': Adjusting idle current to max. value possible with the power supply (' + str(p.IMAX) + ' V).')
+				logger.info('  ' + p.LABEL + ': Adjusting idle current to max. value possible with the power supply (' + str(p.IMAX) + ' V).')
 				p.TEST_IIDLE = p.IMIN
 			if p.TEST_VIDLE * p.TEST_IIDLE > p.PMAX:
 				p.TEST_IIDLE = p.PMAX / p.TEST_VIDLE
-				print ('  ' + p.LABEL + ': Idle current limit is higher than PSU power limit (' + str(p.PMAX) + ' W). Adjusting idle current limit to ' + str(p.TEST_IIDLE) + ' A.' )
+				logger.info('  ' + p.LABEL + ': Idle current limit is higher than PSU power limit (' + str(p.PMAX) + ' W). Adjusting idle current limit to ' + str(p.TEST_IIDLE) + ' A.' )
 		
 
 
@@ -396,7 +404,7 @@ try:
 		# DUT break-in / pre-heat
 		if T_preheat > 0.0:
 			
-			print ('DUT break-in / pre-heat...\n')
+			logger.info('DUT break-in / pre-heat...\n')
 
 			# set idle conditions:
 			if TEMP_val != None:
@@ -406,7 +414,7 @@ try:
 			do_idle(PSU1,PSU2,HEATER,T_preheat,file=logfile,wait_for_TEMP=do_TEMP_wait)
 
 		if not quick_mode:
-			print ('Curve tracing started...\n')
+			logger.info('Curve tracing started...\n')
 
 			for V2 in V_steps[1]:
 			# outer loop (V2)
@@ -570,7 +578,7 @@ try:
 					     T_HB
 					printit(t, logfile )
 
-			print ('Curve tracing completed.')
+			logger.info('Curve tracing completed.')
 			
 		# Turn off PSUs:
 		for p in [PSU1, PSU2]:
@@ -584,10 +592,10 @@ try:
 			do_run = False
 
 except KeyboardInterrupt:
-	print ('\nCaught keyboard interrupt, exiting...\n')
+	logger.info('\nCaught keyboard interrupt, exiting...\n')
 	
 except:
-	print ('\nOooops, something went wrong during testing: ' +  traceback.format_exc())
+	logger.info('\nOooops, something went wrong during testing: ' +  traceback.format_exc())
 
 finally:
 	cleanup_exit()
