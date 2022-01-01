@@ -6,6 +6,16 @@ import serial
 import sys
 import time
 from math import ceil, log10
+import logging
+
+# set up logger:
+logger = logging.getLogger('powersupply_BK')
+logger.setLevel(logging.DEBUG)
+ch = logging.StreamHandler()
+ch.setLevel(logging.DEBUG)
+formatter = logging.Formatter('%(levelname)s (%(name)s): %(message)s')
+ch.setFormatter(formatter)
+logger.addHandler(ch)
 
 
 # Python dictionary of known B&K power supply models (Vmin,Vmax,Imax,Pmax,VresolutionSet,IresolutionSet,VresolutionRead,IresolutionRead,VoffsetMax,IoffsetMax,MaxSettleTime)
@@ -106,7 +116,7 @@ class BK(object):
 			elif '9120A' in typestring[1]:
 				self.MODEL = '9120A'
 			else:
-				print ( 'Unknown B&K model: ' + typestring[1] )
+				logger.warning ( 'Unknown B&K model: ' + typestring[1] )
 				self.MODEL = '?????'
 
 			v = BK_SPECS[self.MODEL]
@@ -313,7 +323,7 @@ class BK(object):
 		S = 'CV'
 		if self._ILIMITSETTING is None:
 			# ILIMITSETTING has not yet been set in self.current()
-			print('_ILIMITSETTING is None.')
+			logger.debug('_ILIMITSETTING is None.')
 			S = '?'
 		else:
 			if I >= 0.975*self._ILIMITSETTING:
