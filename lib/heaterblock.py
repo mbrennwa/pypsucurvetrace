@@ -12,6 +12,7 @@ import traceback
 import logging
 import time
 import numpy as np
+
 from simple_pid import PID
 from threading import Thread
 from lib.temperaturesensor_MAXIM import temperaturesensor_MAXIM as TSENS

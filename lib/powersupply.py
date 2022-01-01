@@ -6,9 +6,20 @@ Classes of specific real-world power supplies will derive from this class.
 import time
 import numpy as np
 from numpy.polynomial.polynomial import polyval
+import logging
+
 import lib.powersupply_VOLTCRAFT as powersupply_VOLTCRAFT
 import lib.powersupply_KORAD as powersupply_KORAD
 import lib.powersupply_BK as powersupply_BK
+
+# set up logger:
+logger = logging.getLogger('powersupply')
+logger.setLevel(logging.DEBUG)
+ch = logging.StreamHandler()
+ch.setLevel(logging.DEBUG)
+formatter = logging.Formatter('%(levelname)s (%(name)s): %(message)s')
+ch.setFormatter(formatter)
+logger.addHandler(ch)
 
 # PSU object:
 #    .setVoltage(voltage)   set voltage
@@ -104,13 +115,13 @@ class PSU:
 
 		# check inputs:
 		if not port:
-			print (label + ': cannot connect to power supply (no serial port specified).')
+			logger.error (label + ': cannot connect to power supply (no serial port specified).')
 			
 		elif not commandset:
-			print (label + ': cannot connect to power supply (no type / command set specified).')
+			logger.error (label + ': cannot connect to power supply (no type / command set specified).')
 
 		elif not label:
-			print (label + ': cannot set up power supply (no label specified).')
+			logger.error (label + ': cannot set up power supply (no label specified).')
 
 		# connect to the PSUs and set it/them up:
 		else:
@@ -269,10 +280,9 @@ class PSU:
 
 			if not stable:
 				if r[2] == "CC":
-					pass
-					### print(self.LABEL + ': voltage setpoint running into current limit mode. Skip waiting for stable output voltage...')
+					pass # voltage setpoint running into current limit mode. Skip waiting for stable output voltage...
 				else:
-					print (self.LABEL + ' warning: voltage setpoint not reached after ' + str(self.MAXSETTLETIME) + ' s! Offset = ' + str(delta) + ' V')
+					logger.warning (self.LABEL + ': voltage setpoint not reached after ' + str(self.MAXSETTLETIME) + ' s! Offset = ' + str(delta) + ' V')
 
 
 	########################################################################################################
@@ -327,9 +337,9 @@ class PSU:
 					time.sleep(self.READIDLETIME)
 			if not stable:
 				if r[2] == "CV":
-					print(self.LABEL + ': current setpoint running into voltage limit mode. Skip waiting for stable output current...')
+					pass # current setpoint running into voltage limit mode. Skip waiting for stable output current...
 				else:
-					print (self.LABEL + ' warning: current setpoint not reached after ' + str(self.MAXSETTLETIME) + ' s! Offset = ' + str(delta) + ' A')
+					logger.warning (self.LABEL + ': current setpoint not reached after ' + str(self.MAXSETTLETIME) + ' s! Offset = ' + str(delta) + ' A')
 
 
 	########################################################################################################
@@ -449,7 +459,6 @@ class PSU:
 				I.append(i)
 				if l == "CC":
 					L.append(1.0)
-					### print(self.LABEL + ': running in current limit mode. Skip reading ' + str(N) + ' consistent readings in a row...')
 					limit = limit + 1
 					if limit > limit_max: # ran into the current limit for the third time
 						break
@@ -472,7 +481,7 @@ class PSU:
 
 				if time.time() - t0 > self.MAXSETTLETIME:
 					# getting consistent readings is taking too long; give up
-					print(self.LABEL + ': Could not get ' + str(N) + ' consistent readings in a row after ' + str(self.MAXSETTLETIME) + ' s! DUT drifting? Noise?')
+					logger.info(self.LABEL + ': Could not get ' + str(N) + ' consistent readings in a row after ' + str(self.MAXSETTLETIME) + ' s! DUT drifting? Noise?')
 					break
 		
 		if N > 1:
