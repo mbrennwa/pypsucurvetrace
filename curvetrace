@@ -23,7 +23,6 @@ import datetime
 import numpy as np
 import time
 import logging
-# logging.basicConfig(level=logging.DEBUG)
 
 import lib.powersupply as powersupply
 import lib.heaterblock as heaterblock
@@ -52,18 +51,18 @@ def cleanup_exit():
 			if p.CONNECTED:
 				p.turnOff()
 		except:
-			logging.warning('Could not turn off PSU ' + p.LABEL + '!')
+			logger.warning('Could not turn off PSU ' + p.LABEL + '!')
 			pass
 
 	try:
 		HEATER.turn_off()
 	except:
-		logging.warning('Could not turn off heater: ' +  traceback.format_exc())
+		logger.warning('Could not turn off heater: ' +  traceback.format_exc())
 		pass
 	try:
 		HEATER.terminate_controller_thread()
 	except:
-		logging.warning('Could not terminate heaterblock controller thread: ' +  traceback.format_exc())
+		logger.warning('Could not terminate heaterblock controller thread: ' +  traceback.format_exc())
 		pass
 
 
