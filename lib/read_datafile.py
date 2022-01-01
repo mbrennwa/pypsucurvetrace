@@ -3,14 +3,17 @@ Function to read PyPSUcurvetrace data files
 """
 
 # imports:
-# import traceback
-# import time
-# import math
-# import datetime
-# import configparser
-# import argparse
 import numpy as np
-# import os.path
+import logging
+
+# set up logger:
+logger = logging.getLogger('read_datafile')
+logger.setLevel(logging.DEBUG)
+ch = logging.StreamHandler()
+ch.setLevel(logging.DEBUG)
+formatter = logging.Formatter('%(levelname)s (%(name)s): %(message)s')
+ch.setFormatter(formatter)
+logger.addHandler(ch)
 
 
 ############################

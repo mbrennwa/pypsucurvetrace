@@ -18,16 +18,26 @@
 import traceback
 import sys
 import os
-# import glob
 import argparse
 import numpy as np
 import matplotlib.pyplot as plt
 from pathlib import Path
 import tempfile
+import logging
 
 from lib.read_datafile import read_datafile
 from lib.plot_curves import plot_curves
 from lib.curvetrace_tools import say_hello
+
+# set up logger:
+logger = logging.getLogger('curveplot')
+logger.setLevel(logging.DEBUG)
+ch = logging.StreamHandler()
+ch.setLevel(logging.DEBUG)
+formatter = logging.Formatter('%(levelname)s (%(name)s): %(message)s')
+ch.setFormatter(formatter)
+logger.addHandler(ch)
+
 
 ################
 # main program #
@@ -91,21 +101,13 @@ say_hello('curveplot', 'Plotting of PyPSUcurvetrace data')
 # determine data file(s):
 datafiles = args.datafiles
 
-
-
-
-
-
-
-
-
-
-
-
 # program flow:
 pairs = False
 if args.pairs:
-	pairs = True
+	if len(datafiles) == 1:
+		logger.warning('Specified --pairs option with a single datafile, ignoring --pairs.')
+	else:
+		pairs = True
 savefig = False
 savePDF = False
 saveSVG = False
@@ -124,7 +126,7 @@ if args.nodisplay:
 	if savefig:
 		dodisplay = False
 	else:
-		print('WARNING: --saveXYZ not set, ignoring --nodisplay!')
+		logger.warning('--saveXYZ not set, ignoring --nodisplay!')
 
 # determine plot type:
 plot_type = 'U1I1U2' # default
@@ -186,7 +188,7 @@ if args.linecolor:
 if args.linestyle:
 	linestyle = (args.linestyle,)
 if len(linecolor) < len(datafiles):
-	print('WARNING: will use the same linecolor for all datafiles!')
+	logger.warning('No linecolors specified, will use the same linecolor for all datafiles!')
 	u = tuple( )
 	for i in range(len(datafiles)):
 		u += (linecolor[0],)
@@ -195,7 +197,7 @@ if len(linecolor) < len(datafiles):
 # determine line style:
 linestyle = ('solid',) # default
 if len(linestyle) < len(datafiles):
-	print('WARNING: will use the same linestyle for all datafiles!')
+	logger.warning('No linestyles specified, will use the same linestyle for all datafiles!')
 	u = tuple( )
 	for i in range(len(datafiles)):
 		u += (linestyle[0],)
@@ -221,7 +223,7 @@ data = label = preheat = ls = lc = tuple( )
 for i in range(len(datafiles)):
 	d, l, p = read_datafile(datafiles[i])
 	if len(d.rawdata) == 0:
-		print('WARNING: datafile ' + datafiles[i] + ' contains no curve data. Skipping this file...')
+		logger.warning('datafile ' + datafiles[i] + ' contains no curve data. Skipping this file...')
 	else:
 		data    += (d,)
 		label   += (l,)
@@ -232,7 +234,7 @@ linestyle = ls
 linecolor = lc
 
 if len(data) == 0:
-	print('No curve data for plotting.')
+	logger.info('No curve data for plotting.')
 	
 else:
 	# determine font size and name:
@@ -325,7 +327,7 @@ else:
 				f += ( figname+'.png', )
 			for ff in f:
 
-				print('Saving figure' + nn + 'to file ' + ff + '...')
+				logger.info('Saving figure' + nn + 'to file ' + ff + '...')
 				fig.savefig(ff, metadata=meta)
 
 		if dodisplay:

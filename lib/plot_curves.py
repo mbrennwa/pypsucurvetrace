@@ -3,15 +3,18 @@ Function to plot PyPSUcurvetrace data
 """
 
 # imports:
-# import traceback
-# import time
-# import math
-# import datetime
-# import configparser
-# import argparse
 import numpy as np
-# import os.path
 import matplotlib.pyplot as plt
+import logging
+
+# set up logger:
+logger = logging.getLogger('plot_curves')
+logger.setLevel(logging.DEBUG)
+ch = logging.StreamHandler()
+ch.setLevel(logging.DEBUG)
+formatter = logging.Formatter('%(levelname)s (%(name)s): %(message)s')
+ch.setFormatter(formatter)
+logger.addHandler(ch)
 
 
 ###############
@@ -37,6 +40,7 @@ def plot_curves( data,			# measurement_data object (or tuple of measurement_data
                  ylimit=None,           # y-axis data limit (absolute value)
                  xscale=None,           # x-axis multiplier prefix (G, M, k, m, µ, n, p, f)
                  yscale=None,           # y-axis multiplier prefix (G, M, k, m, µ, n, p, f)
+                 cscale=None,           # curve multiplier prefix (G, M, k, m, µ, n, p, f)
                  nobranding=False       # do not add PyPSUcurvetrace "branding" to the plot
                 ):
 
@@ -48,12 +52,12 @@ def plot_curves( data,			# measurement_data object (or tuple of measurement_data
 		linestyle = tuple(linestyle)
 
 	if len(linecolor) != len(data):
-		print('ERROR: number of linecolors (' + str(len(linecolor)) + ') does not match number of datafiles (' + str(len(data)) + ') !')
-		exit()
+		logger.error('ERROR: number of linecolors (' + str(len(linecolor)) + ') does not match number of datafiles (' + str(len(data)) + ') !')
+		return
 
 	if len(linestyle) != len(data):
-		print('ERROR: number of linestyles (' + str(len(linestyle)) + ') does not match number of datafiles (' + str(len(data)) + ') !')
-		exit()
+		logger.error('ERROR: number of linestyles (' + str(len(linestyle)) + ') does not match number of datafiles (' + str(len(data)) + ') !')
+		return
 
 	# data scaling
 	if xscale == 'mu':
@@ -74,6 +78,12 @@ def plot_curves( data,			# measurement_data object (or tuple of measurement_data
 		ysc = 1.0
 		yunitprfix = ''
 	try:
+		csc = float(10**sc[cscale])
+		cunitprfix = cscale
+	except:
+		csc = 1.0
+		cunitprfix = ''
+	try:
 		xlimit = xlimit / xsc
 	except:
 		pass
@@ -91,7 +101,7 @@ def plot_curves( data,			# measurement_data object (or tuple of measurement_data
 			# append tuple elements:
 			X += (data[i].get_U1_meas(exclude_CC)/xsc,) # measured U1 value
 			Y += (data[i].get_I1_meas(exclude_CC)/ysc,) # measured I1 value
-			C += (data[i].get_U2_set(exclude_CC),)  # U2 set value
+			C += (data[i].get_U2_set(exclude_CC)/csc,)  # U2 set value
 
 		if xlabel is None:
 			xlabel = 'U1'
@@ -99,10 +109,11 @@ def plot_curves( data,			# measurement_data object (or tuple of measurement_data
 			ylabel = 'I1'
 		xunit = xunitprfix + 'V'
 		yunit = yunitprfix + 'A'
+		cunit = cunitprfix + 'V'
 		
 	else:
-		print('Plot type ' + plot_type + ' not supported.')
-		sys.exit()
+		logger.error('Plot type ' + plot_type + ' not supported.')
+		return
 
 	# prepare fonts:
 	if fontname is None:
@@ -140,6 +151,11 @@ def plot_curves( data,			# measurement_data object (or tuple of measurement_data
 		for k in range(len(C0)):
 			
 			kk = np.where(CC == C0[k])[0]
+			
+			if len(kk) < 2:
+				logger.warning('Not enough data for plotting curve at ' + str(C0[k]) + ' ' + cunit + ' (' + data[i].datafile + '). Skipping...')
+				continue # skip to next curve
+			
 			x = XX[kk]
 			y = YY[kk]
 			
