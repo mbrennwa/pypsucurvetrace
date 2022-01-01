@@ -10,6 +10,17 @@ Python class to control KORAD (RND) power supplies
 import serial
 import sys
 import time
+import logging
+
+# set up logger:
+logger = logging.getLogger('powersupply_KORAD')
+logger.setLevel(logging.DEBUG)
+ch = logging.StreamHandler()
+ch.setLevel(logging.DEBUG)
+formatter = logging.Formatter('%(levelname)s (%(name)s): %(message)s')
+ch.setFormatter(formatter)
+logger.addHandler(ch)
+
 
 # Python dictionary of known KORAD (RND) power supply models (Vmin,Vmax,Imax,Pmax,VresolutionSet,IresolutionSet,VresolutionRead,IresolutionRead,VoffsetMax,IoffsetMax,MaxSettleTime)
 
@@ -80,8 +91,6 @@ class KORAD(object):
 		try:
 			typestring = self._query('*IDN?').split(" ")
 
-			### print (typestring)
-
 			# parse typestring:
 			if len(typestring) < 2:
 				raise RuntimeError ('No KORAD power supply connected to ' + port)
@@ -106,7 +115,7 @@ class KORAD(object):
 			elif 'KWR103' in typestring[1]:
 				self.MODEL = 'KWR103'
 			else:
-				print ( 'Unknown KORAD model: ' + typestring[1] )
+				logger.warning ( 'Unknown KORAD model: ' + typestring[1] )
 				self.MODEL = '?????'
 
 			v = KORAD_SPECS[self.MODEL]
