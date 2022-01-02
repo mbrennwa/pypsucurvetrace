@@ -85,8 +85,11 @@ parser.add_argument('--fontname', help='Font name (this may need clearing of the
 # logo / branding on/off:
 parser.add_argument('--nobranding', action='store_true', help='Hide PyPSUcurvetrace label')
 
-# program flow:
+# matching tools:
 parser.add_argument('--pairs', action='store_true', help='Plot overlays of all dataset pairs in datafiles list (useful for parts matching). The plot title is determined from the datafile names.')
+parser.add_argument('--maxdeltaUc', type=float, help='Skip --pairs plotting if the Uc values from the prehead/idle are different by more than the specified value (ignored if used without --pairs)')
+
+# program flow:
 parser.add_argument('--savepdf', action='store_true', help='Save plot to PDF file. The filename is determined from the --title (if set) or from the datafile name(s). WARNING: existing files with the same name will be overwritten!')
 parser.add_argument('--savesvg', action='store_true', help='Save plot to SVG file (see also --savepdf)')
 parser.add_argument('--savepng', action='store_true', help='Save plot to PNG file (see also --savepdf)')
@@ -101,13 +104,21 @@ say_hello('curveplot', 'Plotting of PyPSUcurvetrace data')
 # determine data file(s):
 datafiles = args.datafiles
 
-# program flow:
+
+
+
+# matching:
 pairs = False
+maxdeltaUc = None
 if args.pairs:
 	if len(datafiles) == 1:
 		logger.warning('Specified --pairs option with a single datafile, ignoring --pairs.')
 	else:
 		pairs = True
+	if args.maxdeltaUc:
+		maxdeltaUc = args.maxdeltaUc
+		
+# program flow:
 savefig = False
 savePDF = False
 saveSVG = False
@@ -249,7 +260,14 @@ else:
 		datapairs = tuple( )
 		for i in range(0,len(data)-1):
 			for j in range(i+1,len(data)):
-				datapairs += ( ( data[i], data[j], ), )
+				do_add = False
+				if args.maxdeltaUc is None:
+					do_add = True
+				else:
+					if abs(preheat[i].Uc-preheat[j].Uc) <= maxdeltaUc:
+						do_add = True
+				if do_add:
+					datapairs += ( ( data[i], data[j], ), )
 		datapairs = list(datapairs)
 		linecolor = [ 'r', 'b' ]
 		linestyle = [ 'solid', 'solid' ]
