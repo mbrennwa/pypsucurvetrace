@@ -80,7 +80,7 @@ parser.add_argument('--nogrid', action='store_true', help='Turn off grid lines')
 
 # fonts:
 parser.add_argument('--fontsize', type=float, help='Font size')
-parser.add_argument('--fontname', help='Font name')
+parser.add_argument('--fontname', help='Font name (this may need clearing of the matplotlib font cache after installing new fonts to your system)')
 
 # logo / branding on/off:
 parser.add_argument('--nobranding', action='store_true', help='Hide PyPSUcurvetrace label')
