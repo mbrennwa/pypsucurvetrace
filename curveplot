@@ -95,17 +95,13 @@ parser.add_argument('--savesvg', action='store_true', help='Save plot to SVG fil
 parser.add_argument('--savepng', action='store_true', help='Save plot to PNG file (see also --savepdf)')
 parser.add_argument('--nodisplay', action='store_true', help='Do not show the figure(s) on screen, only save to file (this requires at lease one of the --saveXYZ options to be set)')
 
-
-args = parser.parse_args()
-
 # Say Hello:
 say_hello('curveplot', 'Plotting of PyPSUcurvetrace data')
 
+args = parser.parse_args()
+
 # determine data file(s):
 datafiles = args.datafiles
-
-
-
 
 # matching:
 pairs = False
