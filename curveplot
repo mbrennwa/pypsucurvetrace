@@ -323,6 +323,9 @@ else:
 			specialChars = " %/,;.:\\*" 
 			for c in specialChars:
 				figname = figname.replace(c, '_')
+			for k in range(len(specialChars)):
+				figname = figname.replace('__', '_')
+				
 			if len(figname) > os.pathconf('/', 'PC_NAME_MAX')-4:
 				figname = figname[0:os.pathconf('/', 'PC_NAME_MAX')-4]
 			
