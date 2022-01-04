@@ -240,7 +240,7 @@ for i in range(len(datafiles)):
 			lc      += (linecolor[i],)
 	except:
 		# could not read file (maybe the file does not exist, may happen if the datafiles list was created by some iterator loop that did not know enough)
-		logger.warning('Could not read ' + datafiles[i] + '. Skipping this file...')
+		logger.warning('Could not load data from ' + datafiles[i] + '. Skipping this file...')
 		continue # skip to next file
 		
 linestyle = ls
