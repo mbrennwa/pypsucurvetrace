@@ -271,6 +271,10 @@ else:
 	else:
 		Nplots = 1
 
+	# matplotlib figure:
+	fig = plt.figure(figsize=(width, height))
+
+	# loop to deal with all plots:
 	for i in range(Nplots):
 		if pairs:
 			data = datapairs[i]
@@ -286,7 +290,6 @@ else:
 					title += ', ' + label[i]
 
 		# plot data:
-		fig = plt.figure(figsize=(width, height))
 		try:
 			plot_curves( data = data,
 				     xlimit = xlimit,
@@ -358,4 +361,7 @@ else:
 			plt.show()
 			
 		# close the figure
-		plt.close(fig)
+		fig.clear() # clear the figure (for the next plot in the loop)
+	
+	# cleanup: close the plot after all plots are done
+	plt.close(fig)
