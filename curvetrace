@@ -326,19 +326,9 @@ if (T_idle > 0.0) or (T_preheat > 0.0):
 print ('* Heaterblock temperature (current) = ' + str(HEATER.get_temperature_string()))
 print ('* Heaterblock temperature (target)  = ' + str(HEATER.get_target_temperature_string()))
 
-
-
-
-
+# set function to calculate the "average" value:
 AVGFUNCTION = 'MEAN'
 # AVGFUNCTION = 'MEDIAN'
-
-
-
-
-
-#? I1LIM = 0.0
-#? I2LIM = 0.0
 
 # determine voltage step values:
 V_steps = []
