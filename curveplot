@@ -228,15 +228,21 @@ if args.nobranding:
 data = label = preheat = ls = lc = tuple( )
 
 for i in range(len(datafiles)):
-	d, l, p = read_datafile(datafiles[i])
-	if len(d.rawdata) == 0:
-		logger.warning('datafile ' + datafiles[i] + ' contains no curve data. Skipping this file...')
-	else:
-		data    += (d,)
-		label   += (l,)
-		preheat += (p,)
-		ls      += (linestyle[i],)
-		lc      += (linecolor[i],)
+	try:
+		d, l, p = read_datafile(datafiles[i])
+		if len(d.rawdata) == 0:
+			logger.warning('datafile ' + datafiles[i] + ' contains no curve data. Skipping this file...')
+		else:
+			data    += (d,)
+			label   += (l,)
+			preheat += (p,)
+			ls      += (linestyle[i],)
+			lc      += (linecolor[i],)
+	except:
+		# could not read file (maybe the file does not exist, may happen if the datafiles list was created by some iterator loop that did not know enough)
+		logger.warning('Could not read ' + datafiles[i] + '. Skipping this file...')
+		continue # skip to next file
+		
 linestyle = ls
 linecolor = lc
 
