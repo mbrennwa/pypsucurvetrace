@@ -72,10 +72,10 @@ PMAX   = 1
 VIDLE     = 1.0
 
 # - V2 minimum value (V):
-VIDLE_MIN = 0.0
+VIDLE_MIN = 0.3
 
 # - V2 maximum value (V):
-VIDLE_MAX = 3.0
+VIDLE_MAX = 2.0
 
 # - The DUT transconductance value (in A/V) to be used for regulation of the I1 idle current by adjusting the V2 voltage:
 #   (IDLE_GM = delta-I1 / delta-U2 ratio of the DUT at the idle point)
@@ -100,7 +100,6 @@ T_TOL    = 0.5
 IDLESECS    = 0
 
 # Duration of pre-heat / warmup period before starting the test (seconds):
-## PREHEATSECS = 300
 PREHEATSECS = 12
 
 
