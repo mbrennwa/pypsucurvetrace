@@ -366,8 +366,8 @@ else:
 			# Show the plot:
 			plt.show()
 			
-		# close the figure
-		fig.clear() # clear the figure (for the next plot in the loop)
+		# clear the figure (for the next plot in the loop)
+		plt.clf()
 	
 	# cleanup: close the plot after all plots are done
 	plt.close(fig)
