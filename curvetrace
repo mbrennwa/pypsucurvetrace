@@ -350,6 +350,13 @@ for p in [PSU1,PSU2]:
 			V_steps.append(u)
 
 try:
+
+	# keep start values for idle voltages as configured (for later):
+	Uc_ini_1 = Uc_ini_2 = None
+	if PSU1.CONFIGURED: Uc_ini_1 = PSU1.TEST_VIDLE
+	if PSU2.CONFIGURED: Uc_ini_2 = PSU2.TEST_VIDLE
+
+	# run the test/measurements (loop until done):
 	do_run = True
 	while do_run:
 
@@ -400,7 +407,9 @@ try:
 				do_TEMP_wait = True
 			else:
 				do_TEMP_wait = False
-			do_idle(PSU1,PSU2,HEATER,T_preheat,file=logfile,wait_for_TEMP=do_TEMP_wait)
+			
+			# do idle/preheat:
+			do_idle(PSU1, PSU2, HEATER, T_preheat, file=logfile, wait_for_TEMP=do_TEMP_wait)
 
 		if not quick_mode:
 			logger.info('Curve tracing started...\n')
@@ -575,8 +584,14 @@ try:
 				p.turnOff()
 	
 		if batch_mode:
+		
 			# prepare next step and file:
 			logfile, samplename, _, step = start_new_logfile(batch_mode, basename, step+1)
+			
+			# reset initial values for idle conditions:
+			if PSU1.CONFIGURED: PSU1.TEST_VIDLE = Uc_ini_1
+			if PSU2.CONFIGURED: PSU2.TEST_VIDLE = Uc_ini_2
+			
 		else:
 			do_run = False
 
