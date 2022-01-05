@@ -369,7 +369,7 @@ def configure_idle_PSU(PSU,configDUT):
 # do idle / DUT break-in #
 ##########################
 
-def do_idle(PSU1,PSU2,HEATER,seconds,file=None,wait_for_TEMP=False):
+def do_idle(PSU1, PSU2, HEATER, seconds, file=None, wait_for_TEMP=False):
 	
 	REG = None
 
@@ -396,7 +396,7 @@ def do_idle(PSU1,PSU2,HEATER,seconds,file=None,wait_for_TEMP=False):
 
 		# sleep time (seconds):
 		dt = 0.0
-
+		
 		# Set output limits at the fixed PSU:
 		FIX.setCurrent(IFIXLIM,False)
 		FIX.setVoltage(FIX.TEST_VIDLE,True)
@@ -409,7 +409,6 @@ def do_idle(PSU1,PSU2,HEATER,seconds,file=None,wait_for_TEMP=False):
 		t0 = time.time()
 		timenow = time.time()
 		heater_delays = 0.0
-		Uc = REG.TEST_VIDLE # initial Uc value
 		while timenow < t0+seconds+heater_delays:
 
 			# wait for heaterblock to reach prescribed temperature (if configured/available/required):
@@ -442,20 +441,16 @@ def do_idle(PSU1,PSU2,HEATER,seconds,file=None,wait_for_TEMP=False):
 
 			dIf = If-FIX.TEST_IIDLE  # deviation of the observed idle current from the target value
 			if not dIf == 0.0:
-			
-				# determine Uc (the voltage changed needed for Ur voltage):
+				# determine the voltage changed needed for Ur voltage:
 				dUr = 0.65 * dIf / REG.TEST_IDLE_GM
 				
-				# make sure Uc is within the allowed limits:
-				if Uc - dUr < REG.TEST_VIDLE_MIN:
-					Uc = REG.TEST_VIDLE_MIN
-				elif Uc - dUr > REG.TEST_VIDLE_MAX:
-					Uc = REG.TEST_VIDLE_MIN
+				if REG.TEST_VIDLE - dUr < REG.TEST_VIDLE_MIN:
+					REG.TEST_VIDLE = REG.TEST_VIDLE_MIN
+				elif REG.TEST_VIDLE - dUr > REG.TEST_VIDLE_MAX:
+					REG.TEST_VIDLE = REG.TEST_VIDLE_MIN
 				else:
-					Uc = Uc - dUr
-					
-				# set voltage output at REG PSU to Uc:
-				REG.setVoltage(Uc,True)
+					REG.TEST_VIDLE = REG.TEST_VIDLE - dUr
+				REG.setVoltage(REG.TEST_VIDLE,True)
 
 			time.sleep(dt)
 			timenow = time.time()
