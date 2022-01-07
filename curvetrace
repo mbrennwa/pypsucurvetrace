@@ -23,10 +23,13 @@ import datetime
 import numpy as np
 import time
 import logging
+import matplotlib.pyplot as plt
+import multiprocessing
 
 import lib.powersupply as powersupply
 import lib.heaterblock as heaterblock
 from lib.curvetrace_tools import say_hello, printit, connect_PSU, configure_test_PSU, configure_idle_PSU, do_idle, start_new_logfile, format_PSU_reading
+from lib.plot_curves import curve_plotter
 
 # set up logger:
 logger = logging.getLogger('curvetrace')
@@ -44,6 +47,7 @@ logger.addHandler(ch)
 ###################
 
 def cleanup_exit():
+
 	# Try hard to turn off all PSUs to avoid unwanted/unattended powering of the DUT or heater block.
 
 	for p in [PSU1, PSU2]:
@@ -65,6 +69,11 @@ def cleanup_exit():
 		logger.warning('Could not terminate heaterblock controller thread: ' +  traceback.format_exc())
 		pass
 
+	# stop curve-plotter process and wait for the process to finish
+	queue.put( None )
+	queue.close()
+	queue.join_thread()
+	plt_proc.join()
 
 
 ################
@@ -272,8 +281,6 @@ for p in [PSU1,PSU2]:
 			if p.TEST_VIDLE * p.TEST_IIDLE > p.PMAX:
 				p.TEST_IIDLE = p.PMAX / p.TEST_VIDLE
 				logger.info('  ' + p.LABEL + ': Idle current limit is higher than PSU power limit (' + str(p.PMAX) + ' W). Adjusting idle current limit to ' + str(p.TEST_IIDLE) + ' A.' )
-		
-
 
 # Print summary of test setup:
 print('\nTest setup:')
@@ -325,6 +332,15 @@ if (T_idle > 0.0) or (T_preheat > 0.0):
 
 print ('* Heaterblock temperature (current) = ' + str(HEATER.get_temperature_string()))
 print ('* Heaterblock temperature (target)  = ' + str(HEATER.get_target_temperature_string()))
+
+# set up plotting environment
+plt.ion()
+plt.show()
+
+# set up separate process for data plotting:
+queue = multiprocessing.Queue() # queue for data exchange with the plotting process
+plt_proc = multiprocessing.Process(target=curve_plotter, args=(queue,)) # plotting process
+plt_proc.start() # start the plotting process
 
 # set function to calculate the "average" value:
 AVGFUNCTION = 'MEAN'
@@ -556,7 +572,11 @@ try:
 						if limit >= limit_max:
 							break # break out of the inner loop (V1 steps) and continue with the next V2 step
 
-					# Print results:
+					# send data to curve plotter thread:
+					u = [ V1*PSU1.TEST_POLARITY, I1LIM*PSU1.TEST_POLARITY, V1MEAS*PSU1.TEST_POLARITY, I1MEAS*PSU1.TEST_POLARITY, LIMIT1, V2*PSU2.TEST_POLARITY, I2LIM*PSU2.TEST_POLARITY, V2MEAS*PSU2.TEST_POLARITY, I2MEAS*PSU2.TEST_POLARITY, LIMIT2, T_HB ]
+					queue.put(u)
+					
+					# Print results to terminal:
 					try:
 						T_HB = "{:.2f}".format(T_HB)
 					except:
@@ -591,6 +611,9 @@ try:
 			# reset initial values for idle conditions:
 			if PSU1.CONFIGURED: PSU1.TEST_VIDLE = Uc_ini_1
 			if PSU2.CONFIGURED: PSU2.TEST_VIDLE = Uc_ini_2
+			
+			# tell curve plotter to start new set of curves:
+			queue.put([])
 			
 		else:
 			do_run = False

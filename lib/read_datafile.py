@@ -30,43 +30,58 @@ class preheat:
 
 class measurement_data:
 
-	def __init__ (self,datafile):
-		self.rawdata = np.loadtxt(datafile, comments='%')
-		if len(self.rawdata.shape) == 1:
-			# one data line only
-			if len(self.rawdata) == 0:
-				# empty data
-				self.CC_on = self.rawdata
-			else:
-				# only one data line
-				if self.rawdata[4]+self.rawdata[9] == 0:
-					self.CC_on = [0] # index to first line
-				else:
-					self.CC_on = [] # empty index
-		else:
-			# two or more data lines
-			self.CC_on = np.where( self.rawdata[:,4]+self.rawdata[:,9] == 0)
-		
-		# replace "-0.0" values by "0.0"	
-		self.rawdata = np.where(self.rawdata==-0.0, 0.0, self.rawdata) 	
+	def __init__ (self,datafile=None):
 		
 		self.datafile = datafile
 		
+		if datafile is None:
+			# set up an empty measurement_data object:
+			self.rawdata = np.array([])
+		
+		else:
+			# load data from file
+			self.rawdata = np.loadtxt(self.datafile, comments='%')
+			
+			# replace "-0.0" values by "0.0"	
+			self.rawdata = np.where(self.rawdata==-0.0, 0.0, self.rawdata) 	
+		
 	def __get_column(self,column,exclude_CC):
+		
 		if len(self.rawdata.shape) == 1:
-			# one data line only
-			x = self.rawdata[column]
-			if exclude_CC:
-				if len(self.CC_on) == 0: # empty index
-					x = []
-			x = np.array(x)
+			if len(self.rawdata) == 0:
+				x = np.array([])
+			else:
+				# one data line only
+				x = self.rawdata[column]
+				if exclude_CC:
+					if len(self.get_CC_on()) == 0: # empty index
+						x = np.array([])
 		else:
 			# two or more data lines
 			if exclude_CC:
-				x = self.rawdata[:,column][self.CC_on]
+				x = self.rawdata[:,column][self.get_CC_on()]
 			else:
 				x = self.rawdata[:,column][:]
 		return x
+		
+	def get_CC_on (self):
+		if len(self.rawdata.shape) == 1:
+			# zero or one data line only
+			if len(self.rawdata) == 0:
+				# empty data
+				CC_on = self.rawdata
+			else:
+				# only one data line
+				if self.rawdata[4]+self.rawdata[9] == 0:
+					CC_on = [0] # index to first line
+				else:
+					CC_on = [] # empty index
+		else:
+			# two or more data lines
+			CC_on = np.where( self.rawdata[:,4]+self.rawdata[:,9] == 0)
+			
+		return CC_on
+
 	
 	def get_U1_meas (self,exclude_CC):
 		return self.__get_column(2,exclude_CC)
@@ -85,7 +100,13 @@ class measurement_data:
 				T = np.matlib.repmat(None, len(exclude_CC))
 			else:
 				T = np.matlib.repmat(None, len(self.rawdata[:,1]))
-		return T		
+		return T
+		
+	def add_data(self, x):
+		if len(self.rawdata) == 0:
+			self.rawdata = np.array(x)
+		else:
+			self.rawdata = np.vstack([self.rawdata, x])
 
 
 ############################
