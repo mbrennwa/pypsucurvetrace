@@ -326,12 +326,11 @@ class BK(object):
 			logger.debug('_ILIMITSETTING is None.')
 			S = '?'
 		else:
-			if I >= 0.975*self._ILIMITSETTING:
+			if I+self.IRESREAD >= 0.90*self._ILIMITSETTING:
 				# the current reading is close to the ILIMITSETTING value
-				if V < 0.975*self._VLIMITSETTING:
-					# the voltage reading is clearly lower to the VLIMITSETTING value
+				if V-self.VRESREAD < 0.95*self._VLIMITSETTING:
+					# the voltage reading is lower than the VLIMITSETTING value
 					S = 'CC'
-
-
+					
 		return (V, I, S)
 
