@@ -58,7 +58,7 @@ POLARITY = -1
 VSTART = 0
 
 # Test voltage V2 end:
-VEND   = 4.0
+VEND   = 3.5
 
 # Test voltage V2 steps:
 VSTEP  = 0.25
