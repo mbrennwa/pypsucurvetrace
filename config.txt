@@ -4,14 +4,20 @@
 
 
 [PSU1]
-# BK 9120A
-COMPORT = /dev/serial/by-id/usb-Prolific_Technology_Inc._USB-Serial_Controller-if00-port0
+### # BK 9120A
+### COMPORT = /dev/serial/by-id/usb-Prolific_Technology_Inc._USB-Serial_Controller-if00-port0
+### TYPE = BK
+### NUMSTABLEREAD = 1
+### V_SET_CALPOLY  = (-0.00075,0.99981)
+### V_READ_CALPOLY = (-0.00001,1.0)
+### I_SET_CALPOLY  = (0.0,1.0)
+### I_READ_CALPOLY = (0.0005,1.0)
+
+
+# BK 9185B, PSU LABEL #7
+COMPORT = /dev/serial/by-id/usb-Silicon_Labs_CP2102_USB_to_UART_Bridge_Controller_508D19126-if00-port0
 TYPE = BK
 NUMSTABLEREAD = 1
-V_SET_CALPOLY  = (-0.00075,0.99981)
-V_READ_CALPOLY = (-0.00001,1.0)
-I_SET_CALPOLY  = (0.0,1.0)
-I_READ_CALPOLY = (0.0005,1.0)
 
 ### # KORAD/RND KWR103, PSU LABEL #2
 ### COMPORT = /dev/serial/by-id/usb-nuvoton_KORAD_USB_Mode_48DB467A3733-if00
