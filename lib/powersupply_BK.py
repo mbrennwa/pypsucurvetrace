@@ -20,8 +20,8 @@ logger.addHandler(ch)
 
 # Python dictionary of known B&K power supply models (Vmin,Vmax,Imax,Pmax,VresolutionSet,IresolutionSet,VresolutionRead,IresolutionRead,VoffsetMax,IoffsetMax,MaxSettleTime)
 BK_SPECS = {
-		"9185B_HIGH":	( 0.0, 610.0,  0.35, 210,  0.02,    0.00001, 0.3,    0.0015, 0.02, 0.0, 2.0 ),  # 9185B in "HIGH" setting, confirmed working
-		"9185B_LOW":	( 0.0, 400.0,  0.5 , 210,  0.02,    0.00001, 0.3,    0.0015, 0.02, 0.0, 2.0 ),  # 9185B in "LOW" setting, confirmed working
+		"9185B_HIGH":	( 0.0, 610.0,  0.35, 210,  0.02,    0.00001, 0.3,    0.00001, 0.02, 0.0001, 2.0 ),  # 9185B in "HIGH" setting, confirmed working
+		"9185B_LOW":	( 0.0, 400.0,  0.5 , 210,  0.02,    0.00001, 0.3,    0.00001, 0.02, 0.0001, 2.0 ),  # 9185B in "LOW" setting, confirmed working
 		# "9120A":	    ( 0.0, 32.0,   3.0 , 96,   0.0005,  0.0001,  0.0001, 0.00001, 2.0 )   # 9120A, currently testing / under construction
 		"9120A":	    ( 0.0, 32.0,   3.0 , 96,   0.0005,  0.0001,  0.0001, 0.00001, 0.012, 0.0002, 2.0 )   # 9120A, currently testing / under construction
 }
