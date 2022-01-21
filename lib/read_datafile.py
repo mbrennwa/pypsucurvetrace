@@ -40,7 +40,10 @@ class measurement_data:
 		
 		else:
 			# load data from file
-			self.rawdata = np.loadtxt(self.datafile, comments='%')
+			try:
+				self.rawdata = np.genfromtxt(self.datafile, comments='%') # this deals nicely with NA values (for example if the heaterblock T values are missing)
+			except Exception as e:
+				logger.error('Could not load data from file ' + self.datafile + ' (' + str(e) + ').')
 			
 			# replace "-0.0" values by "0.0"	
 			self.rawdata = np.where(self.rawdata==-0.0, 0.0, self.rawdata) 	
