@@ -293,44 +293,42 @@ class BK(object):
 				pass
 
 		# read output limit status:
-		### k = 1
-		### while True:
-		### 	try:
-		### 		if k > 10:
-		### 			raise RuntimeException("Could not read output limit status from B&K PSU!")
-		### 			
-		### 		# THIS SOMEHOW MESSES UP THE COMMUNICATION WITH THE PSU:				
-		### 		S = int(self._query('STATus:OPERation:CONDition?'))
-		### 		
-		### 		if S&8 != 0:
-		### 			S = 'CC'
-		### 		elif S&4 != 0:
-		### 			S = 'CV'
-		### 		else:
-		### 			S = None
-		### 			print('BK PSU: Could not determine CV or CC condition.')
-		### 		break
-		### 	except:
-		### 		k = k+1
-		### 		self._Serial.reset_output_buffer()
-		### 		self._Serial.reset_input_buffer()
-		### 		time.sleep(0.05)
-		### 		pass
+		if self.MODEL == '9120A':
+			# Reading the CV/CC mode from the PSU unit messes up the communication with the PSU
+			### THIS SOMEHOW MESSES UP THE COMMUNICATION WITH THE 9120A, so threat his unit differently (see above):				
+			### S = int(self._query('STATus:OPERation:CONDition?'))
+
+			# Try to guesstimate the CV/CC mode from the V and I readings:
+			S = 'CV'
+			if self._ILIMITSETTING is None:
+				# ILIMITSETTING has not yet been set in self.current()
+				logger.debug('_ILIMITSETTING is None.')
+				S = '?'
+			else:
+				if I+self.IRESREAD >= 0.95*self._ILIMITSETTING:
+					# the current reading is close to the ILIMITSETTING value
+					if V-self.VRESREAD < 0.95*self._VLIMITSETTING:
+						# the voltage reading is lower than the VLIMITSETTING value
+						S = 'CC'
+
+		elif self.MODEL in ['9185B_HIGH' , '9185B_LOW']:
 		
-		# Reading the CV/CC mode from the PSU unit messes up the communication with the PSU
-		# Try to determine the CV/CC mode from the V and I readings:
-		
-		S = 'CV'
-		if self._ILIMITSETTING is None:
-			# ILIMITSETTING has not yet been set in self.current()
-			logger.debug('_ILIMITSETTING is None.')
-			S = '?'
-		else:
-			if I+self.IRESREAD >= 0.90*self._ILIMITSETTING:
-				# the current reading is close to the ILIMITSETTING value
-				if V-self.VRESREAD < 0.95*self._VLIMITSETTING:
-					# the voltage reading is lower than the VLIMITSETTING value
-					S = 'CC'
+			k = 1
+			while True:
+				try:
+					if k > 10:
+						raise RuntimeException("Could not read output limit status from B&K PSU!")
+					S = self._query('OUTPUT:STATE?')
+					break
+				except:
+					k = k+1
+					self._Serial.reset_output_buffer()
+					self._Serial.reset_input_buffer()
+					time.sleep(0.05)
+					pass
 					
+		else:
+			raise RuntimeError('Cannot determine CV/CC mode for B&K model ' + self.MODEL)
+
 		return (V, I, S)
 
