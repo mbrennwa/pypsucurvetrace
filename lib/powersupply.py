@@ -262,6 +262,8 @@ class PSU:
 			stable = False
 			limit = 0 	# number of readings with current limiter ON
 			limit_max = 2	# max. allowed number of current limit ON readings
+			if self.MODEL == '9120A':
+				limit_max = 6 # The BK 9120A is a diva and needs a bit more convincing and pampering
 			t0 = time.time() # start time (now)
 			r = self.read()
 			delta = abs(r[0] - value)

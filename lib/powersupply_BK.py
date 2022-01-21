@@ -23,7 +23,7 @@ BK_SPECS = {
 		"9185B_HIGH":	( 0.0, 610.0,  0.35, 210,  0.02,    0.00001, 0.3,    0.00001, 0.02, 0.0001, 2.0 ),  # 9185B in "HIGH" setting, confirmed working
 		"9185B_LOW":	( 0.0, 400.0,  0.5 , 210,  0.02,    0.00001, 0.3,    0.00001, 0.02, 0.0001, 2.0 ),  # 9185B in "LOW" setting, confirmed working
 		# "9120A":	    ( 0.0, 32.0,   3.0 , 96,   0.0005,  0.0001,  0.0001, 0.00001, 2.0 )   # 9120A, currently testing / under construction
-		"9120A":	    ( 0.0, 32.0,   3.0 , 96,   0.0005,  0.0001,  0.0001, 0.00001, 0.012, 0.0002, 2.0 )   # 9120A, currently testing / under construction
+		"9120A":	    ( 0.0, 32.0,   3.0 , 96,   0.0005,  0.0001,  0.0001, 0.00001, 0.012, 0.0002, 3.0 )   # 9120A, currently testing / under construction
 }
 
 BK_TIMEOUT = 2.0
@@ -305,13 +305,11 @@ class BK(object):
 				logger.debug('_ILIMITSETTING is None.')
 				S = '?'
 			else:
-				if I+self.IRESREAD >= 0.95*self._ILIMITSETTING:
-					# the current reading is close to the ILIMITSETTING value
-					if V-self.VRESREAD < 0.95*self._VLIMITSETTING:
-						# the voltage reading is lower than the VLIMITSETTING value
+				if V-self.VRESREAD < 0.97*self._VLIMITSETTING:            # the voltage reading is lower than the VLIMITSETTING value, PSU did not reach the set value
+					if I+self.IRESREAD >= 0.91*self._ILIMITSETTING:   # the current reading is close to the ILIMITSETTING value, so the current limiter is likely on and keeping the voltage low
 						S = 'CC'
 
-		elif self.MODEL in ['9185B_HIGH' , '9185B_LOW']:
+		elif self.MODEL in ['9185B_HIGH' , '9185B_LOW' ]:
 		
 			k = 1
 			while True:
