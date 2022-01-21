@@ -248,7 +248,8 @@ class heater:
 
 	def terminate_controller_thread(self):
 		# turn off PSU / heater power:
-		self._controller.terminate()
+		if self._controller is not None:
+			self._controller.terminate()
 
 
 
