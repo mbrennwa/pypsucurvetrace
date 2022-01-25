@@ -22,10 +22,10 @@ POLARITY = -1
 VSTART = 0
 
 # Test voltage V1 end:
-VEND   = 200
+VEND   = 60
 
 # Test voltage V1 steps:
-VSTEP  = 1
+VSTEP  = 2
 
 # Max. allowed current during the test:
 IMAX   = 10.0
@@ -61,7 +61,7 @@ VSTART = 0
 VEND   = 16
 
 # Test voltage V2 steps:
-VSTEP  = 1
+VSTEP  = 2
 
 # Max. allowed current during the test is 1 A (this is way more than necessary for the DUT, but a larger value helps achieving quick regulation of the PSU output):
 IMAX   = 1
