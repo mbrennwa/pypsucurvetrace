@@ -100,7 +100,8 @@ T_TOL    = 0.5
 
 
 # Duration of idle periods between readings (seconds):
-IDLESECS    = 0.1
+### IDLESECS    = 0.1 not needed with heaterblock
+IDLESECS    = 0.0
 
 # Duration of pre-heat / warmup period before starting the test (seconds):
 PREHEATSECS = 40
