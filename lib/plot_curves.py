@@ -40,6 +40,7 @@ def plot_curves( data,			# measurement_data object (or tuple of measurement_data
                  xlabel=None,           # x-axis label
                  ylabel=None,           # y-axis label
                  xlimit=None,           # x-axis data limit (absolute value)
+                 xylimit=None,          # x*y data limit (absolute value)
                  ylimit=None,           # y-axis data limit (absolute value)
                  xscale=None,           # x-axis multiplier prefix (G, M, k, m, µ, n, p, f)
                  yscale=None,           # y-axis multiplier prefix (G, M, k, m, µ, n, p, f)
@@ -92,6 +93,10 @@ def plot_curves( data,			# measurement_data object (or tuple of measurement_data
 		pass
 	try:
 		ylimit = ylimit / ysc
+	except:
+		pass
+	try:
+		xylimit = abs(xylimit) / xsc / ysc
 	except:
 		pass
 
@@ -173,6 +178,7 @@ def plot_curves( data,			# measurement_data object (or tuple of measurement_data
 					yend = np.interp(xlimit, x[[kk[-1],kk[-1]+1]], y[[kk[-1],kk[-1]+1]])
 					x = np.append(x[kk], xlimit)
 					y = np.append(y[kk], yend)
+					
 			if ylimit is not None:
 				kk = np.where(abs(y) < abs(ylimit))[0]
 				if not kk.any():
@@ -182,6 +188,21 @@ def plot_curves( data,			# measurement_data object (or tuple of measurement_data
 					xend = np.interp(ylimit, y[[kk[-1],kk[-1]+1]], x[[kk[-1],kk[-1]+1]])
 					x = np.append(x[kk], xend)
 					y = np.append(y[kk], ylimit)
+					
+			if xylimit is not None:
+				kk = np.where(abs(x*y) < xylimit)[0]
+				if not kk.any():
+					continue # skip this curve, continue to the next curve
+				if kk[-1]+1 < len(y):
+					xi  = np.linspace(x[kk[-1]],x[kk[-1]+1],1000);
+					yi  = np.linspace(y[kk[-1]],y[kk[-1]+1],1000);
+					xyi = xi*yi
+					k0 = np.argmin(abs(xyi-xylimit))
+					x = x[kk]
+					y = y[kk]
+					if xi[k0] != x[-1]:
+						x = np.append(x, xi[k0])
+						y = np.append(y, yi[k0])
 			
 			plt.plot(x, y, color=linecolor[i], linestyle=linestyle[i], linewidth=lw_base)
 			

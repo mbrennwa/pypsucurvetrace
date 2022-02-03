@@ -57,6 +57,7 @@ parser.add_argument('--height', type=float, help='Height of the figure')
 # data limits:
 parser.add_argument('--xlimit', type=float, help='Max. x-axis value')
 parser.add_argument('--ylimit', type=float, help='Max. y-axis value')
+parser.add_argument('--xylimit', type=float, help='Max. x*y value')
 parser.add_argument('--xscale', help='x-axis multiplier prefix (G, M, k, m, µ, n, p, f)')
 parser.add_argument('--yscale', help='y-axis multiplier prefix (G, M, k, m, µ, n, p, f)')
 
@@ -149,16 +150,19 @@ if args.height:
 	height = args.height
 
 # determine data limits and scales:
-xlimit = None # default
-ylimit = None # default
-xscale = None
-yscale = None
+xlimit  = None # default
+ylimit  = None # default
+xylimit = None # default
+xscale  = None
+yscale  = None
 xreverseneg = True
 yreverseneg = True
 if args.xlimit:
 	xlimit = args.xlimit
 if args.ylimit:
 	ylimit = args.ylimit
+if args.xylimit:
+	xylimit = args.xylimit
 if args.xscale:
 	xscale = args.xscale
 if args.yscale:
@@ -297,9 +301,10 @@ else:
 
 		# plot data:
 		try:
-			plot_curves( data = data,
-				     xlimit = xlimit,
-				     ylimit = ylimit,
+			plot_curves( data      = data,
+				     xlimit    = xlimit,
+				     ylimit    = ylimit,
+				     xylimit   = xylimit,
 				     plot_type = plot_type,
 				     linecolor = linecolor,
 				     linestyle = linestyle,
@@ -307,15 +312,15 @@ else:
 				     gridcolor = gridcolor,
 				     grid_on   = grid_on,
 				     nobranding = nobranding,
-				     title  = title,
-				     xlabel = xlabel,
-				     ylabel = ylabel,
-				     xscale = xscale,
-				     yscale = yscale,
+				     title     = title,
+				     xlabel    = xlabel,
+				     ylabel    = ylabel,
+				     xscale    = xscale,
+				     yscale    = yscale,
 				     x_reverse_neg = xreverseneg,
 				     y_reverse_neg = yreverseneg,
-				     fontsize = fontsize,
-				     fontname = fontname)
+				     fontsize  = fontsize,
+				     fontname  = fontname)
 		except:
 			# plot failed for some reason, skip this plot and try the next one
 			continue
