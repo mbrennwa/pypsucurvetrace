@@ -6,8 +6,9 @@ import time
 import math
 import os.path
 import logging
-import lib.powersupply as powersupply
-import lib.heaterblock as heaterblock
+
+# import lib.powersupply as powersupply ### import only where needed
+# import lib.heaterblock as heaterblock ### not needed here?
 
 
 #############
@@ -150,6 +151,8 @@ def __convert_str_tuple(x):
 ###########################
 
 def connect_PSU(configTESTER,label):
+
+	import lib.powersupply as powersupply
 
 	if not (label in configTESTER):
 		# print(label + ' not specified in configuration file. Leaving ' + label + ' unconfigured.')
