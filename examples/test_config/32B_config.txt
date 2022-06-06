@@ -45,7 +45,7 @@ IIDLE  = 0.1
 ##################################################
 [PSU2]
 
-# DUT is connected with normal polarity (not inverted):
+# DUT is connected with negative polarity (inverted):
 POLARITY = -1
 
 # Test voltage V2 start:
