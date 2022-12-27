@@ -3,6 +3,8 @@
 
 For two-terminal devices under test (DUTs) like resistors or diodes you need only one power supply unit (PSU). For three-terminal DUTs like transistors you need two PSUs.
 
+*PyPSUcurvetrace* also allows using a heater block to control the temperature of the DUT.
+
 *PyPSUcurvetrace* is developed using Python 3 on Linux. Other software environments may (should) work, too, but have not been tested so far.
 
 Currently supported power supply types:
@@ -19,14 +21,18 @@ Power supply types on the radar for future support:
 
 
 ### Overview
-The following figure shows the basic test setup for a three-terminal DUT with two PSUs:
-![alt text](https://github.com/mbrennwa/PyPSUcurvetrace/blob/master/figures/test_setup.png "Basic test setup")
+The following figure shows the basic test circuit for a three-terminal DUT with two PSUs:
+![alt text](https://github.com/mbrennwa/PyPSUcurvetrace/blob/master/figures/test_setup.png "Basic test circuit")
 
 For two-terminal DUTs, only PSU1 is needed and PSU2 can be ignored. If negative voltages are required at the DUT terminals, the respective PSU terminals are connected with inverted polarity.
 
 Tests are run using the `curvetrace` program. `curvetrace` tests the DUT by varying the voltages V1 and V2 at the PSU terminals, and by reading the corresponding currents I1 and I2. The results are shown on the screen and saved in an ASCII data file for further processing.
 
-`curvetrace` also provides different methods to control the DUT temperature during the test. Firstly, `curvetrace` may insert idle periods in between the individual readings, or a "pre-heat" period before starting the test, where the voltages (V1, V2) and currents (I1, I2) applied to the DUT are set to predefined ``idle'' values. Secondly, `curvetrace` can use a heater block equipped with a heater element and temperature sensor for active control of the DUT temperature (full heaterblock documentation is pending).
+Here's a photo showing the test setup for a power MosFET using two RND/Korad PSUs:
+![alt text](https://github.com/mbrennwa/PyPSUcurvetrace/blob/master/figures/test_power_MosFET_photo.jpg "Power MosFET test setup")
+
+`curvetrace` provides different methods to control the DUT temperature during the test. Firstly, `curvetrace` may insert idle periods in between the individual readings, or a "pre-heat" period before starting the test, where the voltages (V1, V2) and currents (I1, I2) applied to the DUT are set to predefined ``idle'' values. Secondly, `curvetrace` can use a heater block equipped with a heater element and temperature sensor for active control of the DUT temperature (full heaterblock documentation is pending). Here's a photo of a temperature controlled heaterblock using power resistors as heaters and a Maxim DS18B20 temperature sensor:
+![alt text](https://github.com/mbrennwa/PyPSUcurvetrace/blob/master/figures/heaterblock_photo.jpg "Heaterblock for temperature controlled DUT testing")
 
 `curvetrace` also offers some special operation modes:
 * "batch": sequential measurement of parts using the same DUT configuration
@@ -95,9 +101,9 @@ This example shows curve traces obtained from an IRFP150 N-channel power mosfet 
 * DUT source pin to the negative terminals of PSU1 and PSU2 (joined together)
 * DUT drain pin to the positive terminal of PSU1
 * DUT gate pin to the positive terminal of PSU2. A gate stopper resistor was used to avoid oscillation.
-![alt text](https://github.com/mbrennwa/PyPSUcurvetrace/blob/master/figures/IRFP150_curves.png "IRFP150 curves")
+The power limit for the test was set to 100 W. The curves were recorded at fixed temperatures of 30°C, 50°C and 70°C using a heaterblock for temperature control (see photo above).
+![alt text](https://github.com/mbrennwa/PyPSUcurvetrace/blob/master/figures/IRFP150_curves_heaterblock.png "IRFP150 curves at 30°C, 50°C and 70°C")
 
-The power limit for the test was set to 100 W, because the DUT was mounted on a heatsink that did not provide enough cooling for more power. You can see how the IRFP150 tends to run away at higher power levels, which is due to the temperature increase. It would be better to mount such high-power DUTs on a large copper block or a water cooling system to achieve more stable temperature conditions during the test.
 
 ### 2SJ79 P-channel mosfet
 This example shows curve traces obtained from an 2SJ79 P-channel mosfet (drain current I<sub>D</sub> vs. drain-source voltage V<sub>DS</sub>, measured at different gate-source voltages V<sub>GS</sub>). The 2SJ79 was connected in the same way as the IRFP150 in the previous example, but with the polarity of the PSU terminals inverted to obtain negative test voltages:
@@ -115,6 +121,7 @@ This example shows curve traces obtained from an 6C33C power triode (anode curre
 For this test, only one high-voltage power supply (PSU1) was available. The second power supply (PSU2) was therefore configured as a 90 V PSU made up by a series connection of a 30 V PSU and a 60 V PSU (see below for configuration of such a series combination).
 
 ![alt text](https://github.com/mbrennwa/PyPSUcurvetrace/blob/master/figures/6C33C_curves.png "6C33C curves")
+
 
 ## Notes
 
