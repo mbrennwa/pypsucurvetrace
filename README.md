@@ -3,7 +3,7 @@
 
 For two-terminal devices under test (DUTs) like resistors or diodes, a single PSU is sufficient. For three-terminal DUTs like transistors, two PSUs are required (single PSU with two separate programmable outputs would also work).
 
-*PyPSUcurvetrace* also allows using a heater block to control the temperature of the DUT (optional). Such a heater block requires a dedicated PSU for temperature control.
+*PyPSUcurvetrace* also allows using an optional heater block to control the temperature of the DUT during curve tracing. The heater block requires a dedicated PSU for temperature control.
 
 *PyPSUcurvetrace* is developed using Python 3 on Linux. Other software environments may (should) work, too, but have not been tested so far.
 
@@ -29,8 +29,8 @@ Here's a photo showing the test setup for a power MosFET using two RND/Korad PSU
 `curvetrace` provides different methods to control the DUT temperature during the test. Firstly, `curvetrace` may insert idle periods in between the individual readings, or a "pre-heat" period before starting the test, where the voltages (V1, V2) and currents (I1, I2) applied to the DUT are set to predefined ``idle'' values. Secondly, `curvetrace` can use a heater block equipped with a heater element and temperature sensor for active control of the DUT temperature (see below).
 
 `curvetrace` also offers some special operation modes:
+* "quick": run "pre-heat" and measure the DUT operating conditions at the idle conditions only, skip curve tracing (may be useful for simple matching of parts based on static idle operating conditions)
 * "batch": sequential measurement of parts using the same DUT configuration
-* "quick": run "pre-heat" only, skip the curve tracing (can be useful for matching parts based on the idle operating point)
 
 The procedure implemented in the `curvetrace` program is as follows:
 1. Read a configuration file with the types and serial ports of the programmable PSUs, and then establish the serial connection to the PSUs.
@@ -66,7 +66,7 @@ Power supply types on the radar for future support:
 * Units with a SCPI interface
 
 ## Software installation and configuration
-* Download the code from the GitHub repository, either using GIT, SVN or as a ZIP archive.
+* Download the code from the GitHub repository, either using `git`, `svn` or as a `ZIP` archive.
 I like SVN (subversion):
 ```
 svn co https://github.com/mbrennwa/PyPSUcurvetrace.git/trunk path/on/your/computer/to/PyPSUcurvetrace
