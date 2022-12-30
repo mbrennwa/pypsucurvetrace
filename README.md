@@ -1,19 +1,11 @@
 # PyPSUcurvetrace
-*PyPSUcurvetrace* is a software toolbox for I/V curve tracing of electronic parts using programmable power supplies. In short, *PyPSUcurvetrace* is a *curve tracer*.
+*PyPSUcurvetrace* is a software toolbox for I/V curve tracing of electronic devices using programmable power supplies (PSUs). In short, *PyPSUcurvetrace* is a *curve tracer*.
 
-For two-terminal devices under test (DUTs) like resistors or diodes you need only one power supply unit (PSU). For three-terminal DUTs like transistors you need two PSUs.
+For two-terminal devices under test (DUTs) like resistors or diodes, a single PSU is sufficient. For three-terminal DUTs like transistors, two PSUs are required (single PSU with two separate programmable outputs would also work).
 
-*PyPSUcurvetrace* also allows using a heater block to control the temperature of the DUT.
+*PyPSUcurvetrace* also allows using a heater block to control the temperature of the DUT. Such a heater block requires a dedicated PSU for temperature control.
 
 *PyPSUcurvetrace* is developed using Python 3 on Linux. Other software environments may (should) work, too, but have not been tested so far.
-
-Currently supported power supply types:
-* Voltcraft PPS
-* Korad / RND (confirmed: models KA3005P and KWR103, other models not tested)
-* BK Precision (confirmed: model BK9185B, 9120A, other models not tested)
-
-Power supply types on the radar for future support:
-* Units with a SCPI interface
 
 *PyPSUcurvetrace* is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version. *PyPSUcurvetrace* is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details. You should have received a copy of the GNU General Public License along with *PyPSUcurvetrace*. If not, see [http://www.gnu.org/licenses/](http://www.gnu.org/licenses/).
 
@@ -66,6 +58,14 @@ The procedure implemented in the `curvetrace` program is as follows:
 * Once a test voltage has been programmed at a PSU for a DUT measurement, `curvetrace` reads the voltage at the PSU terminals and waits for stabilisation of the read-back output voltage at the set point before continuing. This ensures that measurements are taken only after the voltages applied to the DUT have stabilised at the requested values.
 * Some PSU types provide unreliable readings of the voltage or current values if the readings are taken too early after programming a new set point. To improve the reliability of the data obtains from such PSUs, `curvetrace` can be configured to take repeated readings with short idle periods in between. Readings are taken continuously until a specified number of consecutive readings are consistent within the readback resolution of the PSU, and the mean of those readings is returned as the measurement result. This method helps achieving stable, low-noise readings. For configuration of this feature, see the "PSU configuration file" section below.
 
+## Currently supported power supply types:
+* Voltcraft PPS
+* Korad / RND (confirmed: models KA3005P and KWR103, other models not tested)
+* BK Precision (confirmed: model BK9185B, 9120A, other models not tested)
+
+Power supply types on the radar for future support:
+* Units with a SCPI interface
+
 ## Software installation and configuration
 * Download the code from the GitHub repository, either using GIT, SVN or as a ZIP archive.
 I like SVN (subversion):
@@ -84,8 +84,9 @@ ls /dev/serial/by-id
 * Copy the `config_PSU_TEMPLATE.txt` file to `config_PSU.txt`. Modify the file to reflect the details of the USB/serial interfaces of your your PSUs. See "Notes" section for further information on the PSU configuration file.
 * *NOTE:* By default, most Voltcraft units use the same serial device ID. Therefore, it is not possible to access more than one PSU unit via `/dev/serial/by-id/`. If you want to use more than one PSU unit, you will need to modify the device IDs of the serial interfaces so that they are different from each other. See "Notes" section below for details.
 * Make sure your user account has permissions to access the serial ports of the PSU units. See "Notes" section below.
+* Optional: configure the heaterblock (see below).
 
-## Usage
+## Using the software
 To run the software, execute the `curvetrace` program from a console terminal.
   * The easiest method is to run the program without any arguments and just follow thew the on-screen instructions for fully interactive user input:
   ```
@@ -96,6 +97,14 @@ To run the software, execute the `curvetrace` program from a console terminal.
   curvetrace -c examples/test_config/2SK216_config.txt
   ```
   See "Notes" section for further information on test configuration files.
+
+## Heaterblock for temperature control of the DUT (optional)
+
+### Heaterblock design
+UNDER CONSTRUCTION
+
+### Software configuration
+UNDER CONSTRUCTION
 
 ## Examples
 
