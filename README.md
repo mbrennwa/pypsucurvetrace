@@ -3,7 +3,7 @@
 
 For two-terminal devices under test (DUTs) like resistors or diodes, a single PSU is sufficient. For three-terminal DUTs like transistors, two PSUs are required (single PSU with two separate programmable outputs would also work).
 
-*PyPSUcurvetrace* also allows using a heater block to control the temperature of the DUT. Such a heater block requires a dedicated PSU for temperature control.
+*PyPSUcurvetrace* also allows using a heater block to control the temperature of the DUT (optional). Such a heater block requires a dedicated PSU for temperature control.
 
 *PyPSUcurvetrace* is developed using Python 3 on Linux. Other software environments may (should) work, too, but have not been tested so far.
 
@@ -26,8 +26,7 @@ Tests are run using the `curvetrace` program. `curvetrace` tests the DUT by vary
 Here's a photo showing the test setup for a power MosFET using two RND/Korad PSUs:
 ![alt text](https://github.com/mbrennwa/PyPSUcurvetrace/blob/master/figures/test_power_MosFET_photo.jpg "Power MosFET test setup")
 
-`curvetrace` provides different methods to control the DUT temperature during the test. Firstly, `curvetrace` may insert idle periods in between the individual readings, or a "pre-heat" period before starting the test, where the voltages (V1, V2) and currents (I1, I2) applied to the DUT are set to predefined ``idle'' values. Secondly, `curvetrace` can use a heater block equipped with a heater element and temperature sensor for active control of the DUT temperature (full heaterblock documentation is pending). Here's a photo of a temperature controlled heaterblock using power resistors as heaters and a Maxim DS18B20 temperature sensor:
-![alt text](https://github.com/mbrennwa/PyPSUcurvetrace/blob/master/figures/heaterblock_photo.jpg "Heaterblock for temperature controlled DUT testing")
+`curvetrace` provides different methods to control the DUT temperature during the test. Firstly, `curvetrace` may insert idle periods in between the individual readings, or a "pre-heat" period before starting the test, where the voltages (V1, V2) and currents (I1, I2) applied to the DUT are set to predefined ``idle'' values. Secondly, `curvetrace` can use a heater block equipped with a heater element and temperature sensor for active control of the DUT temperature (see below).
 
 `curvetrace` also offers some special operation modes:
 * "batch": sequential measurement of parts using the same DUT configuration
@@ -47,7 +46,7 @@ The procedure implemented in the `curvetrace` program is as follows:
 4. Check the test configuration versus the limits of the PSUs, and adjust the configuration where needed.
 5. Show a summary of the test configuration and ask the user if it's okay to start the test.
 6. Run the test:
-* If a heaterblock is used: wait until the DUT has attained the specified temperature.
+* If a heater block is used: wait until the DUT has attained the specified temperature.
 * The voltages are stepped in two nested loops. Voltage V1 is varied in the inner loop, V2 is varied in the outer loop.
 * The measured data are shown on the screen and saved to the data file.
 7. Once the test is completed, turn off the PSUs.
@@ -84,7 +83,7 @@ ls /dev/serial/by-id
 * Copy the `config_PSU_TEMPLATE.txt` file to `config_PSU.txt`. Modify the file to reflect the details of the USB/serial interfaces of your your PSUs. See "Notes" section for further information on the PSU configuration file.
 * *NOTE:* By default, most Voltcraft units use the same serial device ID. Therefore, it is not possible to access more than one PSU unit via `/dev/serial/by-id/`. If you want to use more than one PSU unit, you will need to modify the device IDs of the serial interfaces so that they are different from each other. See "Notes" section below for details.
 * Make sure your user account has permissions to access the serial ports of the PSU units. See "Notes" section below.
-* Optional: configure the heaterblock (see below).
+* Optional: configure the heater block (see below).
 
 ## Using the software
 To run the software, execute the `curvetrace` program from a console terminal.
@@ -98,9 +97,13 @@ To run the software, execute the `curvetrace` program from a console terminal.
   ```
   See "Notes" section for further information on test configuration files.
 
-## Heaterblock for temperature control of the DUT (optional)
+## Heater block for temperature control of the DUT (optional)
+Documentation for the heater block is under construction.
 
-### Heaterblock design
+In the meantime, here's a photo of a temperature controlled heater block using power resistors as heaters and a Maxim DS18B20 temperature sensor:
+![alt text](https://github.com/mbrennwa/PyPSUcurvetrace/blob/master/figures/heaterblock_photo.jpg "Heater block for temperature controlled DUT testing")
+
+### Heater block design
 UNDER CONSTRUCTION
 
 ### Software configuration
@@ -113,7 +116,7 @@ This example shows curve traces obtained from an IRFP150 N-channel power mosfet 
 * DUT source pin to the negative terminals of PSU1 and PSU2 (joined together)
 * DUT drain pin to the positive terminal of PSU1
 * DUT gate pin to the positive terminal of PSU2. A gate stopper resistor was used to avoid oscillation.
-The power limit for the test was set to 100 W. The curves were recorded at fixed temperatures of 30°C, 50°C and 70°C using a heaterblock for temperature control (see photo above).
+The power limit for the test was set to 100 W. The curves were recorded at fixed temperatures of 30°C, 50°C and 70°C using a heater block for temperature control (see photo above).
 ![alt text](https://github.com/mbrennwa/PyPSUcurvetrace/blob/master/figures/IRFP150_curves_heaterblock.png "IRFP150 curves at 30°C, 50°C and 70°C")
 
 
