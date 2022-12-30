@@ -246,6 +246,8 @@ class curvetrace_controlled_parameter_StaticBox(wx.StaticBox):
 		else:
 			logging.error('Unknown x-step scaling: ' + sc)
 		
+		n_max = int(n_max)
+		
 		self._step_number.SetRange(1, n_max)
 
 		# set initial step-number value (only if do_init, i.e., whenn called from __init__):
