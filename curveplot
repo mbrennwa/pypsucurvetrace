@@ -63,6 +63,7 @@ parser.add_argument('--ylimit', type=float, help='Max. y-axis value')
 parser.add_argument('--xylimit', type=float, help='Max. x*y value')
 parser.add_argument('--xscale', help='x-axis multiplier prefix (G, M, k, m, µ, n, p, f)')
 parser.add_argument('--yscale', help='y-axis multiplier prefix (G, M, k, m, µ, n, p, f)')
+parser.add_argument('--cscale', help='curves multiplier prefix (G, M, k, m, µ, n, p, f)')
 
 # axis direction for "negative" parts:
 parser.add_argument('--xreverseneg', action='store_true', help='Do not reverse x-axis direction for negative DUTs')
@@ -158,6 +159,7 @@ ylimit  = None # default
 xylimit = None # default
 xscale  = None
 yscale  = None
+cscale  = None
 xreverseneg = True
 yreverseneg = True
 if args.xlimit:
@@ -170,6 +172,8 @@ if args.xscale:
 	xscale = args.xscale
 if args.yscale:
 	yscale = args.yscale
+if args.cscale:
+	cscale = args.cscale
 if args.xreverseneg:
 	xreverseneg = False
 if args.yreverseneg:
@@ -326,6 +330,7 @@ else:
 				     ylabel    = ylabel,
 				     xscale    = xscale,
 				     yscale    = yscale,
+				     cscale    = cscale,
 				     x_reverse_neg = xreverseneg,
 				     y_reverse_neg = yreverseneg,
 				     fontsize  = fontsize,

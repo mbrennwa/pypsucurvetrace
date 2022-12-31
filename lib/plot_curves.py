@@ -111,14 +111,14 @@ def plot_curves( data,			# measurement_data object (or tuple of measurement_data
 			# append tuple elements:
 			X += (data[i].get_U1_meas(exclude_CC)/xsc,) # measured U1 value
 			Y += (data[i].get_I1_meas(exclude_CC)/ysc,) # measured I1 value
-			u = data[i].get_U2_set(exclude_CC)/csc # U2 set value
+			u = data[i].get_U2_set(exclude_CC) # U2 set value
 			if bjt_vbe is not None:
 			    if bjt_r2 is not None:
 			        try:
 			            u = (u-bjt_vbe) / bjt_r2
 			        except:
 			            print('could not convert PSU-U2 to BJT base current.')
-			C += (u,)
+			C += (u/csc,)
 
 		if xlabel is None:
 			xlabel = 'U1'
