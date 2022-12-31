@@ -117,7 +117,6 @@ if args.c:
 PSU1 = connect_PSU(configTESTER,'PSU1');
 PSU2 = connect_PSU(configTESTER,'PSU2');
 
-
 # set up heaterblock:
 HEATER = heaterblock.heater( config=configTESTER, target_temperature=0.0 )
 HEATER.turn_off()
@@ -139,6 +138,13 @@ if not PSU1.CONFIGURED:
 	if not PSU2.CONFIGURED:
 		logger.error('No power supply configured.')
 		sys.exit()
+
+# determine R2CONTROL (opitonal, may be missing in DUT config file):
+R2CONTROL = None
+try:
+	R2CONTROL = float(configDUT['EXTRA']['R2CONTROL'])
+except:
+	pass
 
 # set up temperature control (optional, may be missing in DUT config file):
 TEMP_val = None
@@ -333,6 +339,13 @@ if (T_idle > 0.0) or (T_preheat > 0.0):
 print ('* Heaterblock temperature (current) = ' + str(HEATER.get_temperature_string()))
 print ('* Heaterblock temperature (target)  = ' + str(HEATER.get_target_temperature_string()))
 
+R2CTL_txt = '* R2CONTROL = '
+try:
+    R2CTL_txt = R2CTL_txt + str(R2CONTROL) + ' Ohm'
+except:
+    R2CTL_txt = R2CTL_txt + 'NOT SPECIFIED'
+print (R2CTL_txt)
+
 # set up plotting environment
 plt.ion()
 plt.show()
@@ -382,6 +395,7 @@ try:
 		# Print header / column labels:
 		printit('* Sample: ' + samplename,logfile,'%', terminal_output=False)
 		printit('* Date / time: ' + str(datetime.datetime.now()),logfile,'%', terminal_output=False)
+		printit (R2CTL_txt,logfile,'%', terminal_output=False)
 		if quick_mode:
 			printit ('* Running in quick mode (pre-heating only, no curve tracing)',logfile,'%', terminal_output=False)
 		else:
@@ -396,7 +410,6 @@ try:
 			printit ('Column 9:  PSU2 current measurement (I)',logfile,'%', terminal_output=False)
 			printit ('Column 10: PSU2 limiter flag',logfile,'%', terminal_output=False)
 			printit ('Column 11: Heaterblock temperature (°C)',logfile,'%', terminal_output=False)
-
 		print ('\n')
 
 		# Make sure the heater is turned on (if possible/configured):
