@@ -26,6 +26,8 @@ logger.addHandler(ch)
 
 def plot_curves( data,			# measurement_data object (or tuple of measurement_data objects)
                  plot_type='U1I1U2',    # type of curve plot
+                 bjt_r2 = None,         # R2CONTROL value for BJT U2 conversion
+                 bjt_vbe = None,        # BJT VBE-on voltage
                  exclude_CC = True,     # exclude data with current limiter on
                  x_reverse_neg = True,  # reverse x axis for "negative" DUTs
                  y_reverse_neg = True,  # reverse y axis for "negative" DUTs
@@ -109,7 +111,14 @@ def plot_curves( data,			# measurement_data object (or tuple of measurement_data
 			# append tuple elements:
 			X += (data[i].get_U1_meas(exclude_CC)/xsc,) # measured U1 value
 			Y += (data[i].get_I1_meas(exclude_CC)/ysc,) # measured I1 value
-			C += (data[i].get_U2_set(exclude_CC)/csc,)  # U2 set value
+			u = data[i].get_U2_set(exclude_CC)/csc # U2 set value
+			if bjt_vbe is not None:
+			    if bjt_r2 is not None:
+			        try:
+			            u = (u-bjt_vbe) / bjt_r2
+			        except:
+			            print('could not convert PSU-U2 to BJT base current.')
+			C += (u,)
 
 		if xlabel is None:
 			xlabel = 'U1'
@@ -117,7 +126,12 @@ def plot_curves( data,			# measurement_data object (or tuple of measurement_data
 			ylabel = 'I1'
 		xunit = xunitprfix + 'V'
 		yunit = yunitprfix + 'A'
-		cunit = cunitprfix + 'V'
+		if bjt_vbe is not None:
+		    if bjt_r2 is not None:
+		        cunit = 'A'
+		else:
+		    cunit = 'V'
+		cunit = cunitprfix + cunit
 		
 	else:
 		logger.error('Plot type ' + plot_type + ' not supported.')

@@ -118,7 +118,7 @@ class measurement_data:
 
 def read_datafile(datafile):
 	'''
-	data, label, preheat = read_datafile( datafile )
+	data, label, preheat, r2control = read_datafile( datafile )
 	
 	Read data from PyPSUcurvetrace datafile.
 	
@@ -129,6 +129,7 @@ def read_datafile(datafile):
 	data: measurement data (measurement_data struct)
 	label: DUT/measurement label (string)
 	preheat: DUT operating point at end of preheat/idle (preheat struct)
+	r2control: resistor value used to control U2 voltage and to convert PSU U2 voltage to BJT base current
 	'''
 
 	# read file to parse header
@@ -159,7 +160,17 @@ def read_datafile(datafile):
 				ph.T = None
 			break # break from the loop
 
+	r2 = None
+	for i,line in enumerate(lines):
+		if '* R2CONTROL' in line:
+		    try:
+    			u = line.split('=')
+    			r2 = float(u[1].split('Ohm')[0])
+		    except:
+    			pass
+		    break # break from the loop
+
 	# load measurement data from file:
 	data = measurement_data(datafile)
 
-	return data, label, ph
+	return data, label, ph, r2

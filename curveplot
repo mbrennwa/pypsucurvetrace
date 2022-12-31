@@ -50,6 +50,9 @@ parser.add_argument('datafiles', nargs='+', help='Names (and paths) of PyPSUcurv
 # plot type:
 parser.add_argument('--type', help='Plot type. Format: <X><Y><C>, where X is the x-axis parameter, Y is the y-axis parameter, and C is the curves parameter; parameters are U1, I1, U2, I2. Example: -type U1I1U2. Default (if not format is not specified): type = U1I1U2')
 
+# BJT option:
+parser.add_argument('--bjtvbe', help='BJT VBE-on voltage for conversion of PSU U2 voltage to base current using R2CONTROL from the data file: Ibase = (U2-BJTVBE)/R2CONTROL')
+
 # size of plot figure:
 parser.add_argument('--width', type=float, help='Width of the figure')
 parser.add_argument('--height', type=float, help='Height of the figure')
@@ -226,14 +229,18 @@ if args.gridcolor:
 nobranding = False
 if args.nobranding:
 	nobranding = True
-	
+
+# BJT Vbe-on value:
+BJT_VBE = None # default
+if args.bjtvbe:
+	BJT_VBE = float(args.bjtvbe)
 
 # load data from files:
 data = label = preheat = ls = lc = tuple( )
 
 for i in range(len(datafiles)):
 	try:
-		d, l, p = read_datafile(datafiles[i])
+		d, l, p, r2ctl = read_datafile(datafiles[i])
 		if len(d.rawdata) == 0:
 			logger.warning('datafile ' + datafiles[i] + ' contains no curve data. Skipping this file...')
 		else:
@@ -302,6 +309,8 @@ else:
 		# plot data:
 		try:
 			plot_curves( data      = data,
+				     bjt_r2 = r2ctl,
+				     bjt_vbe = BJT_VBE,
 				     xlimit    = xlimit,
 				     ylimit    = ylimit,
 				     xylimit   = xylimit,
