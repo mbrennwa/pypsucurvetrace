@@ -137,6 +137,10 @@ The power limit for the test was set to 100 W. The curves were recorded at fixed
 ![alt text](https://github.com/mbrennwa/PyPSUcurvetrace/blob/master/figures/NJW0281G.png "NJW0281G curves at 50°C")
 
 
+When $a \ne 0$, there are two solutions to $(ax^2 + bx + c = 0)$ and they are 
+$$ x = {-b \pm \sqrt{b^2-4ac} \over 2a} $$
+
+
 ### 6C33C power triode
 This example shows curve traces obtained from an 6C33C power triode (anode current vs. anode-cathode voltage, measured at different negative grid-cathode voltages V<sub>GS</sub>). The 6C33C was connected as follows
 * DUT anode pin to the positive terminals of PSU1
