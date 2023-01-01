@@ -12,10 +12,6 @@ For two-terminal devices under test (DUTs) like resistors or diodes, a single PS
 There is a discussion thread abut *PyPSUcurvetrace* at the diyAudio forum: https://www.diyaudio.com/community/threads/idea-for-power-transistor-curve-tracer-good-or-not.344199
 
 
-## How does *PyPSUcurvetrace* work?
-
-PyPSUcurvetrace uses the `curvetrace` program for data acquisition and the `curveplot` program for data plotting.
-
 ## Data acquisition
 The `curvetrace` program is used to acquire the test data. Basic documentation of the `curvetrace` program can be accessed by executing `curvetrace --help`.
 
