@@ -21,7 +21,7 @@ The following figure shows the basic test circuit for a three-terminal DUT with 
 
 For two-terminal DUTs, only PSU1 is needed and PSU2 can be ignored. If negative voltages are required at the DUT terminals, the respective PSU terminals are connected with inverted polarity.
 
-Tests are run using the `curvetrace` program. `curvetrace` tests the DUT by varying the voltages $U_1$ and $U_2£ at the PSU terminals, and by reading the corresponding currents $I_1$ and $I_2$. The results are shown on the screen and saved in an ASCII data file for further processing.
+Tests are run using the `curvetrace` program. `curvetrace` tests the DUT by varying the voltages $U_1$ and $U_2$ at the PSU terminals, and by reading the corresponding currents $I_1$ and $I_2$. The results are shown on the screen and saved in an ASCII data file for further processing.
 
 Here's a photo showing the test setup for a power MosFET using two RND/Korad PSUs:
 ![alt text](https://github.com/mbrennwa/PyPSUcurvetrace/blob/master/figures/test_power_MosFET_photo.jpg "Power MosFET test setup")
