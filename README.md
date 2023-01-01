@@ -21,12 +21,12 @@ The following figure shows the basic test circuit for a three-terminal DUT with 
 
 For two-terminal DUTs, only PSU1 is needed and PSU2 can be ignored. If negative voltages are required at the DUT terminals, the respective PSU terminals are connected with inverted polarity.
 
-Tests are run using the `curvetrace` program. `curvetrace` tests the DUT by varying the voltages V1 and V2 at the PSU terminals, and by reading the corresponding currents I1 and I2. The results are shown on the screen and saved in an ASCII data file for further processing.
+Tests are run using the `curvetrace` program. `curvetrace` tests the DUT by varying the voltages $U_1$ and $U_2£ at the PSU terminals, and by reading the corresponding currents $I_1$ and $I_2$. The results are shown on the screen and saved in an ASCII data file for further processing.
 
 Here's a photo showing the test setup for a power MosFET using two RND/Korad PSUs:
 ![alt text](https://github.com/mbrennwa/PyPSUcurvetrace/blob/master/figures/test_power_MosFET_photo.jpg "Power MosFET test setup")
 
-`curvetrace` provides different methods to control the DUT temperature during the test. Firstly, `curvetrace` may insert idle periods in between the individual readings, or a "pre-heat" period before starting the test, where the voltages (V1, V2) and currents (I1, I2) applied to the DUT are set to predefined ``idle'' values. Secondly, `curvetrace` can use a heater block equipped with a heater element and temperature sensor for active control of the DUT temperature (see below).
+`curvetrace` provides different methods to control the DUT temperature during the test. Firstly, `curvetrace` may insert idle periods in between the individual readings, or a "pre-heat" period before starting the test, where the voltages ($U_1$, $U_2$) and currents ($I_1$, $I_2$) applied to the DUT are set to predefined ``idle'' values. Secondly, `curvetrace` can use a heater block equipped with a heater element and temperature sensor for active control of the DUT temperature (see below).
 
 `curvetrace` also offers some special operation modes:
 * "quick": run "pre-heat" and measure the DUT operating conditions at the idle conditions only, skip curve tracing (may be useful for simple matching of parts based on static idle operating conditions)
@@ -47,13 +47,13 @@ The procedure implemented in the `curvetrace` program is as follows:
 5. Show a summary of the test configuration and ask the user if it's okay to start the test.
 6. Run the test:
 * If a heater block is used: wait until the DUT has attained the specified temperature.
-* The voltages are stepped in two nested loops. Voltage V1 is varied in the inner loop, V2 is varied in the outer loop.
+* The voltages are stepped in two nested loops. Voltage $U_1$ is varied in the inner loop, $U_2$ is varied in the outer loop.
 * The measured data are shown on the screen and saved to the data file.
 7. Once the test is completed, turn off the PSUs.
 
 ### Details
 * For each step of the test procedure (measurement, idle, or pre-heat), `curvetrace` sets the voltages at the PSUs according to voltage values requested for this step. The current values of the PSUs are set to the minima of the current and power limits of the DUT and the PSUs at the given test voltages. If the currents established by the DUT are less than the current limits set at the PSUs, the PSUs will operate in "voltage limiting" mode, so that the voltage values required for this test step will be present at the DUT terminals. If the currents established by the DUT reach the current limits set at the PSUs, it is the task of the PSUs to avoid the currents from exceeding the limits by switching to "current limiting" mode, lowering the voltage values applied to the DUT. `curvetrace` reports the occurrence of "current limiting" mode in the data output using "Current Limit" flags.
-* Once the inner loop (iteration of V1 steps) reaches a point where either I1 or I2 run into the current or power limits of the DUT or the PSUs, `curvetrace` stops the V1 iterations of the inner loop and returns to the next V2 iteration of the outer loop.
+* Once the inner loop (iteration of $U_1$ steps) reaches a point where either $I_1$ or $I_2$ run into the current or power limits of the DUT or the PSUs, `curvetrace` stops the $U_1$ iterations of the inner loop and returns to the next $U_2$ iteration of the outer loop.
 * Once a test voltage has been programmed at a PSU for a DUT measurement, `curvetrace` reads the voltage at the PSU terminals and waits for stabilisation of the read-back output voltage at the set point before continuing. This ensures that measurements are taken only after the voltages applied to the DUT have stabilised at the requested values.
 * Some PSU types provide unreliable readings of the voltage or current values if the readings are taken too early after programming a new set point. To improve the reliability of the data obtains from such PSUs, `curvetrace` can be configured to take repeated readings with short idle periods in between. Readings are taken continuously until a specified number of consecutive readings are consistent within the readback resolution of the PSU, and the mean of those readings is returned as the measurement result. This method helps achieving stable, low-noise readings. For configuration of this feature, see the "PSU configuration file" section below.
 
@@ -132,8 +132,8 @@ This example shows curve traces obtained from an 2SJ79 P-channel mosfet (drain c
 This example shows curve traces obtained from a NJW0281G BJT/NPN power transistor (emitter current vs. collector-emitter voltage, measured at different base currents). The NJW0281G pins and PSU outputs were connected according to above diagram.
 * DUT collector pin to the positive terminal of PSU1
 * DUT emitter pin to the negative terminals of PSU1 and PSU2 (joined together)
-* DUT base pin to the positive terminal of PSU2 using a base resistor of 1000 Ohm (R2 in the diagram)
-The power limit for the test was set to 100 W. The curves were recorded at fixed temperatures of 50°C using a heater block for temperature control (see photo above). The PSU2 control voltage $U_2$ was automatically converted to the base current $I_B$ using the `curveplot` program by applying Ohms law to the voltage across the base resistor $R_2$: $I_B = (U_2 - V_{BE,0}) / R_2$.
+* DUT base pin to the positive terminal of PSU2 using a base resistor of $R_2$ = 1000 Ohm
+The power limit for the test was set to 100 W. The curves were recorded at a fixed temperature of 50°C using a heater block for temperature control (see photo above). The PSU2 control voltage $U_2$ was automatically converted to the base current $I_B$ using the `curveplot` program by applying Ohms law to the voltage across the base resistor $R_2$. With $V_{BE}$ = 0.7V, the base current is $I_B = (U_2 - V_{BE}) / R_2$.
 ![alt text](https://github.com/mbrennwa/PyPSUcurvetrace/blob/master/figures/NJW0281G.png "NJW0281G curves at 50°C")
 
 
