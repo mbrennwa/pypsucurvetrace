@@ -226,7 +226,18 @@ def plot_curves( data,			# measurement_data object (or tuple of measurement_data
 			else:
 
 				# determine label string:
-				s += (f'{C0[k]}', )
+				s += (f'{C0[k]} ' + cunit, )
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
 				
 				# last curve point for label coordinates:
 				xl += (x[-1],)
