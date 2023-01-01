@@ -26,7 +26,9 @@ Tests are run using the `curvetrace` program. `curvetrace` tests the DUT by vary
 Here's a photo showing the test setup for a power MosFET using two RND/Korad PSUs:
 ![alt text](https://github.com/mbrennwa/PyPSUcurvetrace/blob/master/figures/test_power_MosFET_photo.jpg "Power MosFET test setup")
 
-`curvetrace` provides different methods to control the DUT temperature during the test. Firstly, `curvetrace` may insert idle periods in between the individual readings, or a "pre-heat" period before starting the test, where the voltages $U_i$ and currents $I_{1,2}$ applied to the DUT are set to predefined ``idle'' values. Secondly, `curvetrace` can use a heater block equipped with a heater element and temperature sensor for active control of the DUT temperature (see below).
+`curvetrace` provides different methods to control the DUT temperature during the test:
+1. `curvetrace` may insert idle periods in between the individual readings, or a "pre-heat" period before starting the test. During these periods, the voltages $U_{1,2}$ and currents $I_{1,2}$ are controlled such that the DUT operates at predefined ``idle'' conditions until the DUT is at thermal equilibrium.
+2. `curvetrace` can actively control the temperature of the DUT using a heater block equipped with a heater element and temperature sensor (see below).
 
 `curvetrace` also offers some special operation modes:
 * "quick": run "pre-heat" and measure the DUT operating conditions at the idle conditions only, skip curve tracing (may be useful for simple matching of parts based on static idle operating conditions)
