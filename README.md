@@ -14,10 +14,10 @@ There is a discussion thread abut *PyPSUcurvetrace* at the diyAudio forum: https
 
 ## How does *PyPSUcurvetrace* work?
 
-PyPSUcurvetrace uses the `curvetrace` program for data acquisition and the `cureplot` program for data plotting.
+PyPSUcurvetrace uses the `curvetrace` program for data acquisition and the `curveplot` program for data plotting.
 
 ## Data acquisition
-The `curvetrace` program is used to acquire the test data. The `curvetrace` documentation can be accessed by executing `curvetrace --help`.
+The `curvetrace` program is used to acquire the test data. Basic documentation of the `curvetrace` program can be accessed by executing `curvetrace --help`.
 
 The following figure shows the basic test circuit for for data acquisition using the `curvetrace` program with a three-terminal DUT with two PSUs:
 ![alt text](https://github.com/mbrennwa/PyPSUcurvetrace/blob/master/figures/test_setup.png "Basic test circuit")
