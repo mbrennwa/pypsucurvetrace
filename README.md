@@ -128,6 +128,15 @@ This example shows curve traces obtained from an 2SJ79 P-channel mosfet (drain c
 ![alt text](https://github.com/mbrennwa/PyPSUcurvetrace/blob/master/figures/2SJ79_curves.png "2SJ79 curves")
 
 
+### NJW0281G BJT/NPN power transistor
+This example shows curve traces obtained from a NJW0281G BJT/NPN power transistor (emitter current vs. collector-emitter voltage, measured at different base currents). The NJW0281G pins and PSU outputs were connected according to above diagram.
+* DUT collector pin to the positive terminal of PSU1
+* DUT emitter pin to the negative terminals of PSU1 and PSU2 (joined together)
+* DUT base pin to the positive terminal of PSU2 using a base resistor of 1000 Ohm (R2 in the diagram)
+The power limit for the test was set to 100 W. The curves were recorded at fixed temperatures of 50°C using a heater block for temperature control (see photo above). The PSU2 control voltage $U_2$ was automatically converted to the base current $I_B$ using the `curveplot` program by applying Ohms law to the voltage across the base resistor $R_2$:$$I_B = (U_2 - V_{BE}) / R_2$.
+![alt text](https://github.com/mbrennwa/PyPSUcurvetrace/blob/master/figures/NJW0281G.png "NJW0281G curves at 50°C")
+
+
 ### 6C33C power triode
 This example shows curve traces obtained from an 6C33C power triode (anode current vs. anode-cathode voltage, measured at different negative grid-cathode voltages V<sub>GS</sub>). The 6C33C was connected as follows
 * DUT anode pin to the positive terminals of PSU1
