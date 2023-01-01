@@ -14,9 +14,12 @@ There is a discussion thread abut *PyPSUcurvetrace* at the diyAudio forum: https
 
 ## How does *PyPSUcurvetrace* work?
 
+PyPSUcurvetrace uses the `curvetrace` program for data acquisition and the `cureplot` program for data plotting.
 
-### Overview
-The following figure shows the basic test circuit for a three-terminal DUT with two PSUs:
+## Data acquisition
+The `curvetrace` program is used to acquire the test data. The `curvetrace` documentation can be accessed by executing `curvetrace --help`.
+
+The following figure shows the basic test circuit for for data acquisition using the `curvetrace` program with a three-terminal DUT with two PSUs:
 ![alt text](https://github.com/mbrennwa/PyPSUcurvetrace/blob/master/figures/test_setup.png "Basic test circuit")
 
 For two-terminal DUTs, only PSU1 is needed and PSU2 can be ignored. If negative voltages are required at the DUT terminals, the respective PSU terminals are connected with inverted polarity.
@@ -59,13 +62,17 @@ The procedure implemented in the `curvetrace` program is as follows:
 * Once a test voltage has been programmed at a PSU for a DUT measurement, `curvetrace` reads the voltage at the PSU terminals and waits for stabilisation of the read-back output voltage at the set point before continuing. This ensures that measurements are taken only after the voltages applied to the DUT have stabilised at the requested values.
 * Some PSU types provide unreliable readings of the voltage or current values if the readings are taken too early after programming a new set point. To improve the reliability of the data obtains from such PSUs, `curvetrace` can be configured to take repeated readings with short idle periods in between. Readings are taken continuously until a specified number of consecutive readings are consistent within the readback resolution of the PSU, and the mean of those readings is returned as the measurement result. This method helps achieving stable, low-noise readings. For configuration of this feature, see the "PSU configuration file" section below.
 
-## Currently supported power supply types:
+### Currently supported power supply types:
 * Voltcraft PPS
 * Korad / RND (confirmed: models KA3005P and KWR103, other models not tested)
 * BK Precision (confirmed: model BK9185B, 9120A, other models not tested)
 
 Power supply types on the radar for future support:
 * Units with a SCPI interface
+
+## Data plotting
+The `curveplot` program allows high-quality plotting of the test data. The `curveplot` documentation can be accessed by executing `curveplot --help`.
+
 
 ## Software installation and configuration
 * Download the code from the GitHub repository, either using `git`, `svn` or as a `ZIP` archive.
