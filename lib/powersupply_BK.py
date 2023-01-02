@@ -115,6 +115,7 @@ class BK(object):
 				self.MODEL = '9185B_' + voltagemode.upper()
 			elif '9120A' in typestring[1]:
 				self.MODEL = '9120A'
+				logger.warning ( 'B&K 9120A communication tends to be unreliable. Be careful...' )
 			else:
 				logger.warning ( 'Unknown B&K model: ' + typestring[1] )
 				self.MODEL = '?????'
