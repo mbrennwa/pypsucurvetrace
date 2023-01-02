@@ -139,7 +139,9 @@ This example shows curve traces obtained from a NJW0281G BJT/NPN power transisto
 * DUT collector pin to the positive terminal of PSU1
 * DUT emitter pin to the negative terminals of PSU1 and PSU2 (joined together)
 * DUT base pin to the positive terminal of PSU2 using a base resistor of $R_2$ = 1000 Ohm
-The power limit for the test was set to 100 W. The curves were recorded at a fixed temperature of 50°C using a heater block for temperature control (see photo above). The PSU2 control voltage $U_2$ was automatically converted to the base current $I_B$ using the `curveplot` program by applying Ohms law to the voltage across the base resistor $R_2$. With $V_{BE}$ = 0.7V, the base current is $I_B = (U_2 - V_{BE}) / R_2$.
+The power limit for the test was set to 100 W. The curves were recorded at a fixed temperature of 50°C using a heater block for temperature control (see photo above).
+
+While it may seem convenient to use the $I_2$ readings from PSU2 for the BJT base current, the resolution of of these readings tends to be insufficient. Instead, the voltage drop across the base resistor $R_2$ is used to determine the base current. With Ohm's law and $V_{BE}$ = 0.7V, the base current is $I_B = (U_2 - V_{BE}) / R_2$. This $I_B$ calculation is done automatically by the `curveplot` program using the `--bjtvbe 0.7` option.
 ![alt text](https://github.com/mbrennwa/PyPSUcurvetrace/blob/master/figures/NJW0281G.png "NJW0281G curves at 50°C")
 
 
