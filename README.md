@@ -142,7 +142,7 @@ This example shows curve traces obtained from a BC550C BJT/NPN power transistor 
 The power limit for the test was set to 500 mW. The curves were recorded at a fixed temperature of 30°C using a heater block for temperature control (see photo above).
 
 While it would be convenient to use the $I_2$ readings from PSU2 for the BJT base current, the resolution of of these readings tends to be insufficient. Instead, the voltage drop across the base resistor $R_2$ is used to determine the base current. With Ohm's law and $V_{BE}$ = 0.65V, the base current is $I_B = (U_2 - V_{BE}) / R_2$. This $I_B$ calculation is done automatically by the `curveplot` program using the `--bjtvbe 0.65` option.
-![alt text](https://github.com/mbrennwa/PyPSUcurvetrace/blob/master/figures/BC550.png "BC550 curves at 30°C")
+![alt text](https://github.com/mbrennwa/PyPSUcurvetrace/blob/master/figures/BC550C.png "BC550 curves at 30°C")
 
 
 ### NJW0281G BJT/NPN power transistor
