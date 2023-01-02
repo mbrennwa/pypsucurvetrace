@@ -18,10 +18,10 @@ POLARITY = 1
 VSTART = 0
 
 # Test voltage V1 end:
-VEND   = 10
+VEND   = 20
 
 # Test voltage V1 steps:
-VSTEP  = 1
+VSTEP  = 0.5
 
 # Max. allowed current during the test (A):
 IMAX   = 0.1
@@ -105,3 +105,7 @@ PREHEATSECS = 60
 # number of repeated readings at each measurement step:
 # (note that each reading is preceeded by an idle period if IDLECECS > 0):
 NREP        = 1
+
+# DUT temperature (target and tolerance values, deg.C):
+T_TARGET = 30
+T_TOL    = 0.5
