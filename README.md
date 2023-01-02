@@ -85,7 +85,7 @@ On Linux:
 ```
 ls /dev/serial/by-id
 ```
-* Copy the `config_PSU_TEMPLATE.txt` file to `config_PSU.txt`. Modify the file to reflect the details of the USB/serial interfaces of your your PSUs. See "Notes" section for further information on the PSU configuration file.
+* Copy the `config_PSU_TEMPLATE.txt` file to `config.txt`. Modify the file to reflect the details of the USB/serial interfaces of your your PSUs. See "Notes" section for further information on the PSU configuration file.
 * *NOTE:* By default, most Voltcraft units use the same serial device ID. Therefore, it is not possible to access more than one PSU unit via `/dev/serial/by-id/`. If you want to use more than one PSU unit, you will need to modify the device IDs of the serial interfaces so that they are different from each other. See "Notes" section below for details.
 * Make sure your user account has permissions to access the serial ports of the PSU units. See "Notes" section below.
 * Optional: configure the heater block (see below).
@@ -163,7 +163,7 @@ For this test, only one high-voltage power supply (PSU1) was available. The seco
 ## Notes
 
 ### Configuration file
-The configuration file `config.txt` contains the configuration details of your power supplies (PSUs) and, optionally, also the heaterblock (see below). Take a look at the `config_PSU.txt` for details of the file format. There are separate sections for PSU1 and PSU2. Each section contains the following fields:
+The configuration file `config.txt` contains the configuration details of your power supplies (PSUs) and, optionally, also the heaterblock (see below). Take a look at the `config.txt` for details of the file format. There are separate sections for PSU1 and PSU2. Each section contains the following fields:
 * `COMPORT`: virtual file corresponding to the serial port of the PSU
 * `COMMANDSET`: the "language" for communication with the PSU. Currently supported `COMMANDSET`s are
 	* `VOLTCRAFT` for Voltcraft, Manson, etc.
