@@ -500,23 +500,17 @@ try:
 						
 						
 						    print('DEBUG INFO: START IDLING...')
+						    do_idle(PSU1,PSU2,HEATER,T_idle)
+						    print('DEBUG INFO: DONE IDLING.')
 						    
 						    
-							do_idle(PSU1,PSU2,HEATER,T_idle)
-
-						    print('DEBUG INFO: DONE IDLING...')
-						    print('DEBUG INFO: IDLE-CLEANUP, RETURN TO REQUIRED PSU2 SETTINGS...')
 						    
 						    
-							# return to required PSU2 output:
-							if PSU2.CONFIGURED:
-								PSU2.setCurrent(I2LIM,False)
-								PSU2.setVoltage(V2,True)
-
-
-						    print('DEBUG INFO: IDLE-CLEANUP DONE.')
-
-
+						    
+						    # return to required PSU2 output:
+						    if PSU2.CONFIGURED:
+						        PSU2.setCurrent(I2LIM,False)
+						        PSU2.setVoltage(V2,True)
 
 						# Determine PSU1 current limit:
 						if V1 > 0.0:

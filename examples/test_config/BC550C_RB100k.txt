@@ -97,7 +97,7 @@ IIDLE     = 1
 R2CONTROL = 100000
 
 # Duration of idle periods between readings (seconds):
-IDLESECS    = 0
+IDLESECS    = 3
 
 # Duration of pre-heat / warmup period before starting the test (seconds):
 PREHEATSECS = 60

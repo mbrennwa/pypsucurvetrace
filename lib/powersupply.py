@@ -244,7 +244,6 @@ class PSU:
 		else:
 			V.append(value)
 
-
 		for k in range(len(self._PSU)):
 			if self._PSU[k].COMMANDSET in [ 'KORAD' , 'VOLTCRAFT' , 'BK' ]:
 				
@@ -256,7 +255,7 @@ class PSU:
 				
 			else:
 				raise RuntimeError('Cannot set voltage on power supply with ' + self.COMMANDSET + ' command set.')
-
+				
 		# wait for stable output voltage:
 		if wait_stable:
 			stable = False
@@ -267,6 +266,7 @@ class PSU:
 			t0 = time.time() # start time (now)
 			r = self.read()
 			delta = abs(r[0] - value)
+			
 			while not time.time() > t0+self.MAXSETTLETIME:
 
 				delta = abs(r[0] - value)
@@ -279,7 +279,7 @@ class PSU:
 					break
 				time.sleep(self.READIDLETIME)
 				r = self.read()
-
+				
 			if not stable:
 				if r[2] == "CC":
 					pass # voltage setpoint running into current limit mode. Skip waiting for stable output voltage...
@@ -430,18 +430,21 @@ class PSU:
 			v = []
 			i = []
 			l = []
+			
 			for k in range(len(self._PSU)):
+			
 				if self._PSU[k].COMMANDSET in [ 'KORAD' , 'VOLTCRAFT' , 'BK' ]:
-					vv,ii,ll = self._PSU[k].reading()
-					
-					# add values to the list:					
-					v.append(vv)
-					i.append(ii)
-					l.append(ll)
+				    vv,ii,ll = self._PSU[k].reading()
+				    
+				    # add values to the list:
+				    v.append(vv)
+				    i.append(ii)
+				    l.append(ll)
+				
 				else:
 					raise RuntimeError('Cannot read values from power supply with ' + self._PSU[k].COMMANDSET + ' command set.')
 					break
-
+			
 			v = sum(v)
 			i = sum(i)/len(i)
 			if 'CC' in l:
@@ -496,7 +499,7 @@ class PSU:
 					L = "CC"
 				else:
 					L = "CV"
-					
+		
 		# determine corrected reading values:
 		V = polyval(V, self.V_READ_CALPOLY)
 		I = polyval(I, self.I_READ_CALPOLY)

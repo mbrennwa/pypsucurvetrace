@@ -396,7 +396,7 @@ def do_idle(PSU1, PSU2, HEATER, seconds, file=None, wait_for_TEMP=False):
 	else: # fixed output on FIX power supply and regulated output on REG power supply
 
 		IFIXLIM = min (FIX.TEST_ILIMIT,FIX.TEST_PIDLELIMIT/FIX.TEST_VIDLE); # current limit set at fixed PSU
-
+		
 		# sleep time (seconds):
 		dt = 0.0
 		
