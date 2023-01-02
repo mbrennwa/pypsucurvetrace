@@ -18,7 +18,7 @@ POLARITY = 1
 VSTART = 0
 
 # Test voltage V1 end:
-VEND   = 25
+VEND   = 50
 
 # Test voltage V1 steps:
 VSTEP  = 0.5
@@ -52,12 +52,12 @@ IIDLE  = 0.02
 POLARITY = 1
 
 # Test voltage V2 start:
-# Vbe = 0.68
-VSTART = 0.68
+# Vbe = 0.65
+VSTART = 0.65
 
 # Test voltage V2 end:
-# Ib = 0...200 uA ==> U2 = Ib x Rb + Vbe = (0...200E-6) x 100k + 0.7 = 
-VEND   = 10
+# Ib = 0...60 uA ==> U2 = Ib x Rb + Vbe = (0...200E-6) x 100k + 0.7
+VEND   = 6.65
 
 # Test voltage V2 steps:
 VSTEP  = 1
