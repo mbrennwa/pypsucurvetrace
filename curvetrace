@@ -494,18 +494,7 @@ try:
 
 						# idle (if configured)
 						if T_idle > 0.0:
-						
-						
-						
-						
-						
-						    print('DEBUG INFO: START IDLING...')
 						    do_idle(PSU1,PSU2,HEATER,T_idle)
-						    print('DEBUG INFO: DONE IDLING.')
-						    
-						    
-						    
-						    
 						    
 						    # return to required PSU2 output:
 						    if PSU2.CONFIGURED:
