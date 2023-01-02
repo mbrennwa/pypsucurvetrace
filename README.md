@@ -118,7 +118,7 @@ UNDER CONSTRUCTION
 ## Examples
 
 ### IRFP150 N-channel power mosfet
-This example shows curve traces obtained from an IRFP150 N-channel power mosfet (drain current I<sub>D</sub> vs. drain-source voltage V<sub>DS</sub>, measured at different gate-source voltages V<sub>GS</sub>). The IRFP150 pins and PSU outputs were connected according to above diagram.
+This example shows curve traces obtained from an IRFP150 N-channel power mosfet (drain current I<sub>D</sub> vs. drain-source voltage V<sub>DS</sub>, measured at different gate-source voltages V<sub>GS</sub>). The IRFP150 pins and PSU outputs were connected according to the above diagram.
 * DUT source pin to the negative terminals of PSU1 and PSU2 (joined together)
 * DUT drain pin to the positive terminal of PSU1
 * DUT gate pin to the positive terminal of PSU2. A gate stopper resistor was used to avoid oscillation.
@@ -135,7 +135,7 @@ This example shows curve traces obtained from an 2SJ79 P-channel mosfet (drain c
 
 
 ### NJW0281G BJT/NPN power transistor
-This example shows curve traces obtained from a NJW0281G BJT/NPN power transistor (emitter current vs. collector-emitter voltage, measured at different base currents). The NJW0281G pins and PSU outputs were connected according to above diagram.
+This example shows curve traces obtained from a NJW0281G BJT/NPN power transistor (emitter current vs. collector-emitter voltage, measured at different base currents). The NJW0281G pins and PSU outputs were connected according to the above diagram.
 * DUT collector pin to the positive terminal of PSU1
 * DUT emitter pin to the negative terminals of PSU1 and PSU2 (joined together)
 * DUT base pin to the positive terminal of PSU2 using a base resistor of $R_2$ = 1000 Ohm
