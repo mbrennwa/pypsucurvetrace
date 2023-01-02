@@ -162,8 +162,8 @@ For this test, only one high-voltage power supply (PSU1) was available. The seco
 
 ## Notes
 
-### PSU configuration file
-The configuration file `config_PSU.txt` contains the configuration details of your power supplies (PSUs). Take a look at the `config_PSU.txt` for details of the file format. There are separate sections for PSU1 and PSU2. Each section contains the following fields:
+### Configuration file
+The configuration file `config.txt` contains the configuration details of your power supplies (PSUs) and, optionally, also the heaterblock (see below). Take a look at the `config_PSU.txt` for details of the file format. There are separate sections for PSU1 and PSU2. Each section contains the following fields:
 * `COMPORT`: virtual file corresponding to the serial port of the PSU
 * `COMMANDSET`: the "language" for communication with the PSU. Currently supported `COMMANDSET`s are
 	* `VOLTCRAFT` for Voltcraft, Manson, etc.
@@ -177,8 +177,10 @@ Note that it is possible to connect multiple PSU units in series to each other t
 * `COMPORT = ( "/dev/serial/by-id/<xxx_psu1>" , "/dev/serial/by-id/<xxx_psu2>" )`
 * `TYPE = ( "<commandset_psu1>" , "<commandset_psu2>" )`
 
-### Test configuration file
-...(under constrution -- take a look at the example files in the `examples` directory.)...
+### DUT/Test configuration file
+Instead of entering the test parameters manually, the DUT/test parameters can be loaded from a file containing the ranges and step sizes of the test voltages and currents, power limits, etc.
+
+Documentation of the DUT/test configuration file is under constrution! In the meantime, take a look at the example files in the `examples` directory...
 
 ### Set user permissions to access serial ports (Linux)
 To allow accessing the serial ports, add your username to the `dialout` group. For example, if your user account is `johndoe`, execute the following command:
