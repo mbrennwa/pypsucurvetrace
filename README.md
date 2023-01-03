@@ -1,7 +1,7 @@
 # PyPSUcurvetrace
 *PyPSUcurvetrace* is a software toolbox for I/V curve tracing of electronic devices using programmable power supplies (PSUs). In short, *PyPSUcurvetrace* is a *curve tracer*.
 
-For two-terminal devices under test (DUTs) like resistors or diodes, a single PSU is sufficient. For three-terminal DUTs like transistors, two PSUs are required (single PSU with two separate programmable outputs would also work).
+For two-terminal devices under test (DUTs) like resistors or diodes, a single PSU is sufficient. For three-terminal DUTs like transistors (BJTs, FETs) or vacuum tubes, two PSUs are required (a single PSU box with two separate programmable outputs would also work).
 
 *PyPSUcurvetrace* also allows using an optional heater block to control the temperature of the DUT during curve tracing. The heater block requires a dedicated PSU for temperature control.
 
