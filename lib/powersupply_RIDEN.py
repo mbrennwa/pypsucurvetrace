@@ -26,7 +26,7 @@ RIDEN_SPECS = {
 		"RD6006":	( 0.0, 60.0,  6.0,  360,  0.001,  0.001,  0.0, 0.0, 0.5 ) , # not confirmed
 		"RD6006P":	( 0.0, 60.0,  6.0,  360,  0.001,  0.0001, 0.0, 0.0, 0.5 ) , # not confirmed, currently testing
 		"RD6012":	( 0.0, 60.0, 12.0,  720,  0.001,  0.001,  0.0, 0.0, 0.5 ) , # not confirmed
-		"RD6012P":	( 0.0, 60.0, 12.0,  720,  0.001,  0.0001, 0.0, 0.0, 0.5 ) , # not confirmed
+		"RD6012P":	( 0.0, 60.0, 12.0,  720,  0.001,  -1,     0.0, 0.0, 0.5 ) , # not confirmed -- IRES is not constant!
 }
 
 RIDEN_TIMEOUT = 1.0
@@ -99,7 +99,7 @@ class RIDEN(object):
 		    elif 60125 <= self.id <= 60129:
 		        # RD6012P
 		        self.MODEL = 'RD6012P'
-		        # i_multi is not constant!
+		        # IRES is not constant!
 		        logger.warning ( 'RIDEN ' + self.MODEL + ' may have variable IRES or VRES -- this is untested and may not work!' ) # see https://github.com/ShayBox/Riden
                 
 		    elif 60180 <= self.id <= 60189:
