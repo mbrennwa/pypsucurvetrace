@@ -11,6 +11,7 @@ import logging
 import lib.powersupply_VOLTCRAFT as powersupply_VOLTCRAFT
 import lib.powersupply_KORAD as powersupply_KORAD
 import lib.powersupply_BK as powersupply_BK
+import lib.powersupply_RIDEN as powersupply_RIDEN
 
 # set up logger:
 logger = logging.getLogger('powersupply')
@@ -68,6 +69,7 @@ class PSU:
 		commandset : specifies computer interface / command set (string).
 			Voltcraft PPS / Mason: commandset = 'Voltcraft'
 			Korad / RND: commandset = 'Korad'
+			Riden / Ruiden: commandset = 'Riden'
 			SCPI interface: commandset = 'SCPI'
 		label: label or name to be used to describe / identify the PSU unit (string)
 		'''
@@ -153,6 +155,10 @@ class PSU:
 				elif C in [ "BK9184B_LOW" , "BK9185B_LOW" ]:
 					PSU = powersupply_BK.BK(P,voltagemode='LOW',debug=False)
 					C = 'BK'
+					
+				elif C in [ "RIDEN" , "RUIDEN" ]:
+				    PSU = powersupply_RIDEN.RIDEN(P, debug=False)
+				    C = 'RIDEN'
 
 				else:
 					raise RuntimeError ('Unknown commandset ' + C + '! Cannot continue...')
@@ -245,7 +251,7 @@ class PSU:
 			V.append(value)
 
 		for k in range(len(self._PSU)):
-			if self._PSU[k].COMMANDSET in [ 'KORAD' , 'VOLTCRAFT' , 'BK' ]:
+			if self._PSU[k].COMMANDSET in [ 'KORAD' , 'VOLTCRAFT' , 'BK' , 'RIDEN' ]:
 				
 				# determine corrected voltage setpoint:
 				VV = polyval(V[k], self.V_SET_CALPOLY)
@@ -254,7 +260,7 @@ class PSU:
 				self._PSU[k].voltage(VV)
 				
 			else:
-				raise RuntimeError('Cannot set voltage on power supply with ' + self.COMMANDSET + ' command set.')
+				raise RuntimeError('Cannot set voltage on power supply with ' + self._PSU[k].COMMANDSET + ' command set.')
 				
 		# wait for stable output voltage:
 		if wait_stable:
@@ -309,7 +315,7 @@ class PSU:
 		value = round(value/self.VRESSET) * self.VRESSET
 
 		for k in range(len(self._PSU)):
-			if self._PSU[k].COMMANDSET in [ 'KORAD' , 'VOLTCRAFT' , 'BK' ]:
+			if self._PSU[k].COMMANDSET in [ 'KORAD' , 'VOLTCRAFT' , 'BK' , 'RIDEN' ]:
 			
 							
 				# determine corrected current setpoint:
@@ -318,7 +324,7 @@ class PSU:
 				# set current at the PSU:
 				self._PSU[k].current(VV)
 			else:
-				raise RuntimeError('Cannot set current on power supply with ' + self.COMMANDSET + ' command set.')
+				raise RuntimeError('Cannot set current on power supply with ' + self._PSU[k].COMMANDSET + ' command set.')
 
 		# wait for stable output current:
 		if wait_stable:
@@ -361,7 +367,7 @@ class PSU:
 		"""
 
 		for k in range(len(self._PSU)):
-			if self._PSU[k].COMMANDSET in [ 'KORAD' , 'VOLTCRAFT' , 'BK' ]:
+			if self._PSU[k].COMMANDSET in [ 'KORAD' , 'VOLTCRAFT' , 'BK' , 'RIDEN' ]:
 				self._PSU[k].output(False)
 				self._PSU[k].voltage(self.VMIN)
 				self._PSU[k].current(0.0)
@@ -388,11 +394,11 @@ class PSU:
 		"""
 
 		for k in range(len(self._PSU)):
-			if self._PSU[k].COMMANDSET in [ 'KORAD' , 'VOLTCRAFT' , 'BK' ]:
+			if self._PSU[k].COMMANDSET in [ 'KORAD' , 'VOLTCRAFT' , 'BK' , 'RIDEN' ]:
 				self._PSU[k].output(True)
 
 			else:
-				raise RuntimeError('Cannot turn on power supply with ' + self.COMMANDSET + ' command set.')
+				raise RuntimeError('Cannot turn on power supply with ' + self._PSU[k].COMMANDSET + ' command set.')
 
 
 	########################################################################################################
@@ -433,7 +439,7 @@ class PSU:
 			
 			for k in range(len(self._PSU)):
 			
-				if self._PSU[k].COMMANDSET in [ 'KORAD' , 'VOLTCRAFT' , 'BK' ]:
+				if self._PSU[k].COMMANDSET in [ 'KORAD' , 'VOLTCRAFT' , 'BK' , 'RIDEN' ]:
 				    vv,ii,ll = self._PSU[k].reading()
 				    
 				    # add values to the list:
