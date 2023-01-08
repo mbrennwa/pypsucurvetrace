@@ -161,6 +161,22 @@ class RIDEN(object):
 	    return value
 
 
+	def _get_N_registers(self, register_start, N):
+	    value = None
+	    k = 1
+	    while k <= MAX_COMM_ATTEMPTS:
+	        try:
+        	    values = self._instrument.read_registers(register_start, N)
+        	    break # break from the loop if communication was successful
+	        except:
+        	    k += 1
+        	    pass # keep trying
+	    if k > MAX_COMM_ATTEMPTS:
+	        raise RuntimeError('Communication with RIDEN ' + self.MODEL + ' at ' + self._instrument.serial.port + ' failed.')
+ 
+	    return values
+
+
 	def output(self, state):
 		"""
 		enable/disable the PS output
@@ -189,7 +205,6 @@ class RIDEN(object):
 		if current < 0.0:
 			current = 0.0
 			
-			
 		if self.MODEL == 'RD6012P':
 		    logger.warning('powersupply_RIDEN: check if scaling of current value is correct! Use fixed IRES value, or the variable value in register 20 for scaling?')			
 			
@@ -202,10 +217,16 @@ class RIDEN(object):
 		"""
 		
 		# read voltage:
-		V = self._get_register(10) / self._voltage_multiplier()
+		#### V = self._get_register(10) / self._voltage_multiplier()
 
 		# read current:
-		I = self._get_register(11) / self._current_multiplier()
+		#### I = self._get_register(11) / self._current_multiplier()
+		
+		
+		# read voltage and current registers:
+		u = self._get_N_registers(10,2)
+		V = u[0] / self._voltage_multiplier()
+		I = u[1] / self._current_multiplier()
 
 		# read CV/CC:
 		if self._get_register(17) == 0:
