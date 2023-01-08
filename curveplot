@@ -61,9 +61,9 @@ parser.add_argument('--height', type=float, help='Height of the figure')
 parser.add_argument('--xlimit', type=float, help='Max. x-axis value')
 parser.add_argument('--ylimit', type=float, help='Max. y-axis value')
 parser.add_argument('--xylimit', type=float, help='Max. x*y value')
-parser.add_argument('--xscale', help='x-axis multiplier prefix (G, M, k, m, µ, n, p, f)')
-parser.add_argument('--yscale', help='y-axis multiplier prefix (G, M, k, m, µ, n, p, f)')
-parser.add_argument('--cscale', help='curves multiplier prefix (G, M, k, m, µ, n, p, f)')
+parser.add_argument('--xscale', help='x-axis multiplier prefix (G, M, k, m, mu, n, p, f)')
+parser.add_argument('--yscale', help='y-axis multiplier prefix (G, M, k, m, mu, n, p, f)')
+parser.add_argument('--cscale', help='curves multiplier prefix (G, M, k, m, mu, n, p, f)')
 
 # axis direction for "negative" parts:
 parser.add_argument('--xreverseneg', action='store_true', help='Do not reverse x-axis direction for negative DUTs')

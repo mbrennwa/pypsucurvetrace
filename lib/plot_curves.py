@@ -70,6 +70,8 @@ def plot_curves( data,			# measurement_data object (or tuple of measurement_data
 		xscale = 'µ'
 	if yscale == 'mu':
 		yscale = 'µ'
+	if cscale == 'mu':
+		cscale = 'µ'
 	sc = { 'G': 9, 'M': 6, 'k': 3, 'm': -3, 'µ': -6, 'n': -9, 'p': -12, 'f': -15 }
 	try:
 		xsc = float(10**sc[xscale])
@@ -85,6 +87,7 @@ def plot_curves( data,			# measurement_data object (or tuple of measurement_data
 		yunitprfix = ''
 	try:
 		csc = float(10**sc[cscale])
+		print(csc)
 		cunitprfix = cscale
 	except:
 		csc = 1.0
