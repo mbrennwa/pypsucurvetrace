@@ -4,36 +4,18 @@
 
 
 [PSU1]
-
-# RIDEN 6006
+# RIDEN 6006P
 TYPE          = RIDEN
 COMPORT       = /dev/serial/by-id/usb-1a86_USB_Serial-if00-port0
 NUMSTABLEREAD = 1
 
 
-### # BK 9120A --- USE THE BK9185 INSTEAD!!!! TRIED SEVERAL UNITS OF THIS BK MODEL, THEY ALL HAD PROBLEMS WITH CC-LIMITER AND WITH SETTLING TIME AFTER PROGRAMMING THE SET VALUES
-### COMPORT = /dev/serial/by-id/usb-Prolific_Technology_Inc._USB-Serial_Controller-if00-port0
-### TYPE = BK
-### NUMSTABLEREAD = 1
-### V_SET_CALPOLY  = (-0.00075,0.99981)
-### V_READ_CALPOLY = (-0.00001,1.0)
-### I_SET_CALPOLY  = (0.0,1.0)
-### I_READ_CALPOLY = (0.0005,1.0)
-
-
+[PSU1_not_active]
 # BK 9185B, PSU LABEL 7
-### COMPORT = /dev/serial/by-id/usb-Silicon_Labs_CP2102_USB_to_UART_Bridge_Controller_508D19126-if00-port0
-### TYPE = BK9185B_HIGH
-### NUMSTABLEREAD = 1
+COMPORT = /dev/serial/by-id/usb-Silicon_Labs_CP2102_USB_to_UART_Bridge_Controller_508D19126-if00-port0
+TYPE = BK9185B_HIGH
+NUMSTABLEREAD = 1
 
-### # KORAD/RND KWR103, PSU LABEL #2
-### COMPORT = /dev/serial/by-id/usb-nuvoton_KORAD_USB_Mode_48DB467A3733-if00
-### TYPE = KORAD
-### NUMSTABLEREAD = 3
-### V_SET_CALPOLY  = (0,1)
-### V_READ_CALPOLY = (0,1)
-### I_SET_CALPOLY  = (0,1)
-### I_READ_CALPOLY = (0,1)
 
 [PSU2]
 ### KORAD/RND KWR103, PSU LABEL #1
@@ -44,6 +26,26 @@ V_SET_CALPOLY  = (-0.004,1.0)
 V_READ_CALPOLY = (0.004,1.0)
 I_SET_CALPOLY  = (-0.002,1.0)
 I_READ_CALPOLY = (0.002,1.0)
+
+
+# other PSU templates:
+### # KORAD/RND KWR103, PSU LABEL #2
+### COMPORT = /dev/serial/by-id/usb-nuvoton_KORAD_USB_Mode_48DB467A3733-if00
+### TYPE = KORAD
+### NUMSTABLEREAD = 3
+### V_SET_CALPOLY  = (0,1)
+### V_READ_CALPOLY = (0,1)
+### I_SET_CALPOLY  = (0,1)
+### I_READ_CALPOLY = (0,1)
+
+### # BK 9120A --- USE THE BK9185 INSTEAD!!!! TRIED SEVERAL UNITS OF THIS BK MODEL, THEY ALL HAD PROBLEMS WITH CC-LIMITER AND WITH SETTLING TIME AFTER PROGRAMMING THE SET VALUES
+### COMPORT = /dev/serial/by-id/usb-Prolific_Technology_Inc._USB-Serial_Controller-if00-port0
+### TYPE = BK
+### NUMSTABLEREAD = 1
+### V_SET_CALPOLY  = (-0.00075,0.99981)
+### V_READ_CALPOLY = (-0.00001,1.0)
+### I_SET_CALPOLY  = (0.0,1.0)
+### I_READ_CALPOLY = (0.0005,1.0)
 
 
 
