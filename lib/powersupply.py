@@ -408,7 +408,7 @@ class PSU:
 		"""
 		PSU.read(N=1)
 		
-		Read current output: voltage, current, limiting mode (CV or CC) 
+		Read output: voltage, current, limiting mode (CV or CC) 
 		Optional (if N > 1): keep on reading voltage and current until N consecutive readings are stable to within the voltage and current resolution of the PSU, and return the mean of thos N last readings.
 
 		INPUT:
@@ -428,7 +428,7 @@ class PSU:
 		limit_max = 2	# max. allowed number of current limit ON readings
 
 		if N < 1:
-			raise RuntimeError ('Number of consistent readings in a row must be larger than 1!')
+			raise RuntimeError ('Number of consistent readings in a row must not be less than 1!')
 		
 		t0 = time.time()
 		while True:
