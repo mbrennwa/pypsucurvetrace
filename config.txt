@@ -3,14 +3,14 @@
 ###########################################
 
 
-[PSU1]
+[PSU1_not_active]
 # RIDEN 6006P
 TYPE          = RIDEN
 COMPORT       = /dev/serial/by-id/usb-1a86_USB_Serial-if00-port0
 NUMSTABLEREAD = 1
 
 
-[PSU1_not_active]
+[PSU1]
 # BK 9185B, PSU LABEL 7
 TYPE = BK9185B_HIGH
 COMPORT = /dev/serial/by-id/usb-Silicon_Labs_CP2102_USB_to_UART_Bridge_Controller_508D19126-if00-port0
