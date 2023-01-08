@@ -76,10 +76,11 @@ I like SVN (subversion):
 ```
 svn co https://github.com/mbrennwa/PyPSUcurvetrace.git/trunk path/on/your/computer/to/PyPSUcurvetrace
 ```
-* Install the Python-3 Serial package. On Debian, Ubuntu or similar APT-based Linux systems:
-```
-sudo apt install python3-serial
-```
+* Install the required Python-3 packages, either using `pip3` or the package manager of your operating system:
+    * Some general purpose packages: `serial`, `matplotlib`, `numpy`, `logging`
+    * For RIDEN power supplies: `minimalmodbus`
+    * Optional (if using a heaterblock): `simple_pid` and `pydigitemp`
+
 * Connect your PSUs to the USB or serial ports of your computer and determine their serial port interfaces on your system.
 On Linux:
 ```
