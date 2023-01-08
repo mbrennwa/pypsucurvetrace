@@ -23,10 +23,10 @@ logger.addHandler(ch)
 # Python dictionary of known KORAD (RND) power supply models (Vmin,Vmax,Imax,Pmax,Vresolution,Iresolution,VoffsetMax,IoffsetMax,MaxSettleTime)
 
 RIDEN_SPECS = {
-		"RD6006":	( 0.0, 60.0,  6.0,  360,  0.001,  0.001,  0.0, 0.0, 0.5 ) , # not confirmed
-		"RD6006P":	( 0.0, 60.0,  6.0,  360,  0.001,  0.0001, 0.0, 0.0, 0.5 ) , # not confirmed, currently testing
-		"RD6012":	( 0.0, 60.0, 12.0,  720,  0.001,  0.001,  0.0, 0.0, 0.5 ) , # not confirmed
-		"RD6012P":	( 0.0, 60.0, 12.0,  720,  0.001,  -1,     0.0, 0.0, 0.5 ) , # not confirmed -- IRES is not constant!
+		"RD6006":	( 0.0, 60.0,  6.0,  360,  0.001,  0.001,  0.0, 0.0, 0.3 ) , # not confirmed
+		"RD6006P":	( 0.0, 60.0,  6.0,  360,  0.001,  0.0001, 0.0, 0.0, 1.5 ) , # not confirmed, currently testing
+		"RD6012":	( 0.0, 60.0, 12.0,  720,  0.001,  0.001,  0.0, 0.0, 0.3 ) , # not confirmed
+		"RD6012P":	( 0.0, 60.0, 12.0,  720,  0.001,  None,   0.0, 0.0, 0.3 ) , # not confirmed -- IRES is not constant, see ModBus register 20!
 }
 
 RIDEN_TIMEOUT = 1.0
@@ -188,6 +188,11 @@ class RIDEN(object):
 			current = self.IMAX
 		if current < 0.0:
 			current = 0.0
+			
+			
+		if self.MODEL == 'RD6012P':
+		    logger.warning('powersupply_RIDEN: check if scaling of current value is correct! Use fixed IRES value, or the variable value in register 20 for scaling?')			
+			
 		self._set_register(9, round(current/self._IRES))
 
 
@@ -197,10 +202,10 @@ class RIDEN(object):
 		"""
 		
 		# read voltage:
-		V = self._get_register(10) * self._VRES
+		V = self._get_register(10) / self._voltage_multiplier()
 
 		# read current:
-		I = self._get_register(11) * self._IRES
+		I = self._get_register(11) / self._current_multiplier()
 
 		# read CV/CC:
 		if self._get_register(17) == 0:
@@ -209,3 +214,30 @@ class RIDEN(object):
 		    S = 'CC'
 
 		return (V, I, S)
+		
+
+	def _current_multiplier(self):
+		"""
+		return multiplier for current register value
+		"""
+		
+		if self.MODEL == 'RD6012P':
+		    if _get_register(20) == 0:
+		        multi = 10000.0
+		    else:
+		        multi = 1000.0
+		
+		else:
+		    multi = 1 / float(self._IRES)
+
+		return multi
+
+
+	def _voltage_multiplier(self):
+		"""
+		return multiplier for voltage register value
+		"""
+		
+		multi = 1 / float(self._VRES)
+
+		return multi
