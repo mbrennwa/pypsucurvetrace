@@ -87,6 +87,7 @@ class RIDEN(object):
 		    if 60060 <= mdl <= 60064:
 		        # RD6006
 		        self.MODEL = 'RD6006'
+		        logger.warning ( 'Operation of RIDEN ' + self.MODEL + ' with PyPSUcurvetrace is untested -- be careful!' )
                 
 		    elif mdl == 60065:
 		        # RD6006P
@@ -95,16 +96,19 @@ class RIDEN(object):
 		    elif 60120 <= self.id <= 60124:
 		        # RD6012
 		        self.MODEL = 'RD6012'
+		        logger.warning ( 'Operation of RIDEN ' + self.MODEL + ' with PyPSUcurvetrace is untested -- be careful!' )
             
 		    elif 60125 <= self.id <= 60129:
 		        # RD6012P
 		        self.MODEL = 'RD6012P'
+		        logger.warning ( 'Operation of RIDEN ' + self.MODEL + ' with PyPSUcurvetrace is untested -- be careful!' )
 		        # IRES is not constant!
 		        logger.warning ( 'RIDEN ' + self.MODEL + ' may have variable IRES or VRES -- this is untested and may not work!' ) # see https://github.com/ShayBox/Riden
                 
 		    elif 60180 <= self.id <= 60189:
 		        # RD6018
 		        self.MODEL = 'RD6018'
+		        logger.warning ( 'Operation of RIDEN ' + self.MODEL + ' with PyPSUcurvetrace is untested -- be careful!' )
             
 		    else:
 		        # unknown RD model:

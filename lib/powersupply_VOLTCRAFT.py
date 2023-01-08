@@ -91,6 +91,10 @@ class VOLTCRAFT(object):
 		    self.MODEL = PPS_MODELS[model]
 		    self.VMAX = model[0]
 		    self.IMAX = model[1]
+		    
+		    if self.MODEL in ("PPS11603", "PPS13610", "PPS11815"):
+		        logger.warning ( 'Operation of VOLTCRAFT ' + self.MODEL + ' with PyPSUcurvetrace is untested -- be careful!' )
+		        
 		except serial.SerialTimeoutException:
 		    raise RuntimeError("No Voltcraft PPS powersupply "
 				       "connected to %s" % port)
