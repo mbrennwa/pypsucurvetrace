@@ -87,7 +87,6 @@ def plot_curves( data,			# measurement_data object (or tuple of measurement_data
 		yunitprfix = ''
 	try:
 		csc = float(10**sc[cscale])
-		print(csc)
 		cunitprfix = cscale
 	except:
 		csc = 1.0
