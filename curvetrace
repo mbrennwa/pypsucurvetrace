@@ -294,7 +294,6 @@ for p in [PSU1, PSU2]:
 	
 	if not p.CONNECTED:
 		print ('* ' + p.LABEL + ': Not connected')
-	elif not p.CONFIGURED:
 		print ('* ' + p.LABEL + ': Test parameters not configured')
 	else:
 		print ('* ' + p.LABEL + ':')
@@ -340,10 +339,13 @@ print ('* Heaterblock temperature (current) = ' + str(HEATER.get_temperature_str
 print ('* Heaterblock temperature (target)  = ' + str(HEATER.get_target_temperature_string()))
 
 R2CTL_txt = '* R2CONTROL = '
-try:
-    R2CTL_txt = R2CTL_txt + str(R2CONTROL) + ' Ohm'
-except:
-    R2CTL_txt = R2CTL_txt + 'NOT SPECIFIED'
+u = 'NOT SPECIFIED'
+if R2CONTROL is not None:
+	try:
+		u = str(R2CONTROL) + ' Ohm'
+	except:
+		R2CONTROL = None
+R2CTL_txt = R2CTL_txt + ' ' + u
 print (R2CTL_txt)
 
 # set up plotting environment
@@ -515,9 +517,6 @@ try:
 						if PSU1.CONFIGURED:
 							PSU1.setCurrent(I1LIM,False) # set current limit at PSU1
 							PSU1.setVoltage(V1,True) # set voltage at PSU1
-
-						# wait a bit to get stable conditions before taking the reading:
-						time.sleep(0.2)
 
 						# read PSU output voltages and currents:
 						r = []

@@ -2,22 +2,34 @@
 ### Power supplies used for DUT testing ###
 ###########################################
 
+[PSU1]
+# RIDEN 6012P at high-current mode (12 A at 1 mA resolution)
+TYPE          = RIDEN_6012P_12A
+COMPORT       = /dev/serial/by-path/pci-0000:00:14.0-usb-0:2.4.3:1.0-port0
+NUMSTABLEREAD = 1
 
-[PSU1_not_active]
-# RIDEN 6006P
-TYPE          = RIDEN
-COMPORT       = /dev/serial/by-id/usb-1a86_USB_Serial-if00-port0
+[PSU1_disabled]
+# RIDEN 6012P at hlow-current mode (6 A at 0.1 mA resolution)
+TYPE          = RIDEN_6012P_6A
+COMPORT       = /dev/serial/by-path/pci-0000:00:14.0-usb-0:2.4.3:1.0-port0
 NUMSTABLEREAD = 1
 
 
-[PSU1]
+[PSU2]
+# RIDEN 6006P
+TYPE          = RIDEN
+COMPORT       = /dev/serial/by-path/pci-0000:00:14.0-usb-0:2.4.2:1.0-port0
+NUMSTABLEREAD = 1
+
+
+[PSU1_BK9185B_disabled]
 # BK 9185B, PSU LABEL 7
 TYPE = BK9185B_HIGH
 COMPORT = /dev/serial/by-id/usb-Silicon_Labs_CP2102_USB_to_UART_Bridge_Controller_508D19126-if00-port0
 NUMSTABLEREAD = 1
 
 
-[PSU2]
+[PSU2_KORAD_KWR103_disabled]
 ### KORAD/RND KWR103, PSU LABEL #1
 TYPE = KORAD
 COMPORT = /dev/serial/by-id/usb-nuvoton_KORAD_USB_Mode_48EA53743933-if00
@@ -54,7 +66,7 @@ I_READ_CALPOLY = (0.002,1.0)
 ###     (optional -- delete if not used)     ###
 ################################################
 
-[HEATERBLOCK]
+[HEATERBLOCK_disabled]
 
 # PSU for heater:
 PSU_COMPORT = /dev/serial/by-id/usb-Silicon_Labs_CP2102_USB_to_UART_Bridge_Controller_0010-if00-port0

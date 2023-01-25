@@ -156,8 +156,15 @@ class PSU:
 					PSU = powersupply_BK.BK(P,voltagemode='LOW',debug=False)
 					C = 'BK'
 					
-				elif C in [ "RIDEN" , "RUIDEN" ]:
+				elif C == "RIDEN":
 				    PSU = powersupply_RIDEN.RIDEN(P, debug=False)
+				    
+				elif C == "RIDEN_6012P_6A":
+				    PSU = powersupply_RIDEN.RIDEN(P, currentmode='LOW', debug=False)
+				    C = 'RIDEN'
+
+				elif C == "RIDEN_6012P_12A":
+				    PSU = powersupply_RIDEN.RIDEN(P, currentmode='HIGH', debug=False)
 				    C = 'RIDEN'
 
 				else:
@@ -212,6 +219,92 @@ class PSU:
 	########################################################################################################
 	
 
+	def setVoltage_OLD(self,value,wait_stable):
+		"""
+		PSU.setVoltage(value,wait_stable)
+		
+		Set PSU voltage.
+		
+		INPUT:
+		value: voltage set-point value (float)
+		wait_stable: wait until output voltage reaches the set-point value (bool)
+		
+		OUTPUT:
+		(none)
+		"""
+
+		# make sure we're not trying to set a value that is not resolved by the setting resolution of the PSU,
+		# which will never give a stable output at the unresolved value		
+		value = round(value/self.VRESSET) * self.VRESSET
+		
+		# determine voltage settings for all PSU units:
+		V = []
+		if len(self._PSU) > 1:
+          	# for series-connected PSU units:
+			for k in range(len(self._PSU)):
+				delta = value - sum(V)
+				if delta < self._PSU[k].VMIN:
+					if k > 0:
+						V.append(self._PSU[k].VMIN)
+						V[k-1] = V[k-1] - (V[k]-delta)
+					else:
+						raise RuntimeError('Cannot set voltage -- value is lower than VMIN.')
+				if delta > 0:
+					V.append( min(delta,self._PSU[k].VMAX) )
+				else:
+					V.append(0.0)
+
+
+		else:
+			V.append(value)
+              
+		for k in range(len(self._PSU)):
+			if self._PSU[k].COMMANDSET in [ 'KORAD' , 'VOLTCRAFT' , 'BK' , 'RIDEN' ]:
+				
+				# determine corrected voltage setpoint:
+				VV = polyval(V[k], self.V_SET_CALPOLY)
+				
+				# set voltage at the PSU:
+				self._PSU[k].voltage(VV)
+				
+			else:
+				raise RuntimeError('Cannot set voltage on power supply with ' + self._PSU[k].COMMANDSET + ' command set.')
+				
+		# wait for stable output voltage:
+		if wait_stable:
+			stable = False
+			limit = 0 	# number of readings with current limiter ON
+			limit_max = 2	# max. allowed number of current limit ON readings
+			if self.MODEL == '9120A':
+				limit_max = 6 # The BK 9120A is a diva and needs a bit more convincing and pampering
+
+			t0 = time.time() # start time (now)
+			while not time.time() > t0+self.MAXSETTLETIME:
+              
+				# get new reading:
+				time.sleep(self.READIDLETIME)
+				r = self.read()
+				delta = abs(r[0] - value)
+                
+				if r[2] == "CC":
+					limit += 1
+					if limit > limit_max:
+						break
+				
+				elif delta <= 1.3*self.VRESREAD + self.VOFFSETMAX:
+					stable = True
+					break
+				
+			if not stable:
+				if r[2] == "CC":
+					pass # voltage setpoint running into current limit mode. Skip waiting for stable output voltage...
+				else:
+					logger.warning (self.LABEL + ': voltage setpoint not reached after ' + str(self.MAXSETTLETIME) + ' s! Offset = ' + str(delta) + ' V')
+
+                    
+	########################################################################################################
+	
+
 	def setVoltage(self,value,wait_stable):
 		"""
 		PSU.setVoltage(value,wait_stable)
@@ -233,6 +326,7 @@ class PSU:
 		# determine voltage settings for all PSU units:
 		V = []
 		if len(self._PSU) > 1:
+          	# for series-connected PSU units:
 			for k in range(len(self._PSU)):
 				delta = value - sum(V)
 				if delta < self._PSU[k].VMIN:
@@ -245,7 +339,6 @@ class PSU:
 					V.append( min(delta,self._PSU[k].VMAX) )
 				else:
 					V.append(0.0)
-
 
 		else:
 			V.append(value)
@@ -269,28 +362,37 @@ class PSU:
 			limit_max = 2	# max. allowed number of current limit ON readings
 			if self.MODEL == '9120A':
 				limit_max = 6 # The BK 9120A is a diva and needs a bit more convincing and pampering
-			t0 = time.time() # start time (now)
-			r = self.read()
-			delta = abs(r[0] - value)
-			
-			while not time.time() > t0+self.MAXSETTLETIME:
 
-				delta = abs(r[0] - value)
+			last_val = value
+			t0 = time.time() # start time (now)
+			while time.time()-t0 <= self.MAXSETTLETIME:
+              
+				# get new reading:
+				time.sleep(0.2)
+                
+				r = self.read()
+				delta = abs(r[0] - last_val)
+                
+                # don't try for too long if PSU hit the CC limit:
 				if r[2] == "CC":
-					limit = limit + 1
+					limit += 1
 					if limit > limit_max:
 						break
-				if delta <= 1.3*self.VRESREAD + self.VOFFSETMAX:
+				
+                # 
+				elif delta <= 1.3*self.VRESREAD + self.VOFFSETMAX:
 					stable = True
 					break
-				time.sleep(self.READIDLETIME)
-				r = self.read()
 				
+				# prepare next iteration:
+				last_val = r[0]
+                
 			if not stable:
 				if r[2] == "CC":
 					pass # voltage setpoint running into current limit mode. Skip waiting for stable output voltage...
 				else:
 					logger.warning (self.LABEL + ': voltage setpoint not reached after ' + str(self.MAXSETTLETIME) + ' s! Offset = ' + str(delta) + ' V')
+
 
 
 	########################################################################################################
@@ -316,13 +418,13 @@ class PSU:
 
 		for k in range(len(self._PSU)):
 			if self._PSU[k].COMMANDSET in [ 'KORAD' , 'VOLTCRAFT' , 'BK' , 'RIDEN' ]:
-			
 							
 				# determine corrected current setpoint:
 				VV = polyval(value, self.I_SET_CALPOLY)
 				
 				# set current at the PSU:
 				self._PSU[k].current(VV)
+				
 			else:
 				raise RuntimeError('Cannot set current on power supply with ' + self._PSU[k].COMMANDSET + ' command set.')
 
@@ -409,7 +511,7 @@ class PSU:
 		PSU.read(N=1)
 		
 		Read output: voltage, current, limiting mode (CV or CC) 
-		Optional (if N > 1): keep on reading voltage and current until N consecutive readings are stable to within the voltage and current resolution of the PSU, and return the mean of thos N last readings.
+		Optional (if N > 1): keep on reading voltage and current until N consecutive readings are stable to within the voltage and current resolution of the PSU, and return the mean of those N last readings.
 
 		INPUT:
 		N (optional): number of consecutive readings that are stable to within the voltage and current resolution of the PSU (default: N = 1)

@@ -23,10 +23,11 @@ logger.addHandler(ch)
 # Python dictionary of known KORAD (RND) power supply models (Vmin,Vmax,Imax,Pmax,Vresolution,Iresolution,VoffsetMax,IoffsetMax,MaxSettleTime)
 
 RIDEN_SPECS = {
-		"RD6006":	( 0.0, 60.0,  6.0,  360,  0.001,  0.001,  0.0, 0.0, 0.3 ) , # not confirmed
-		"RD6006P":	( 0.0, 60.0,  6.0,  360,  0.001,  0.0001, 0.0, 0.0, 1.5 ) , # not confirmed, currently testing
-		"RD6012":	( 0.0, 60.0, 12.0,  720,  0.001,  0.001,  0.0, 0.0, 0.3 ) , # not confirmed
-		"RD6012P":	( 0.0, 60.0, 12.0,  720,  0.001,  None,   0.0, 0.0, 0.3 ) , # not confirmed -- IRES is not constant, see ModBus register 20!
+		"RD6006":	    ( 0.0, 60.0,  6.0,  360,  0.001,  0.001,  0.0, 0.0, 0.3 ) , # not confirmed
+		"RD6006P":	    ( 0.0, 60.0,  6.0,  360,  0.001,  0.0001, 0.0, 0.0, 1.5 ) , # confirmed working
+		"RD6012":	    ( 0.0, 60.0, 12.0,  720,  0.001,  0.001,  0.0, 0.0, 0.3 ) , # not confirmed
+		"RD6012P_6A":	( 0.0, 60.0,  6.0,  360,  0.001,  0.0001, 0.0, 0.0, 0.6 ) , # 6012P in low-current mode (0..6A at 0.1 mA resolution), confirmed working
+		"RD6012P_12A":	( 0.0, 60.0, 12.0,  720,  0.001,  0.001,  0.0, 0.0, 0.6 ) , # 6012P in high-current mode (0..12A at 1 mA resolution), confirmed working
 }
 
 RIDEN_TIMEOUT = 1.0
@@ -61,11 +62,12 @@ class RIDEN(object):
 	Class for RIDEN (RUIDEN) power supply
 	"""
 
-	def __init__(self, port, baud=115200, debug=False):
+	def __init__(self, port, baud=115200, currentmode = 'LOW', debug=False):
 		'''
 		PSU(port)
 		port : serial port (string, example: port = '/dev/serial/by-id/XYZ_123_abc')
 		baud : baud rate of serial port (check the settings at the RD PSU unit)
+		currentmode: use 'LOW' or 'HIGH' to configure PSU units to use low/high current modes (with corresponding current resolution) [only for units that support this, like the 6012P]
 		debug: flag for debugging info (bool)
 		'''
 		
@@ -93,19 +95,23 @@ class RIDEN(object):
 		        # RD6006P
 		        self.MODEL = 'RD6006P'
                 
-		    elif 60120 <= self.id <= 60124:
+		    elif 60120 <= mdl <= 60124:
 		        # RD6012
 		        self.MODEL = 'RD6012'
 		        logger.warning ( 'Operation of RIDEN ' + self.MODEL + ' with PyPSUcurvetrace is untested -- be careful!' )
             
-		    elif 60125 <= self.id <= 60129:
+		    elif 60125 <= mdl <= 60129:
 		        # RD6012P
-		        self.MODEL = 'RD6012P'
-		        logger.warning ( 'Operation of RIDEN ' + self.MODEL + ' with PyPSUcurvetrace is untested -- be careful!' )
-		        # IRES is not constant!
-		        logger.warning ( 'RIDEN ' + self.MODEL + ' may have variable IRES or VRES -- this is untested and may not work!' ) # see https://github.com/ShayBox/Riden
-                
-		    elif 60180 <= self.id <= 60189:
+		        if currentmode == 'LOW':
+		            self.MODEL = 'RD6012P_6A'
+		            self._set_register(20,0) # set low-current mode
+		        else:
+		            self.MODEL = 'RD6012P_12A'
+		            self._set_register(20,1) # set low-current mode
+	    	        
+		        # logger.warning ( 'RIDEN RD6012P initialized in 6A ("low-current") mode with 0.1 mA if current resolution!' )
+		                        
+		    elif 60180 <= mdl <= 60189:
 		        # RD6018
 		        self.MODEL = 'RD6018'
 		        logger.warning ( 'Operation of RIDEN ' + self.MODEL + ' with PyPSUcurvetrace is untested -- be careful!' )
@@ -119,17 +125,15 @@ class RIDEN(object):
 		    self.VMAX          = RIDEN_SPECS[self.MODEL][1]
 		    self.IMAX          = RIDEN_SPECS[self.MODEL][2]
 		    self.PMAX          = RIDEN_SPECS[self.MODEL][3]
-		    self._VRES         = RIDEN_SPECS[self.MODEL][4]
-		    self._IRES         = RIDEN_SPECS[self.MODEL][5]
-		    self.VRESSET       = self._VRES
-		    self.VRESREAD      = self._VRES
-		    self.IRESSET       = self._IRES
-		    self.IRESREAD      = self._IRES
+		    self.VRESSET       = RIDEN_SPECS[self.MODEL][4]
+		    self.VRESREAD      = RIDEN_SPECS[self.MODEL][4]
+		    self.IRESSET       = RIDEN_SPECS[self.MODEL][5]
+		    self.IRESREAD      = RIDEN_SPECS[self.MODEL][5]
 		    self.VOFFSETMAX    = RIDEN_SPECS[self.MODEL][6]
 		    self.IOFFSETMAX    = RIDEN_SPECS[self.MODEL][7]
 		    self.MAXSETTLETIME = RIDEN_SPECS[self.MODEL][8]
 		    self.READIDLETIME  = self.MAXSETTLETIME/50
-
+		    
 		except KeyError:
 		    raise RuntimeError('Unknown RIDEN powersupply type/model ' + self.MODEL)
 		except:
@@ -197,22 +201,25 @@ class RIDEN(object):
 			voltage = self.VMAX
 		if voltage < self.VMIN:
 			voltage = self.VMIN
-		self._set_register(8, round(voltage/self._VRES))
+            
+		self._set_register(8, round(voltage*self._voltage_multiplier()))
+		
+		time.sleep(0.5)
+		
+		u = self.reading()
 		
 
 	def current(self, current):
 		"""
 		set current: silently saturates at IMIN and IMAX
 		"""
+        
 		if current > self.IMAX:
 			current = self.IMAX
 		if current < 0.0:
 			current = 0.0
-			
-		if self.MODEL == 'RD6012P':
-		    logger.warning('powersupply_RIDEN: check if scaling of current value is correct! Use fixed IRES value, or the variable value in register 20 for scaling?')			
-			
-		self._set_register(9, round(current/self._IRES))
+		
+		self._set_register(9, round(current*self._voltage_multiplier()))
 
 
 	def reading(self):
@@ -220,18 +227,13 @@ class RIDEN(object):
 		read applied output voltage and current and if PS is in "CV" or "CC" mode
 		"""
 		
-		# read voltage:
-		#### V = self._get_register(10) / self._voltage_multiplier()
-
-		# read current:
-		#### I = self._get_register(11) / self._current_multiplier()
-		
-		
 		# read voltage and current registers:
+		V_mult = self._voltage_multiplier()
+		I_mult = self._current_multiplier()
 		u = self._get_N_registers(10,2)
-		V = u[0] / self._voltage_multiplier()
-		I = u[1] / self._current_multiplier()
-
+		V = u[0] / V_mult
+		I = u[1] / I_mult
+        
 		# read CV/CC:
 		if self._get_register(17) == 0:
 		    S = 'CV'
@@ -239,23 +241,6 @@ class RIDEN(object):
 		    S = 'CC'
 
 		return (V, I, S)
-		
-
-	def _current_multiplier(self):
-		"""
-		return multiplier for current register value
-		"""
-		
-		if self.MODEL == 'RD6012P':
-		    if _get_register(20) == 0:
-		        multi = 10000.0
-		    else:
-		        multi = 1000.0
-		
-		else:
-		    multi = 1 / float(self._IRES)
-
-		return multi
 
 
 	def _voltage_multiplier(self):
@@ -263,6 +248,16 @@ class RIDEN(object):
 		return multiplier for voltage register value
 		"""
 		
-		multi = 1 / float(self._VRES)
+		multi = 1.0 / float(RIDEN_SPECS[self.MODEL][4])
 
+		return multi
+		
+
+	def _current_multiplier(self):
+		"""
+		return multiplier for current register value
+		"""
+		
+		multi = 1.0 / float(RIDEN_SPECS[self.MODEL][5])
+            
 		return multi
