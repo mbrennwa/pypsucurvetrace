@@ -107,9 +107,8 @@ class RIDEN(object):
 		            self._set_register(20,0) # set low-current mode
 		        else:
 		            self.MODEL = 'RD6012P_12A'
-		            self._set_register(20,1) # set low-current mode
-	    	        
-		        # logger.warning ( 'RIDEN RD6012P initialized in 6A ("low-current") mode with 0.1 mA if current resolution!' )
+		            self._set_register(20,1) # set high-current mode
+		            logger.warning ( 'RIDEN RD6012P at 12A ("high-current") mode: there is an issue with going higher than 6A somewhere in the code...' )
 		                        
 		    elif 60180 <= mdl <= 60189:
 		        # RD6018
@@ -219,7 +218,7 @@ class RIDEN(object):
 		if current < 0.0:
 			current = 0.0
 		
-		self._set_register(9, round(current*self._voltage_multiplier()))
+		self._set_register(9, round(current*self._current_multiplier()))
 
 
 	def reading(self):
@@ -259,5 +258,22 @@ class RIDEN(object):
 		"""
 		
 		multi = 1.0 / float(RIDEN_SPECS[self.MODEL][5])
+            
+		return multi
+		
+		
+	def _current_multiplier_nadabum(self):
+		"""
+		return multiplier for current register value
+		"""
+		
+		if 'RIDEN6012P' in self.MODEL:
+		    if self._get_register(20) == 0:
+		        multi = 10000.0
+		    else:
+		        multi = 1000.0
+		        
+		else:
+		    multi = 1.0 / float(RIDEN_SPECS[self.MODEL][5])
             
 		return multi

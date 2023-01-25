@@ -9,7 +9,7 @@ COMPORT       = /dev/serial/by-path/pci-0000:00:14.0-usb-0:2.4.3:1.0-port0
 NUMSTABLEREAD = 1
 
 [PSU1_disabled]
-# RIDEN 6012P at hlow-current mode (6 A at 0.1 mA resolution)
+# RIDEN 6012P at low-current mode (6 A at 0.1 mA resolution)
 TYPE          = RIDEN_6012P_6A
 COMPORT       = /dev/serial/by-path/pci-0000:00:14.0-usb-0:2.4.3:1.0-port0
 NUMSTABLEREAD = 1
