@@ -26,8 +26,8 @@ RIDEN_SPECS = {
 		"RD6006":	    ( 0.0, 60.0,  6.0,  360,  0.001,  0.001,  0.0, 0.0, 0.3 ) , # not confirmed
 		"RD6006P":	    ( 0.0, 60.0,  6.0,  360,  0.001,  0.0001, 0.0, 0.0, 1.5 ) , # confirmed working
 		"RD6012":	    ( 0.0, 60.0, 12.0,  720,  0.001,  0.001,  0.0, 0.0, 0.3 ) , # not confirmed
-		"RD6012P_6A":	( 0.0, 60.0,  6.0,  360,  0.001,  0.0001, 0.0, 0.0, 0.6 ) , # 6012P in low-current mode (0..6A at 0.1 mA resolution), confirmed working
-		"RD6012P_12A":	( 0.0, 60.0, 12.0,  720,  0.001,  0.001,  0.0, 0.0, 0.6 ) , # 6012P in high-current mode (0..12A at 1 mA resolution), confirmed working
+		"RD6012P_6A":	( 0.0, 60.0,  6.0,  360,  0.001,  0.0001, 0.0, 0.0, 1.8 ) , # 6012P in low-current mode (0..6A at 0.1 mA resolution), confirmed working
+		"RD6012P_12A":	( 0.0, 60.0, 12.0,  720,  0.001,  0.001,  0.0, 0.0, 1.8 ) , # 6012P in high-current mode (0..12A at 1 mA resolution), confirmed working
 }
 
 RIDEN_TIMEOUT = 1.0
@@ -130,7 +130,7 @@ class RIDEN(object):
 		    self.VOFFSETMAX    = RIDEN_SPECS[self.MODEL][6]
 		    self.IOFFSETMAX    = RIDEN_SPECS[self.MODEL][7]
 		    self.MAXSETTLETIME = RIDEN_SPECS[self.MODEL][8]
-		    self.READIDLETIME  = self.MAXSETTLETIME/50
+		    self.READIDLETIME  = self.MAXSETTLETIME/5
 		    
 		except KeyError:
 		    raise RuntimeError('Unknown RIDEN powersupply type/model ' + self.MODEL)
@@ -211,7 +211,7 @@ class RIDEN(object):
             
 		self._set_register(8, round(voltage*self._voltage_multiplier()))
 		
-		time.sleep(0.5)
+		## time.sleep(0.5)
 		
 		u = self.reading()
 		
@@ -243,7 +243,11 @@ class RIDEN(object):
         
 		# read CV/CC:
 		if self._get_register(17) == 0:
-		    S = 'CV'
+		    if self._get_register(16) == 2:
+		        # over-current protection / OCP is on
+		        S = 'CC'
+		    else:
+		        S = 'CV'
 		else:
 		    S = 'CC'
 
