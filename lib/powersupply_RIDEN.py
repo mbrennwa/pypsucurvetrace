@@ -108,7 +108,6 @@ class RIDEN(object):
 		        else:
 		            self.MODEL = 'RD6012P_12A'
 		            self._set_register(20,1) # set high-current mode
-		            logger.warning ( 'RIDEN RD6012P at 12A ("high-current") mode: there is an issue with going higher than 6A somewhere in the code...' )
 		                        
 		    elif 60180 <= mdl <= 60189:
 		        # RD6018
@@ -137,6 +136,15 @@ class RIDEN(object):
 		    raise RuntimeError('Unknown RIDEN powersupply type/model ' + self.MODEL)
 		except:
 		    raise RuntimeError('Could not determine RIDEN powersupply type/model')
+		    
+		# set over-voltage and over-current settings to max. values (to avoid them from unintended limiting):
+		logger.info ( 'Adjusting OVP and OCP limits to maximum values...' )
+		R = [82, 86, 90, 94, 98, 102, 106, 110, 114, 118] # OVP registers (OCP are +1)
+		mul_U = self._voltage_multiplier()
+		mul_I = self._current_multiplier()
+		for r in R:
+		    self._set_register(r, self.VMAX*mul_U)
+		    self._set_register(r+1, self.IMAX*mul_I)
 
 
 	def _set_register(self, register, value):
@@ -262,7 +270,7 @@ class RIDEN(object):
 		return multi
 		
 		
-	def _current_multiplier_nadabum(self):
+	def _current_multiplier_nadanixdabum(self):
 		"""
 		return multiplier for current register value
 		"""
