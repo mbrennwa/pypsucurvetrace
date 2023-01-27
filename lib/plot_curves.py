@@ -31,11 +31,14 @@ def plot_curves( data,			# measurement_data object (or tuple of measurement_data
                  exclude_CC = True,     # exclude data with current limiter on
                  x_reverse_neg = True,  # reverse x axis for "negative" DUTs
                  y_reverse_neg = True,  # reverse y axis for "negative" DUTs
+                 xlog          = False, # flag for log-scale x-axis
+                 ylog          = False, # flag for log-scale y-axis                 
                  linecolor = 'k',       # line color of the curves (or tuple of line colors)
                  linestyle = '-',       # line style of the curves (or tuple of line colors)
                  linewidth = 2.0,       # line width of the curves (or tuple of line colors)
                  grid_on = True,        # use grid lines
                  gridcolor = 'gray',    # color of the grid lines
+                 dotmarker = None,      # dot marker symbol
                  fontname = None,       # name of the font used in the plot
                  fontsize = None,       # size of the font used in the plot (base value)
                  title=None,            # plot title
@@ -47,6 +50,7 @@ def plot_curves( data,			# measurement_data object (or tuple of measurement_data
                  xscale=None,           # x-axis multiplier prefix (G, M, k, m, µ, n, p, f)
                  yscale=None,           # y-axis multiplier prefix (G, M, k, m, µ, n, p, f)
                  cscale=None,           # curve multiplier prefix (G, M, k, m, µ, n, p, f)
+                 noclabels = False,     # flag to disable curve labels
                  nobranding=False       # do not add PyPSUcurvetrace "branding" to the plot
                 ):
 
@@ -164,6 +168,7 @@ def plot_curves( data,			# measurement_data object (or tuple of measurement_data
 	has_curve_labels = False
 	
 	# plot curves, loop over all data files:
+	x_min = x_max = y_min = y_max = None
 	for i in reversed(range(len(data))):
 	
 		XX = X[i]
@@ -220,26 +225,56 @@ def plot_curves( data,			# measurement_data object (or tuple of measurement_data
 						x = np.append(x, xi[k0])
 						y = np.append(y, yi[k0])
 			
-			plt.plot(x, y, color=linecolor[i], linestyle=linestyle[i], linewidth=lw_base)
+			# remove x=0.0 if x-axis is log scale:
+			if xlog:
+			    u = np.where(x != 0)[0]
+			    x = x[u]
+			    y = y[u]
+			    
+			# remove y=0.0 if y-axis is log scale:
+			if xlog:
+			    u = np.where(y != 0)[0]
+			    x = x[u]
+			    y = y[u]
+			
+			# keep record of data xmin/xmax/ymin/ymax:
+			if x_min is None:
+			    x_min = min(x)
+			else:
+			    x_min = min ([x_min, min(x)])
+			if x_max is None:
+			    x_max = max(x)
+			else:
+			    x_max = max ([x_max, max(x)])
+			if y_min is None:
+			    y_min = min(y)
+			else:
+			    y_min = min ([y_min, min(y)])
+			if y_max is None:
+			    y_max = max(y)
+			else:
+			    y_max = max ([y_max, max(y)])
+            
+			plt.plot(x, y, color=linecolor[i], linestyle=linestyle[i], linewidth=lw_base, marker=dotmarker)
 			
 			# determine curve label things (only for first datafile):
 			if i > 0:
 				has_curve_labels = False
 			else:
+			    if not noclabels:
+				    # determine label string:
+				    s += (f'{round(10000000.0*C0[k])/10000000.0} ' + cunit, )
+				    
+				    # last curve point for label coordinates:
+				    xl += (x[-1],)
+				    yl += (y[-1],)
 
-				# determine label string:
-				s += (f'{round(10000000.0*C0[k])/10000000.0} ' + cunit, )
-				
-				# last curve point for label coordinates:
-				xl += (x[-1],)
-				yl += (y[-1],)
-
-				# curve slope:
-				dx += (x[-1] - x[-2], )
-				dy += (y[-1] - y[-2], )
-				
-				has_curve_labels = True
-	
+				    # curve slope:
+				    dx += (x[-1] - x[-2], )
+				    dy += (y[-1] - y[-2], )
+				    
+				    has_curve_labels = True
+	    
 	# format the plot (once all data plotting is done, so that coordinate systems do not changed anymore)
 
 	ax = plt.gca() # get plot axes
@@ -298,6 +333,13 @@ def plot_curves( data,			# measurement_data object (or tuple of measurement_data
 		r = plt.gca().axes.get_ylim()
 		if abs(r[0]) > abs(r[1]):
 			plt.gca().invert_yaxis()
+			
+	if xlog:
+	    plt.gca().set_xscale('log')
+	    ax.set_xlim([0.5*x_min, 2.0*x_max])
+	if ylog:
+	    plt.gca().set_yscale('log')
+	    ax.set_ylim([0.5*y_min, 2.0*y_max])
 	
 	plt.title(title)
 	plt.xlabel(xlabel + ' ('+xunit+')')

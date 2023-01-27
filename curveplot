@@ -65,9 +65,15 @@ parser.add_argument('--xscale', help='x-axis multiplier prefix (G, M, k, m, mu, 
 parser.add_argument('--yscale', help='y-axis multiplier prefix (G, M, k, m, mu, n, p, f)')
 parser.add_argument('--cscale', help='curves multiplier prefix (G, M, k, m, mu, n, p, f)')
 
+parser.add_argument('--noclabels', action='store_true', help = 'plot without curve labels')
+
 # axis direction for "negative" parts:
 parser.add_argument('--xreverseneg', action='store_true', help='Do not reverse x-axis direction for negative DUTs')
 parser.add_argument('--yreverseneg', action='store_true', help='Do not reverse y-axis direction for negative DUTs')
+
+# log scale:
+parser.add_argument('--xlog', action='store_true', help='x-axis log scale')
+parser.add_argument('--ylog', action='store_true', help='y-axis log scale')
 
 # title / labels:
 parser.add_argument('--title', help='Plot title (see also --saveXYZ and --pairs options)')
@@ -78,6 +84,7 @@ parser.add_argument('--ylabel', help='y-axis label')
 parser.add_argument('--linecolor', help='Color of curves (any of the Matplotlib color specs)')
 parser.add_argument('--linestyle', help='Line style of curves (solid, dashed, dashdot, dotted)')
 parser.add_argument('--linewidth', type=float, help='Line width of curves and plot frame')
+parser.add_argument('--dotmarker', help='Symbol to use for data-point')
 
 # grid:
 parser.add_argument('--gridcolor', help='Grid line color')
@@ -162,6 +169,8 @@ yscale  = None
 cscale  = None
 xreverseneg = True
 yreverseneg = True
+xlog = False
+ylog = False
 if args.xlimit:
 	xlimit = args.xlimit
 if args.ylimit:
@@ -178,7 +187,15 @@ if args.xreverseneg:
 	xreverseneg = False
 if args.yreverseneg:
 	yreverseneg = False
-	
+if args.xlog:
+	xlog = True
+if args.ylog:
+	ylog = True
+
+noclabels = False
+if args.noclabels:
+	noclabels = True
+
 # determine axis labels and plot title:
 xlabel = None # default
 ylabel = None # default
@@ -221,6 +238,18 @@ if len(linestyle) < len(datafiles):
 		u += (linestyle[0],)
 	linestyle = u 
 
+# marker dot symbol:
+dotmarker = None # default
+if args.dotmarker:
+	dotmarker = args.dotmarker
+	
+if len(linestyle) < len(datafiles):
+	logger.warning('No linestyles specified, will use the same linestyle for all datafiles!')
+	u = tuple( )
+	for i in range(len(datafiles)):
+		u += (linestyle[0],)
+	linestyle = u 
+
 # grid lines:
 grid_on = True
 gridcolor = 'lightgray'
@@ -245,6 +274,7 @@ data = label = preheat = ls = lc = tuple( )
 for i in range(len(datafiles)):
 	try:
 		d, l, p, r2ctl = read_datafile(datafiles[i])
+		
 		if len(d.rawdata) == 0:
 			logger.warning('datafile ' + datafiles[i] + ' contains no curve data. Skipping this file...')
 		else:
@@ -323,6 +353,7 @@ else:
 				     linestyle = linestyle,
 				     linewidth = linewidth,
 				     gridcolor = gridcolor,
+				     dotmarker = dotmarker,
 				     grid_on   = grid_on,
 				     nobranding = nobranding,
 				     title     = title,
@@ -331,8 +362,11 @@ else:
 				     xscale    = xscale,
 				     yscale    = yscale,
 				     cscale    = cscale,
+				     noclabels = noclabels,
 				     x_reverse_neg = xreverseneg,
 				     y_reverse_neg = yreverseneg,
+				     xlog      = xlog,
+				     ylog      = ylog,
 				     fontsize  = fontsize,
 				     fontname  = fontname)
 		except:
