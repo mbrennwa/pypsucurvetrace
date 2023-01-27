@@ -50,6 +50,8 @@ def plot_curves( data,			# measurement_data object (or tuple of measurement_data
                  xscale=None,           # x-axis multiplier prefix (G, M, k, m, µ, n, p, f)
                  yscale=None,           # y-axis multiplier prefix (G, M, k, m, µ, n, p, f)
                  cscale=None,           # curve multiplier prefix (G, M, k, m, µ, n, p, f)
+                 xoffset = 0.0,         # offset x-axis data by xoffset
+                 yoffset = 0.0,         # offset y-axis data by yoffset
                  noclabels = False,     # flag to disable curve labels
                  nobranding=False       # do not add PyPSUcurvetrace "branding" to the plot
                 ):
@@ -115,8 +117,8 @@ def plot_curves( data,			# measurement_data object (or tuple of measurement_data
 	
 		for i in range(len(data)):
 			# append tuple elements:
-			X += (data[i].get_U1_meas(exclude_CC)/xsc,) # measured U1 value
-			Y += (data[i].get_I1_meas(exclude_CC)/ysc,) # measured I1 value
+			X += ( data[i].get_U1_meas(exclude_CC) / xsc,) # measured U1 value
+			Y += ( data[i].get_I1_meas(exclude_CC) / ysc,) # measured I1 value
 			u = data[i].get_U2_set(exclude_CC) # U2 set value
 			if bjt_vbe is not None:
 			    if bjt_r2 is not None:
@@ -171,8 +173,8 @@ def plot_curves( data,			# measurement_data object (or tuple of measurement_data
 	x_min = x_max = y_min = y_max = None
 	for i in reversed(range(len(data))):
 	
-		XX = X[i]
-		YY = Y[i]
+		XX = X[i] + xoffset
+		YY = Y[i] + yoffset
 		CC = C[i]
 		C0 = np.unique(CC)
 		

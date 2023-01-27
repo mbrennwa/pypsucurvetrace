@@ -75,6 +75,10 @@ parser.add_argument('--yreverseneg', action='store_true', help='Do not reverse y
 parser.add_argument('--xlog', action='store_true', help='x-axis log scale')
 parser.add_argument('--ylog', action='store_true', help='y-axis log scale')
 
+# x/y data offset values:
+parser.add_argument('--xoffset', type=float, help='x-axis data offset')
+parser.add_argument('--yoffset', type=float, help='y-axis data offset')
+
 # title / labels:
 parser.add_argument('--title', help='Plot title (see also --saveXYZ and --pairs options)')
 parser.add_argument('--xlabel', help='x-axis label')
@@ -191,6 +195,14 @@ if args.xlog:
 	xlog = True
 if args.ylog:
 	ylog = True
+
+# determine data x&y offsets:
+xoffset = 0.0 # default
+yoffset = 0.0 # default
+if args.xoffset:
+	xoffset = args.xoffset
+if args.yoffset:
+	yoffset = args.yoffset
 
 noclabels = False
 if args.noclabels:
@@ -367,6 +379,8 @@ else:
 				     y_reverse_neg = yreverseneg,
 				     xlog      = xlog,
 				     ylog      = ylog,
+				     xoffset   = xoffset,
+				     yoffset   = yoffset,
 				     fontsize  = fontsize,
 				     fontname  = fontname)
 		except:
