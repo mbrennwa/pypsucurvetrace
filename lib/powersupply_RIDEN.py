@@ -153,8 +153,6 @@ class RIDEN(object):
 		    
 		# set over-voltage and over-current settings to max. values (to avoid them from unintended limiting):
 
-		print(OCP_max)
-		print(OVP_max)
 		if ( OCP_max is None ) or ( OVP_max is None ):
 		    logger.warning( 'Cannot adjust OVP and OCP limits of the ' + self.MODEL + ' power supply.' )
 		else:
@@ -163,11 +161,8 @@ class RIDEN(object):
 		    mul_U = self._voltage_multiplier()
 		    mul_I = self._current_multiplier()
 		    for r in R:
-		        print('adjust OVP to ' + str(OVP_max))
 		        self._set_register(r, OVP_max*mul_U)
-		        print('adjust OCP to ' + str(OCP_max))
 		        self._set_register(r+1, OCP_max*mul_I)
-		        print('adjusted.')
 
 
 	def _set_register(self, register, value):
