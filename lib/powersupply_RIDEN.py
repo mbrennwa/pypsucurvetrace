@@ -86,7 +86,7 @@ class RIDEN(object):
 		# determine model / type:
 		try:
 	        # OCP and OVP max values:
-	        OCP_max = OVP_max = None
+		    OCP_max = OVP_max = None
 		    mdl = self._get_register(0)
 		    if 60060 <= mdl <= 60064:
 		        # RD6006
@@ -113,12 +113,12 @@ class RIDEN(object):
 		        if currentmode == 'LOW':
 		            self.MODEL = 'RD6012P_6A'
 		            self._set_register(20,0) # set low-current mode
+		            OCP_max = 6.1
 		        else:
 		            self.MODEL = 'RD6012P_12A'
 		            self._set_register(20,1) # set high-current mode
-		        		        OVP_max = 61.0
+		            OCP_max = 12.1
 		        OVP_max = 61.0
-		        OCP_max = 12.1
 
 		                        
 		    elif 60180 <= mdl <= 60189:
@@ -153,6 +153,8 @@ class RIDEN(object):
 		    
 		# set over-voltage and over-current settings to max. values (to avoid them from unintended limiting):
 
+		print(OCP_max)
+		print(OVP_max)
 		if ( OCP_max is None ) or ( OVP_max is None ):
 		    logger.warning( 'Cannot adjust OVP and OCP limits of the ' + self.MODEL + ' power supply.' )
 		else:
@@ -161,8 +163,11 @@ class RIDEN(object):
 		    mul_U = self._voltage_multiplier()
 		    mul_I = self._current_multiplier()
 		    for r in R:
+		        print('adjust OVP to ' + str(OVP_max))
 		        self._set_register(r, OVP_max*mul_U)
+		        print('adjust OCP to ' + str(OCP_max))
 		        self._set_register(r+1, OCP_max*mul_I)
+		        print('adjusted.')
 
 
 	def _set_register(self, register, value):
@@ -263,17 +268,17 @@ class RIDEN(object):
 		u = self._get_N_registers(16,2)
 
 		# check register 17 (CV or CC?)
-		if u(1) == 1:
+		if u[1] == 1:
 		    S = 'CC'
 		else:
 		    S = 'CV'
 		    
 		    # check register 16 (OVP or OCP on?)
-		    if u(0) == 1:
+		    if u[0] == 1:
 		        # over-voltage protection / OVP is on
 		        self.warning('Detected over-voltage -- PSU output turned off?')
 		    
-		    elif u(0) == 2:
+		    elif u[0] == 2:
 		        # over-current protection / OCP is on
 		        self.warning('Detected over-current -- PSU output turned off?')
 		        S = 'CC'
