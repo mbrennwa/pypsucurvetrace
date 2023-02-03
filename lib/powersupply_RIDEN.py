@@ -85,19 +85,27 @@ class RIDEN(object):
 
 		# determine model / type:
 		try:
+	        # OCP and OVP max values:
+	        OCP_max = OVP_max = None
 		    mdl = self._get_register(0)
 		    if 60060 <= mdl <= 60064:
 		        # RD6006
 		        self.MODEL = 'RD6006'
+		        OVP_max = 61.0
+		        OCP_max = 6.1
 		        logger.warning ( 'Operation of RIDEN ' + self.MODEL + ' with PyPSUcurvetrace is untested -- be careful!' )
                 
 		    elif mdl == 60065:
 		        # RD6006P
 		        self.MODEL = 'RD6006P'
+		        OVP_max = 61.0
+		        OCP_max = 6.1
                 
 		    elif 60120 <= mdl <= 60124:
 		        # RD6012
 		        self.MODEL = 'RD6012'
+		        OVP_max = 61.0
+		        OCP_max = 12.1
 		        logger.warning ( 'Operation of RIDEN ' + self.MODEL + ' with PyPSUcurvetrace is untested -- be careful!' )
             
 		    elif 60125 <= mdl <= 60129:
@@ -108,16 +116,22 @@ class RIDEN(object):
 		        else:
 		            self.MODEL = 'RD6012P_12A'
 		            self._set_register(20,1) # set high-current mode
+		        		        OVP_max = 61.0
+		        OVP_max = 61.0
+		        OCP_max = 12.1
+
 		                        
 		    elif 60180 <= mdl <= 60189:
 		        # RD6018
 		        self.MODEL = 'RD6018'
 		        logger.warning ( 'Operation of RIDEN ' + self.MODEL + ' with PyPSUcurvetrace is untested -- be careful!' )
+		        OVP_max = 61.0
+		        OCP_max = 18.1
             
 		    else:
 		        # unknown RD model:
 		        logger.warning ( 'Unknown RIDEN model ID: ' + mdl )
-		        self.MODEL = '?????'
+		        self.MODEL = '<unknown>'
 
 		    self.VMIN          = RIDEN_SPECS[self.MODEL][0]
 		    self.VMAX          = RIDEN_SPECS[self.MODEL][1]
@@ -138,13 +152,17 @@ class RIDEN(object):
 		    raise RuntimeError('Could not determine RIDEN powersupply type/model')
 		    
 		# set over-voltage and over-current settings to max. values (to avoid them from unintended limiting):
-		logger.info ( 'Adjusting OVP and OCP limits to maximum values...' )
-		R = [82, 86, 90, 94, 98, 102, 106, 110, 114, 118] # OVP registers (OCP are +1)
-		mul_U = self._voltage_multiplier()
-		mul_I = self._current_multiplier()
-		for r in R:
-		    self._set_register(r, self.VMAX*mul_U)
-		    self._set_register(r+1, self.IMAX*mul_I)
+
+		if ( OCP_max is None ) or ( OVP_max is None ):
+		    logger.warning( 'Cannot adjust OVP and OCP limits of the ' + self.MODEL + ' power supply.' )
+		else:
+		    logger.info ( 'Adjusting OVP to ' + str(OVP_max) + ' V and and OCP to ' + str(OCP_max) + ' A.' )
+		    R = [82, 86, 90, 94, 98, 102, 106, 110, 114, 118] # OVP registers (OCP are +1)
+		    mul_U = self._voltage_multiplier()
+		    mul_I = self._current_multiplier()
+		    for r in R:
+		        self._set_register(r, OVP_max*mul_U)
+		        self._set_register(r+1, OCP_max*mul_I)
 
 
 	def _set_register(self, register, value):
@@ -242,14 +260,23 @@ class RIDEN(object):
 		I = u[1] / I_mult
         
 		# read CV/CC:
-		if self._get_register(17) == 0:
-		    if self._get_register(16) == 2:
-		        # over-current protection / OCP is on
-		        S = 'CC'
-		    else:
-		        S = 'CV'
-		else:
+		u = self._get_N_registers(16,2)
+
+		# check register 17 (CV or CC?)
+		if u(1) == 1:
 		    S = 'CC'
+		else:
+		    S = 'CV'
+		    
+		    # check register 16 (OVP or OCP on?)
+		    if u(0) == 1:
+		        # over-voltage protection / OVP is on
+		        self.warning('Detected over-voltage -- PSU output turned off?')
+		    
+		    elif u(0) == 2:
+		        # over-current protection / OCP is on
+		        self.warning('Detected over-current -- PSU output turned off?')
+		        S = 'CC'
 
 		return (V, I, S)
 
