@@ -271,11 +271,11 @@ class RIDEN(object):
 		    # check register 16 (OVP or OCP on?)
 		    if u[0] == 1:
 		        # over-voltage protection / OVP is on
-		        self.warning('Detected over-voltage -- PSU output turned off?')
+		        logger.warning('Detected over-voltage event -- PSU output turned off?')
 		    
 		    elif u[0] == 2:
 		        # over-current protection / OCP is on
-		        self.warning('Detected over-current -- PSU output turned off?')
+		        logger.warning('Detected over-current event -- PSU output turned off?')
 		        S = 'CC'
 
 		return (V, I, S)
