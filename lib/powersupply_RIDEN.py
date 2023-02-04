@@ -247,40 +247,6 @@ class RIDEN(object):
 		self._set_register(9, round(current*self._current_multiplier()))
 
 
-	def reading_OLD(self):
-		"""
-		read applied output voltage and current and if PS is in "CV" or "CC" mode
-		"""
-		
-		# read voltage and current registers:
-		V_mult = self._voltage_multiplier()
-		I_mult = self._current_multiplier()
-		u = self._get_N_registers(10,2)
-		V = u[0] / V_mult
-		I = u[1] / I_mult
-        
-		# read CV/CC:
-		u = self._get_N_registers(16,2)
-
-		# check register 17 (CV or CC?)
-		if u[1] == 1:
-		    S = 'CC'
-		else:
-		    S = 'CV'
-		    
-		    # check register 16 (OVP or OCP on?)
-		    if u[0] == 1:
-		        # over-voltage protection / OVP is on
-		        logger.warning('Detected over-voltage event -- PSU output turned off?')
-		    
-		    elif u[0] == 2:
-		        # over-current protection / OCP is on
-		        logger.warning('Detected over-current event -- PSU output turned off?')
-		        S = 'CC'
-
-		return (V, I, S)
-
-
 	def reading(self):
 		"""
 		read applied output voltage and current and if PS is in "CV" or "CC" mode
