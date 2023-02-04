@@ -12,12 +12,13 @@ import logging
 
 # set up logger:
 logger = logging.getLogger('powersupply_RIDEN')
-logger.setLevel(logging.DEBUG)
-ch = logging.StreamHandler()
-ch.setLevel(logging.DEBUG)
-formatter = logging.Formatter('%(levelname)s (%(name)s): %(message)s')
-ch.setFormatter(formatter)
-logger.addHandler(ch)
+if not logger.handlers:
+    logger.setLevel(logging.DEBUG)
+    ch = logging.StreamHandler()
+    ch.setLevel(logging.DEBUG)
+    formatter = logging.Formatter('%(levelname)s (%(name)s): %(message)s')
+    ch.setFormatter(formatter)
+    logger.addHandler(ch)
 
 
 # Python dictionary of known KORAD (RND) power supply models (Vmin,Vmax,Imax,Pmax,Vresolution,Iresolution,VoffsetMax,IoffsetMax,MaxSettleTime)

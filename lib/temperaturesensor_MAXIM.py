@@ -31,13 +31,14 @@ except ImportError as e:
 	raise
 	
 # set up logger:
-logger = logging.getLogger('powersupply_VOLTCRAFT')
-logger.setLevel(logging.DEBUG)
-ch = logging.StreamHandler()
-ch.setLevel(logging.DEBUG)
-formatter = logging.Formatter('%(levelname)s (%(name)s): %(message)s')
-ch.setFormatter(formatter)
-logger.addHandler(ch)
+logger = logging.getLogger('temperaturesensor_MAXIM')
+if not logger.handlers:
+    logger.setLevel(logging.DEBUG)
+    ch = logging.StreamHandler()
+    ch.setLevel(logging.DEBUG)
+    formatter = logging.Formatter('%(levelname)s (%(name)s): %(message)s')
+    ch.setFormatter(formatter)
+    logger.addHandler(ch)
 
 
 # check Python version and print warning if we're running version < 3:

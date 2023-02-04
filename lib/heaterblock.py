@@ -18,6 +18,16 @@ from threading import Thread
 from lib.temperaturesensor_MAXIM import temperaturesensor_MAXIM as TSENS
 from lib.powersupply import PSU
 
+# set up logger:
+logger = logging.getLogger('heaterblock')
+if not logger.handlers:
+    logger.setLevel(logging.DEBUG)
+    ch = logging.StreamHandler()
+    ch.setLevel(logging.DEBUG)
+    formatter = logging.Formatter('%(levelname)s (%(name)s): %(message)s')
+    ch.setFormatter(formatter)
+    logger.addHandler(ch)
+
 
 # heater class (dummy):
 class heater:
@@ -79,11 +89,11 @@ class heater:
 				self.turn_on()
 
 		except KeyError as e:
-			logging.warning('Could not configure heaterblock because ' + str(e) + ' is missing in the configuration file.')
+			logger.warning('Could not configure heaterblock because ' + str(e) + ' is missing in the configuration file.')
 			pass
 
 		except Exception as e:
-			logging.warning('Could not configure heaterblock: ' + traceback.format_exc())
+			logger.warning('Could not configure heaterblock: ' + traceback.format_exc())
 			pass
 					
 	
@@ -98,7 +108,7 @@ class heater:
 					voltage = min( voltage, self._PSU.VMAX )
 					self._PSU.setVoltage(voltage,wait_stable=False)
 				except Exception as e:
-					logging.warning('Could not set heater power: ' + traceback.format_exc())
+					logger.warning('Could not set heater power: ' + traceback.format_exc())
 	
 		
 	def get_temperature(self, do_read = True):
@@ -182,7 +192,7 @@ class heater:
 				self._PSU.setCurrent(self._PSU.IMAX,wait_stable=False) # set current to max. to allow power control based on voltage limit only
 				self._power_is_on = True
 			except Exception as e:
-				logging.warning('Could not turn on the heater: ' + traceback.format_exc())
+				logger.warning('Could not turn on the heater: ' + traceback.format_exc())
 
 
 	def turn_off(self):
@@ -192,7 +202,7 @@ class heater:
 				self._PSU.turnOff()
 				self._power_is_on = False
 			except Exception as e:
-				logging.warning('Could not turn off the heater: ' + traceback.format_exc())
+				logger.warning('Could not turn off the heater: ' + traceback.format_exc())
 
 
 	def is_on(self):
@@ -274,7 +284,7 @@ class heater_control_thread(Thread):
 			self._do_run = True
 		except :
 			# may fail if heaterblock is not really set up
-			logging.warning('Could not initialize heaterblock: ' + traceback.format_exc())
+			logger.warning('Could not initialize heaterblock: ' + traceback.format_exc())
 			pass
 	
 		
@@ -307,14 +317,14 @@ class heater_control_thread(Thread):
 							self._heaterblock.set_power(power)               # set heater power
 							
 		except:
-			logging.warning('Heaterblock PID controller failed: ' + traceback.format_exc())
+			logger.warning('Heaterblock PID controller failed: ' + traceback.format_exc())
 			
 		finally:
 			# try to turn off the power supply
 			try:
 				self._heaterblock.turn_off()
 			except:
-				logging.warning('Could not turn off heaterblock: ' + traceback.format_exc())
+				logger.warning('Could not turn off heaterblock: ' + traceback.format_exc())
 				pass
 				
 			# let others know that thread is not running anymore

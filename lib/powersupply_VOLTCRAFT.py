@@ -12,12 +12,13 @@ import logging
 
 # set up logger:
 logger = logging.getLogger('powersupply_VOLTCRAFT')
-logger.setLevel(logging.DEBUG)
-ch = logging.StreamHandler()
-ch.setLevel(logging.DEBUG)
-formatter = logging.Formatter('%(levelname)s (%(name)s): %(message)s')
-ch.setFormatter(formatter)
-logger.addHandler(ch)
+if not logger.handlers:
+    logger.setLevel(logging.DEBUG)
+    ch = logging.StreamHandler()
+    ch.setLevel(logging.DEBUG)
+    formatter = logging.Formatter('%(levelname)s (%(name)s): %(message)s')
+    ch.setFormatter(formatter)
+    logger.addHandler(ch)
 
 
 # The model can be identified by the maximum voltage and maximum current.

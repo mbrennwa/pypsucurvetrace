@@ -5,7 +5,7 @@ Helper functions for use with curvetrace programs
 import time
 import math
 import os.path
-import logging
+# import logging
 
 # import lib.powersupply as powersupply ### import only where needed
 # import lib.heaterblock as heaterblock ### not needed here?

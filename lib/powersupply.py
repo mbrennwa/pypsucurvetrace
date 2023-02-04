@@ -15,12 +15,13 @@ import lib.powersupply_RIDEN as powersupply_RIDEN
 
 # set up logger:
 logger = logging.getLogger('powersupply')
-logger.setLevel(logging.DEBUG)
-ch = logging.StreamHandler()
-ch.setLevel(logging.DEBUG)
-formatter = logging.Formatter('%(levelname)s (%(name)s): %(message)s')
-ch.setFormatter(formatter)
-logger.addHandler(ch)
+if not logger.handlers:
+    logger.setLevel(logging.DEBUG)
+    ch = logging.StreamHandler()
+    ch.setLevel(logging.DEBUG)
+    formatter = logging.Formatter('%(levelname)s (%(name)s): %(message)s')
+    ch.setFormatter(formatter)
+    logger.addHandler(ch)
 
 # PSU object:
 #    .setVoltage(voltage)   set voltage
