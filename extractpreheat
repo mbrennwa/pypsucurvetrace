@@ -59,5 +59,5 @@ datafiles = args.datafiles
 sep = ', '
 print( 'Filename' + sep + 'Label' + sep + 'U0' + sep + 'I0' + sep + 'Uc' + sep + 'Ic' + sep + 'T')
 for i in range(len(datafiles)):
-	d, l, p = read_datafile(datafiles[i])
+	d, l, p, u = read_datafile(datafiles[i])
 	print( Path(d.datafile).stem + sep + l + sep + str(p.U0) + sep + str(p.I0) + sep + str(p.Uc) + sep + str(p.Ic) + sep + str(p.T))
