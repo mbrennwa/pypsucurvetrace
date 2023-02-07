@@ -113,7 +113,7 @@ class heater:
 		if self._PSU != None:
 			if self._power_is_on:
 				try:
-					power -= 0.6 * self.get_DUT_heating_power()  # subtract heat input from the DUT
+					power -= 0.6 * self.get_DUT_heating_power()  # subtract (some of the) heat input from the DUT
 					power  = max((0, power))               # make sure power is not negative (the PID may want that, but we can't)
 					power  = min((power, self.max_power))  # make sure power is not more than max. allowed values (the PID may want that, but we can't)
 					voltage = np.sqrt(power*self._heater_R)
