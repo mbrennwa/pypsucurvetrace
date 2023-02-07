@@ -399,10 +399,11 @@ class PSU:
 				self._PSU[k].output(False)
 				self._PSU[k].voltage(self.VMIN)
 				self._PSU[k].current(0.0)
-				self._last_power = 0.0
 
 			else:
 				raise RuntimeError('Cannot turn off power supply with ' + self._PSU[k].COMMANDSET + ' command set.')
+				
+		self._last_power = 0.0
 
 
 

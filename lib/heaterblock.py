@@ -113,12 +113,16 @@ class heater:
 		if self._PSU != None:
 			if self._power_is_on:
 				try:
-					power -= 0.6 * self.get_DUT_heating_power()  # subtract (some of the) heat input from the DUT
-					power  = max((0, power))               # make sure power is not negative (the PID may want that, but we can't)
-					power  = min((power, self.max_power))  # make sure power is not more than max. allowed values (the PID may want that, but we can't)
-					voltage = np.sqrt(power*self._heater_R)
-					voltage = min( voltage, self._PSU.VMAX )
-					self._PSU.setVoltage(voltage,wait_stable=False)
+				    dut_power = self.get_DUT_heating_power()
+				    if dut_power > 0.0:
+					    power -= dut_power  # subtract heat input from the DUT
+					    if power < 0.0:
+					        logger.warning('DUT power exceeds required heaterblock power.')
+					        power = 0.0 # make sure power is not negative
+				    power  = min((power, self.max_power))  # make sure power is not more than max. allowed values (the PID may want that, but we can't)
+				    voltage = np.sqrt(power*self._heater_R)
+				    voltage = min( voltage, self._PSU.VMAX )
+				    self._PSU.setVoltage(voltage,wait_stable=False)
 				except Exception as e:
 					logger.warning('Could not set heater power: ' + traceback.format_exc())
 	
@@ -249,30 +253,17 @@ class heater:
 				T_now        = self.get_temperature(do_read=True)
 				
 				if T_now > T_tgt + T_tol:
-				    if T_last is not None:
-				        if T_now < T_last: 
-				            # heaterblock is cooling down...
-				            if nn > 0:
-				                nn -= 1
-				        else:
-				            nn +=1
-				            if nn > 4:
+				    if DUT_PSU_allowed_turn_off is not None:
+				        if T_last is not None:
+				            if T_now >= T_last:
 				                # heaterblock is not cooling down...
-				                if DUT_PSU_allowed_turn_off is not None:
+				                nn +=1
+				                if nn > 4:
 				                    if DUT_PSU_allowed_turn_off.CONFIGURED:
-				                        logger.warning('TURNING DUT OFF\n\n')
+				                        logger.warning('\n\nTURNING DUT-PSU OFF\n\n')
 				                        DUT_PSU_allowed_turn_off.turnOff()
 				                        PSU_turned_off = True
 							        
-				else:
-				    # turn on the PSU again, if it was turned off before:
-				    if PSU_turned_off:
-				            logger.warning('TURNING DUT ON\n\n')
-				            DUT_PSU_allowed_turn_off.turnOn()
-				            PSU_turned_off = False
-				            time.sleep(5) # allow some time to re-adjust
-				            nn = 0
-
 				msg = 'Waiting for heaterblock temperature (current: ' + self.get_temperature_string() +' °C, target: ' + self.get_target_temperature_string() + ' °C)...'
 				print (msg, end="\r")
 				# time.sleep(0.5)
