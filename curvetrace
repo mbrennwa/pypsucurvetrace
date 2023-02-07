@@ -119,7 +119,7 @@ PSU1 = connect_PSU(configTESTER,'PSU1');
 PSU2 = connect_PSU(configTESTER,'PSU2');
 
 # set up heaterblock:
-HEATER = heaterblock.heater( config=configTESTER, target_temperature=0.0, PSU1, PSU2 )
+HEATER = heaterblock.heater( config=configTESTER, target_temperature=0.0, DUT_PSU1=PSU1, DUT_PSU2=PSU2 )
 HEATER.turn_off()
 
 logfile, samplename, basename, step = start_new_logfile(batch_mode)
@@ -492,8 +492,9 @@ try:
 
 						# if heaterblock is configured and turned on:
 						# make sure the heaterblock temperature is within tolerance before doing the measurement,
-						# allow turning off the DUT to prevent heat input from DUT to heaterblock
+						# allow turning off the DUT to prevent (excessive) heat input from DUT to heaterblock
 						HEATER.wait_for_stable_T(DUT_PSU_allowed_turn_off=PSU1, terminal_output=True)
+						
 
 						# idle (if configured)
 						if T_idle > 0.0:

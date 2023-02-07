@@ -82,7 +82,7 @@ VIDLE_MAX = 18
 
 # - The DUT transconductance value (in A/V) to be used for regulation of the I1 idle current by adjusting the V2 voltage:
 #   (IDLE_GM = delta-I1 / delta-U2 ratio of the DUT at the idle point)
-IDLE_GM   = -0.5
+IDLE_GM   = -0.2
 
 # - Max. allowed idle current during the test is 1 A (this is way more than necessary for the DUT, but a larger value helps achieving quick regulation of the PSU output):
 IIDLE     = 1
@@ -104,7 +104,7 @@ T_TOL    = 0.5
 IDLESECS    = 0.0
 
 # Duration of pre-heat / warmup period before starting the test (seconds):
-PREHEATSECS = 40
+PREHEATSECS = 50
 
 # number of repeated readings at each measurement step:
 # (note that each reading is preceeded by an idle period if IDLECECS > 0):

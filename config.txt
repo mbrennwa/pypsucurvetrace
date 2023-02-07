@@ -66,7 +66,7 @@ I_READ_CALPOLY = (0.002,1.0)
 ###     (optional -- delete if not used)     ###
 ################################################
 
-[HEATERBLOCK_disabled]
+[HEATERBLOCK]
 
 # PSU for heater:
 PSU_COMPORT = /dev/serial/by-id/usb-Silicon_Labs_CP2102_USB_to_UART_Bridge_Controller_0010-if00-port0

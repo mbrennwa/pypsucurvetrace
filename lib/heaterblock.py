@@ -33,7 +33,7 @@ if not logger.handlers:
 class heater:
 
 
-	def __init__(self, config, target_temperature=0.0, init_on = False, DUT_PSU1, DUT_PSU2):
+	def __init__(self, config, target_temperature=0.0, init_on = False, DUT_PSU1 = None, DUT_PSU2 = None):
 		
 		# set / init all fields before trying to read from config file (which may not have all fields):
 		self._PSU   = None
@@ -99,8 +99,12 @@ class heater:
 			pass
 
 
-	def get_DUT_heating_power(self, DUT_power):
-		P = self._DUT_PSU1.get_last_power() + self._DUT_PSU2.get_last_power()
+	def get_DUT_heating_power(self):
+		P = 0.0
+		if self._DUT_PSU1 is not None:
+			P += self._DUT_PSU1.get_last_power()
+		if self._DUT_PSU2 is not None:
+			P += self._DUT_PSU2.get_last_power()
 		return P
 
 
@@ -229,6 +233,9 @@ class heater:
 			is_first_line = True
 			PSU_turned_off = False
 			
+			T_last = None
+			nn = 0
+			
 			while not self.temperature_is_stable():
 			
 				# go to new line on terminal output:
@@ -242,15 +249,35 @@ class heater:
 				T_now        = self.get_temperature(do_read=True)
 				
 				if T_now > T_tgt + T_tol:
-					if DUT_PSU_allowed_turn_off is not None:
-						if DUT_PSU_allowed_turn_off.CONFIGURED:
-							DUT_PSU_allowed_turn_off.turnOff()
-							PSU_turned_off = True
+				    if T_last is not None:
+				        if T_now < T_last: 
+				            # heaterblock is cooling down...
+				            if nn > 0:
+				                nn -= 1
+				        else:
+				            nn +=1
+				            if nn > 4:
+				                # heaterblock is not cooling down...
+				                if DUT_PSU_allowed_turn_off is not None:
+				                    if DUT_PSU_allowed_turn_off.CONFIGURED:
+				                        logger.warning('TURNING DUT OFF\n\n')
+				                        DUT_PSU_allowed_turn_off.turnOff()
+				                        PSU_turned_off = True
+							        
+				else:
+				    # turn on the PSU again, if it was turned off before:
+				    if PSU_turned_off:
+				            logger.warning('TURNING DUT ON\n\n')
+				            DUT_PSU_allowed_turn_off.turnOn()
+				            PSU_turned_off = False
+				            time.sleep(5) # allow some time to re-adjust
+				            nn = 0
 
 				msg = 'Waiting for heaterblock temperature (current: ' + self.get_temperature_string() +' °C, target: ' + self.get_target_temperature_string() + ' °C)...'
 				print (msg, end="\r")
 				# time.sleep(0.5)
 				# T_now = HEATER.get_temperature()
+				T_last = T_now
 			
 			if not is_first_line:
 				print (' '*len(msg), end="\r") # clear previous line from terminal
