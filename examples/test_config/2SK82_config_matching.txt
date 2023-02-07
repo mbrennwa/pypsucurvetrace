@@ -31,7 +31,7 @@ VSTEP  = 2
 IMAX   = 10.0
 
 # Max. allowed power during the test:
-PMAX   = 95
+PMAX   = 65
 
 # Idle conditions for pre-heat and idle between readings are configured to fixed values (PSU2 output will be regulated to attain these values, see below):
 
