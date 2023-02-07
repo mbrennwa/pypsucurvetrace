@@ -33,13 +33,15 @@ if not logger.handlers:
 class heater:
 
 
-	def __init__(self, config, target_temperature=0.0, init_on = False):
+	def __init__(self, config, target_temperature=0.0, init_on = False, DUT_PSU1, DUT_PSU2):
 		
 		# set / init all fields before trying to read from config file (which may not have all fields):
 		self._PSU   = None
 		self._TSENS = None
 		self._power_is_on = False
 		self._target_T = target_temperature
+		self._DUT_PSU1 = DUT_PSU1
+		self._DUT_PSU2 = DUT_PSU2
 
 		# thread to read T sensor and for PID control:
 		self._controller = None
@@ -95,15 +97,21 @@ class heater:
 		except Exception as e:
 			logger.warning('Could not configure heaterblock: ' + traceback.format_exc())
 			pass
-					
-	
+
+
+	def get_DUT_heating_power(self, DUT_power):
+		P = self._DUT_PSU1.get_last_power() + self._DUT_PSU2.get_last_power()
+		return P
+
+
 	def set_power(self, power):
 		# set heater power:
 		if self._PSU != None:
 			if self._power_is_on:
 				try:
-					power = max((0, power))               # make sure power is not negative (the PID may want that, but we can't)
-					power = min((power, self.max_power))  # make sure power is not more than max. allowed values (the PID may want that, but we can't)
+					power -= self.get_DUT_heating_power()  # subtract heat input from the DUT
+					power  = max((0, power))               # make sure power is not negative (the PID may want that, but we can't)
+					power  = min((power, self.max_power))  # make sure power is not more than max. allowed values (the PID may want that, but we can't)
 					voltage = np.sqrt(power*self._heater_R)
 					voltage = min( voltage, self._PSU.VMAX )
 					self._PSU.setVoltage(voltage,wait_stable=False)

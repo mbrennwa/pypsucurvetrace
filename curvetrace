@@ -119,7 +119,7 @@ PSU1 = connect_PSU(configTESTER,'PSU1');
 PSU2 = connect_PSU(configTESTER,'PSU2');
 
 # set up heaterblock:
-HEATER = heaterblock.heater( config=configTESTER, target_temperature=0.0 )
+HEATER = heaterblock.heater( config=configTESTER, target_temperature=0.0, PSU1, PSU2 )
 HEATER.turn_off()
 
 logfile, samplename, basename, step = start_new_logfile(batch_mode)

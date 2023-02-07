@@ -37,9 +37,13 @@ class DUTsetup_tab(wx.Panel):
 		box.Add(lbl,0,wx.ALIGN_CENTER)
 
 		# Add a dummy circuit / symbol:
-		self._circuit = schemdraw.Drawing()
-		self._circuit.draw(backend='svg')
-		self._circuit += elm.Resistor().label('100KΩ')
+		c = schemdraw.Drawing()
+		# c.draw(backend='svg')
+		c += elm.Resistor().label('100KΩ')
+		
+		png_bytes = drawing.get_imagedata('svg')
+		
+		bmp = wx.Bitmap.FromPNGData(png_bytes)
 
 		logging.debug('Need to figure out how to add the circuit symobol to the wx panel...')
 

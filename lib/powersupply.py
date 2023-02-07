@@ -115,6 +115,9 @@ class PSU:
 		self.LABEL = label
 		self.CONNECTED = False
 		self.CONFIGURED = False
+		
+		# Last power value (for use with heaterblock):
+		self._last_power = 0.0
 
 		# check inputs:
 		if not port:
@@ -356,7 +359,11 @@ class PSU:
 			else:
 				raise RuntimeError('Cannot set voltage on power supply with ' + self._PSU[k].COMMANDSET + ' command set.')
 				
-		# wait for stable output voltage:
+		# update power output:
+		if value == 0.0:
+			self._last_power = 0.0
+
+# wait for stable output voltage:
 		if wait_stable:
 			stable = False
 			limit = 0 	# number of readings with current limiter ON
@@ -429,7 +436,11 @@ class PSU:
 			else:
 				raise RuntimeError('Cannot set current on power supply with ' + self._PSU[k].COMMANDSET + ' command set.')
 
-		# wait for stable output current:
+		# update power output:
+		if value == 0.0:
+			self._last_power = 0.0
+
+        # wait for stable output current:
 		if wait_stable:
 			stable = False
 			limit = 0 	# number of readings with voltage limiter ON
@@ -474,6 +485,8 @@ class PSU:
 				self._PSU[k].output(False)
 				self._PSU[k].voltage(self.VMIN)
 				self._PSU[k].current(0.0)
+			
+			self._last_power = 0.0
 
 			else:
 				raise RuntimeError('Cannot turn off power supply with ' + self._PSU[k].COMMANDSET + ' command set.')
@@ -612,5 +625,16 @@ class PSU:
 		# determine corrected reading values:
 		V = polyval(V, self.V_READ_CALPOLY)
 		I = polyval(I, self.I_READ_CALPOLY)
+		
+		# store power output:
+		self._last_power = V*I
 
 		return (V,I,L)
+		
+
+	########################################################################################################
+	
+
+	def get_last_power(self):
+	    return self._last_power
+
