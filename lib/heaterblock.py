@@ -24,7 +24,8 @@ if not logger.handlers:
     logger.setLevel(logging.DEBUG)
     ch = logging.StreamHandler()
     ch.setLevel(logging.DEBUG)
-    formatter = logging.Formatter('%(levelname)s (%(name)s): %(message)s')
+    ### formatter = logging.Formatter('%(levelname)s (%(name)s): %(message)s')
+    formatter = logging.Formatter('%(name)s %(levelname)s : %(message)s')
     ch.setFormatter(formatter)
     logger.addHandler(ch)
 
@@ -117,7 +118,7 @@ class heater:
 				    if dut_power > 0.0:
 					    power -= dut_power  # subtract heat input from the DUT
 					    if power < 0.0:
-					        logger.warning('DUT power exceeds required heaterblock power.')
+					        ### logger.warning('DUT power exceeds required heaterblock power.')
 					        power = 0.0 # make sure power is not negative
 				    power  = min((power, self.max_power))  # make sure power is not more than max. allowed values (the PID may want that, but we can't)
 				    voltage = np.sqrt(power*self._heater_R)
@@ -260,7 +261,7 @@ class heater:
 				                nn +=1
 				                if nn > 4:
 				                    if DUT_PSU_allowed_turn_off.CONFIGURED:
-				                        logger.warning('\n\nTURNING DUT-PSU OFF\n\n')
+				                        logger.warning('DUT power exceeds required heaterblock power. Turning DUT off.')
 				                        DUT_PSU_allowed_turn_off.turnOff()
 				                        PSU_turned_off = True
 							        
