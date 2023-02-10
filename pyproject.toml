@@ -18,9 +18,9 @@ classifiers = [
 ]
 
 [project.scripts]
-curvetrace = "pypsucurvetrace.scripts:curvetrace"
-curveplot = "pypsucurvetrace.scripts:curveplot"
-extractpreheat = "pypsucurvetrace.scripts:extractpreheat"
+curvetrace = "pypsucurvetrace:curvetrace"
+curveplot = "pypsucurvetrace:curveplot"
+extractpreheat = "pypsucurvetrace:extractpreheat"
 
 [project.urls]
 "Homepage" = "https://github.com/mbrennwa/PyPSUcurvetrace"
