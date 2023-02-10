@@ -17,6 +17,9 @@ classifiers = [
     "Operating System :: OS Independent",
 ]
 
+[project.scripts]
+curvetrace = "pypsucurvetrace.scripts:curvetrace"
+
 [project.urls]
 "Homepage" = "https://github.com/mbrennwa/PyPSUcurvetrace"
 "Bug Tracker" = "https://github.com/mbrennwa/PyPSUcurvetrace/issues"
