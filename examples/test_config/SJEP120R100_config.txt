@@ -1,0 +1,99 @@
+#############################################
+# Test configuration SJEP120R100 power JFET #
+#############################################
+
+
+
+#################################################
+# Configuration for first power supply (PSU-1): #
+#################################################
+[PSU1]
+
+# DUT is connected with normal polarity (not inverted):
+POLARITY = 1
+
+# Test voltage V1 start (V):
+VSTART = 0
+
+# Test voltage V1 end (V):
+VEND   = 30
+
+# Test voltage V1 step size (V):
+VSTEP  = 0.5
+
+# Max. allowed current during the test (A):
+IMAX   = 10
+
+# Max. allowed power during the test (W):
+PMAX   = 40
+
+# Idle conditions for pre-heat and idle between readings are configured to fixed values (PSU2 output will be regulated to attain these values, see below):
+
+# - Idle voltage (V) (will be set as voltage limit at PSU-1 during idling):
+VIDLE  = 18
+
+#   (no min. or max. idle voltage is specified, which tells the program to use a fixed V1 idle voltage)
+
+# - Idle current (A) (target value to be attained with PSU-2 regulation)
+#   (make sure this is lower and not too close to IMAX):
+IIDLE  = 2.0
+
+
+
+##################################################
+# Configuration for second power supply (PSU-2): #
+##################################################
+[PSU2]
+
+# DUT is connected with normal polarity (not inverted):
+POLARITY = 1
+
+# Test voltage V2 start (V):
+VSTART = 0.9
+
+# Test voltage V2 end (V):
+VEND   = 1.8
+
+# Test voltage V2 step size (V):
+VSTEP  = 0.1
+
+# Max. allowed current during the test (A)
+IMAX   = 1
+
+# Max. allowed power during the test (W)
+PMAX   = 5
+
+# Idle conditions configured such that PSU-2 regulates the idle conditions configured for PSU-1
+
+# - V2 initial value (V):
+VIDLE     = 1.5
+
+# - V2 minimum value (V):
+VIDLE_MIN = 0.1
+
+# - V2 maximum value (V):
+VIDLE_MAX = 10.0
+
+# - The DUT transconductance value (in A/V) to be used for regulation of the I1 idle current by adjusting the V2 voltage:
+#   (IDLE_GM = delta-I1 / delta-U2 ratio of the DUT at the idle point)
+IDLE_GM   = 8
+
+# - Max. allowed idle current during the test (A)
+IIDLE     = 1
+
+
+
+###############################################
+# Configuration of additional test parameters #
+###############################################
+[EXTRA]
+
+# Duration of idle periods between readings (seconds):
+IDLESECS    = 00
+
+# Duration of pre-heat / warmup period before starting the test (seconds):
+PREHEATSECS = 30
+
+# number of repeated readings at each measurement step:
+# (note that each reading is preceeded by an idle period if IDLECECS > 0):
+NREP        = 1
