@@ -1,0 +1,26 @@
+sudo apt install python3-usb
+
+sudo nano /etc/udev/rules.d/90-keithleyPSU.rules
+--> enter: SUBSYSTEM=="usb", ACTION=="add", ATTRS{idVendor}=="05e6", ATTRS{idProduct}=="2280", GROUP="plugdev", MODE="0660"
+--> save and exit
+
+Run python3, then execute the following commands:
+import pyvisa
+rm = pyvisa.ResourceManager()
+rm.list_resources()
+inst = rm.open_resource('USB0::1510::8832::4315095::0::INSTR')
+print(inst.query("*IDN?"))	# SHOW INSTRUMENT IDENTIFICATION
+inst.write("*RST")	# RESET INSTRUMENT
+
+inst.write(":SOURCE:VOLTAGE:SLEW:RISING 1000")	# SET VOLTAGE SLEW RATE TO 1000 V / SEC (RISING)
+inst.write(":SOURCE:VOLTAGE:SLEW:FALLING 1000")	# SET VOLTAGE SLEW RATE TO 1000 V / SEC (FALLING)
+
+inst.write(":VOLTAGE 15")	# set voltage source to 15 V
+
+inst.write(":CURRENT 0.25")	# set current source to 0.25 A
+
+inst.write(":OUTPUT:STATE ON")	# turn on output
+print(inst.query(":READ?"))
+
+inst.close()
+
