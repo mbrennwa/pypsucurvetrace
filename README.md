@@ -8,9 +8,9 @@ $ https://github.com/mbrennwa/PyPSUcurvetrace
 ```
 
 ## Usage
-
-`curvetrace`: get curve data
-`curveplot`: plot curve data
-`extractpreheat`: extract pre-heat data
+The PyPSUcurvetrace package contains the following command-line programs:
+* `curvetrace`: get curve data
+* `curveplot`: plot curve data
+* `extractpreheat`: extract pre-heat data
 
 See the MANUAL for full documentation.
