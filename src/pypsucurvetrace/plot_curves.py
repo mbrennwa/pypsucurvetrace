@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 import logging
 from queue import Empty
 
-from lib.read_datafile import measurement_data
+from pypsucurvetrace.read_datafile import measurement_data
 
 # set up logger:
 logger = logging.getLogger('plot_curves')
