@@ -31,6 +31,7 @@ import pypsucurvetrace.heaterblock as heaterblock
 from pypsucurvetrace.curvetrace_tools import say_hello, printit, connect_PSU, configure_test_PSU, configure_idle_PSU, do_idle, start_new_logfile, format_PSU_reading
 from pypsucurvetrace.plot_curves import curve_plotter
 
+
 # set up logger:
 logger = logging.getLogger('curvetrace')
 if not logger.handlers:
@@ -40,6 +41,7 @@ if not logger.handlers:
 	formatter = logging.Formatter('%(levelname)s (%(name)s): %(message)s')
 	ch.setFormatter(formatter)
 	logger.addHandler(ch)
+
 
 if __name__ == "__main__":
     ctrace()
