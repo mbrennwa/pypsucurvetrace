@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-
 # This file is part of PyPSUcurvetrace, a toolbox for I/V curve tracing of electronic parts using programmable power supplies.
 #
 # PyPSUcurvetrace is free software: you can redistribute it and/or modify
