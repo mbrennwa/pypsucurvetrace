@@ -15,19 +15,12 @@
 # You should have received a copy of the GNU General Public License
 # along with PyPSUcurvetrace.  If not, see <http://www.gnu.org/licenses/>.
 
-# import traceback
-# import sys
-# import os
 import argparse
-# import numpy as np
-# import matplotlib.pyplot as plt
 from pathlib import Path
-# import tempfile
 import logging
 
-from lib.read_datafile import read_datafile
-# from lib.plot_curves import plot_curves
-from lib.curvetrace_tools import say_hello
+from pypsucurvetrace.read_datafile import read_datafile
+from pypsucurvetrace.curvetrace_tools import say_hello
 
 
 # set up logger:
