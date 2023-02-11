@@ -1,4 +1,4 @@
-from pypsucurvetrace.cplot import cplot
+from PyPSUcurvetrace.cplot import cplot
 
 def curvetrace():
     print("Hello curvetrace")

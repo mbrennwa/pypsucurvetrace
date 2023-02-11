@@ -24,10 +24,10 @@ import logging
 import matplotlib.pyplot as plt
 import multiprocessing
 
-import pypsucurvetrace.powersupply as powersupply
-import pypsucurvetrace.heaterblock as heaterblock
-from pypsucurvetrace.curvetrace_tools import say_hello, printit, connect_PSU, configure_test_PSU, configure_idle_PSU, do_idle, start_new_logfile, format_PSU_reading
-from pypsucurvetrace.plot_curves import curve_plotter
+import PyPSUcurvetrace.powersupply as powersupply
+import PyPSUcurvetrace.heaterblock as heaterblock
+from PyPSUcurvetrace.curvetrace_tools import say_hello, printit, connect_PSU, configure_test_PSU, configure_idle_PSU, do_idle, start_new_logfile, format_PSU_reading
+from PyPSUcurvetrace.plot_curves import curve_plotter
 
 
 # set up logger:

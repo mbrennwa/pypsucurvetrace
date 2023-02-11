@@ -23,9 +23,9 @@ from pathlib import Path
 import tempfile
 import logging
 
-from lib.read_datafile import read_datafile
-from lib.plot_curves import plot_curves
-from lib.curvetrace_tools import say_hello
+from PyPSUcurvetrace.read_datafile import read_datafile
+from PyPSUcurvetrace.plot_curves import plot_curves
+from PyPSUcurvetrace.curvetrace_tools import say_hello
 
 # set up logger:
 logger = logging.getLogger('curveplot')
