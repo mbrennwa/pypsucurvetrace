@@ -2,9 +2,13 @@
 *PyPSUcurvetrace* is a software toolbox for I/V curve tracing of electronic devices using programmable power supplies (PSUs). In short, *PyPSUcurvetrace* is a *curve tracer*.
 
 ## Installation
-
+Install from GitHub repository:
 ```bash
-$ https://github.com/mbrennwa/PyPSUcurvetrace
+$ pip3 install git+https://github.com/mbrennwa/PyPSUcurvetrace
+```
+Uninstall:
+```bash
+$ pip3 uninstall pypsucurvetrace
 ```
 
 ## Usage
