@@ -1,10 +1,10 @@
-from pypsucurvetrace.curveplotter import curveplotter
+from pypsucurvetrace.cplot import cplot
 
 def curvetrace():
     print("Hello curvetrace")
     
 def curveplot():
-    curveplotter()
+    cplot()
     
 def extractpreheat():
     print("Hello extractpreheat")
