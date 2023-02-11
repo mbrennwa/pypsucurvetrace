@@ -4,11 +4,11 @@
 ## Installation
 Install from GitHub repository:
 ```bash
-$ pip3 install git+https://github.com/mbrennwa/PyPSUcurvetrace
+pip3 install git+https://github.com/mbrennwa/PyPSUcurvetrace
 ```
 Uninstall:
 ```bash
-$ pip3 uninstall pypsucurvetrace
+pip3 uninstall pypsucurvetrace
 ```
 
 ## Usage
