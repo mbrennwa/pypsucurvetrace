@@ -6,6 +6,10 @@ Install or upgrade from GitHub repository:
 ```bash
 pip3 install --upgrade git+https://github.com/mbrennwa/PyPSUcurvetrace
 ```
+Install or upgrade from local repository:
+```bash
+pip3 install --upgrade path/to/PyPSUcurvetrace
+```
 Uninstall:
 ```bash
 pip3 uninstall pypsucurvetrace
