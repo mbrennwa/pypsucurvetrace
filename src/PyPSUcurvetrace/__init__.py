@@ -7,4 +7,4 @@ def curveplot():
     cplot()
     
 def extractpreheat():
-    print("Hello extractpreheat")
+    print("src/PyPSUcurvetrace/__init__.py: Hello extractpreheat")
