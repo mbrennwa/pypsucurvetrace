@@ -2,12 +2,6 @@
 Python class for heaterblock object.
 """
 
-### import time
-### import numpy as np
-### import matplotlib.pyplot as plt
-### from simple_pid import PID
-
-
 import traceback
 import logging
 import time
@@ -15,8 +9,8 @@ import numpy as np
 
 from simple_pid import PID
 from threading import Thread
-from lib.temperaturesensor_MAXIM import temperaturesensor_MAXIM as TSENS
-from lib.powersupply import PSU
+from PyPSUcurvetrace.temperaturesensor_MAXIM import temperaturesensor_MAXIM as TSENS
+from PyPSUcurvetrace.powersupply import PSU
 
 # set up logger:
 logger = logging.getLogger('heaterblock')

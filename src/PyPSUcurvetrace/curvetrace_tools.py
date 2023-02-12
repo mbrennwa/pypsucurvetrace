@@ -5,11 +5,6 @@ Helper functions for use with curvetrace programs
 import time
 import math
 import os.path
-# import logging
-
-# import lib.powersupply as powersupply ### import only where needed
-# import lib.heaterblock as heaterblock ### not needed here?
-
 
 #############
 # say hello #
@@ -152,7 +147,7 @@ def __convert_str_tuple(x):
 
 def connect_PSU(configTESTER,label):
 
-	import lib.powersupply as powersupply
+	import PyPSUcurvetrace.powersupply as powersupply
 
 	if not (label in configTESTER):
 		# print(label + ' not specified in configuration file. Leaving ' + label + ' unconfigured.')

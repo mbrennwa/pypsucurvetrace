@@ -1,7 +1,8 @@
-from PyPSUcurvetrace.cplot import cplot
+from PyPSUcurvetrace.ctrace import ctrace
+from PyPSUcurvetrace.cplot  import cplot
 
 def curvetrace():
-    print("Hello curvetrace")
+    ctrace()
     
 def curveplot():
     cplot()

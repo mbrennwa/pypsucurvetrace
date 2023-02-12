@@ -17,8 +17,8 @@ import argparse
 from pathlib import Path
 import logging
 
-from pypsucurvetrace.read_datafile import read_datafile
-from pypsucurvetrace.curvetrace_tools import say_hello
+from PyPSUcurvetrace.read_datafile import read_datafile
+from PyPSUcurvetrace.curvetrace_tools import say_hello
 
 
 # set up logger:

@@ -23,6 +23,7 @@ import time
 import logging
 import matplotlib.pyplot as plt
 import multiprocessing
+from pathlib import Path
 
 import PyPSUcurvetrace.powersupply as powersupply
 import PyPSUcurvetrace.heaterblock as heaterblock
@@ -94,8 +95,13 @@ def ctrace():
     say_hello('curvetrace', 'I-V curve tracing of electronic parts using programmable power supplies')
 
     # read PSU config file:
+    cfgfile = 'PyPSUcurvetrace_config.txt'
+    cfgfile = Path.home() / cfgfile
+    if not cfgfile.is_file():
+        logger.error('Could not find config file ' + str(cfgfile) + '.')
+        exit()        
     configTESTER = configparser.ConfigParser()
-    configTESTER.read('config.txt')
+    configTESTER.read(cfgfile)
 
     # check for batch mode:
     batch_mode = False

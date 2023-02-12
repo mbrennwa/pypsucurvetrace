@@ -8,10 +8,10 @@ import numpy as np
 from numpy.polynomial.polynomial import polyval
 import logging
 
-import lib.powersupply_VOLTCRAFT as powersupply_VOLTCRAFT
-import lib.powersupply_KORAD as powersupply_KORAD
-import lib.powersupply_BK as powersupply_BK
-import lib.powersupply_RIDEN as powersupply_RIDEN
+import PyPSUcurvetrace.powersupply_VOLTCRAFT as powersupply_VOLTCRAFT
+import PyPSUcurvetrace.powersupply_KORAD as powersupply_KORAD
+import PyPSUcurvetrace.powersupply_BK as powersupply_BK
+import PyPSUcurvetrace.powersupply_RIDEN as powersupply_RIDEN
 
 # set up logger:
 logger = logging.getLogger('powersupply')
