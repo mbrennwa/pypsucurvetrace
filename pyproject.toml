@@ -11,6 +11,10 @@ authors = [
 description = "A software toolbox for I/V curve tracing of electronic devices using programmable power supplies (PSUs)."
 readme = "README.md"
 requires-python = ">=3.7"
+dependencies = [
+    "minimalmodbus",
+    "simple_pid"
+]
 classifiers = [
     "Programming Language :: Python :: 3",
     "License = GPL-3.0-or-later",

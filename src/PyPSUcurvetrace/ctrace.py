@@ -27,7 +27,7 @@ from pathlib import Path
 
 import PyPSUcurvetrace.powersupply as powersupply
 import PyPSUcurvetrace.heaterblock as heaterblock
-from PyPSUcurvetrace.curvetrace_tools import say_hello, printit, connect_PSU, configure_test_PSU, configure_idle_PSU, do_idle, start_new_logfile, format_PSU_reading
+from PyPSUcurvetrace.curvetrace_tools import error_and_exit, say_hello, printit, connect_PSU, configure_test_PSU, configure_idle_PSU, do_idle, start_new_logfile, format_PSU_reading
 from PyPSUcurvetrace.plot_curves import curve_plotter
 
 
@@ -98,8 +98,7 @@ def ctrace():
     cfgfile = 'PyPSUcurvetrace_config.txt'
     cfgfile = Path.home() / cfgfile
     if not cfgfile.is_file():
-        logger.error('Could not find config file ' + str(cfgfile) + '.')
-        exit()        
+        error_and_exit(logger, 'Could not find config file ' + str(cfgfile) + '.')
     configTESTER = configparser.ConfigParser()
     configTESTER.read(cfgfile)
 

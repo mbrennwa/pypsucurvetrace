@@ -2,9 +2,12 @@
 Helper functions for use with curvetrace programs
 """
 
+
+import sys
 import time
 import math
 import os.path
+
 
 #############
 # say hello #
@@ -17,6 +20,18 @@ def say_hello(progname, purpose):
 	print('***** Disclaimer: NO WARRANTIES OF ANY KIND! Users are advised to study the code in order to understand how this program works.')
 	print('\n')
 
+
+######################
+# log error and exit #
+######################
+
+def error_and_exit(logger, message, exception = None):
+	print('\n')
+	if exception is not None:
+	    message = message + '(' + repr(e) + ')'	
+	logger.error(message)
+	sys.exit()
+	
 
 ##########################################
 # function to get number input from user #
