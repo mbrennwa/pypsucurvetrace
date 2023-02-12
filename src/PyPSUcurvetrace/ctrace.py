@@ -14,7 +14,6 @@
 # along with PyPSUcurvetrace.  If not, see <http://www.gnu.org/licenses/>.
 
 import traceback
-import sys
 import argparse
 import configparser
 import datetime
@@ -122,8 +121,14 @@ def ctrace():
 	    configDUT.read(args.c)
 	    
     # connect to PSUs:
-    PSU1 = connect_PSU(configTESTER,'PSU1');
-    PSU2 = connect_PSU(configTESTER,'PSU2');
+    try:
+        PSU1 = connect_PSU(configTESTER,'PSU1');
+    except Exception as e:
+        error_and_exit(logger, 'Could not connect to PSU1', e)
+    try:
+        PSU2 = connect_PSU(configTESTER,'PSU2');
+    except Exception as e:
+        error_and_exit(logger, 'Could not connect to PSU1', e)
 
     # set up heaterblock:
     HEATER = heaterblock.heater( config=configTESTER, target_temperature=0.0, DUT_PSU1=PSU1, DUT_PSU2=PSU2 )
@@ -144,8 +149,7 @@ def ctrace():
     # check if at least one of the power supplies is configured:	
     if not PSU1.CONFIGURED:
 	    if not PSU2.CONFIGURED:
-		    logger.error('No power supply configured.')
-		    sys.exit()
+		    error_and_exit(logger, 'No power supply configured.')
 
     # determine R2CONTROL (opitonal, may be missing in DUT config file):
     R2CONTROL = None
@@ -215,8 +219,7 @@ def ctrace():
 
 	    if PSU1.CONNECTED and PSU2.CONNECTED:
 		    if (not PSU1.TEST_VIDLE_MAX == PSU1.TEST_VIDLE_MIN) and (not PSU2.TEST_VIDLE_MAX == PSU2.TEST_VIDLE_MIN):
-			    logger.error('Both PSUs are configured with variable idle voltages. This cannot work.')
-			    sys.exit()
+			    error_and_exit(logger, 'Both PSUs are configured with variable idle voltages. This cannot work.')
 
     # check voltage / power / current limits (and fix where possible and necessary):
     logger.info('Checking voltage / current settings...')

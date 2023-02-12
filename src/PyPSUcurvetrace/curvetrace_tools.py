@@ -28,7 +28,7 @@ def say_hello(progname, purpose):
 def error_and_exit(logger, message, exception = None):
 	print('\n')
 	if exception is not None:
-	    message = message + '(' + repr(e) + ')'	
+	    message = message + '\n' + repr(exception)	
 	logger.error(message)
 	sys.exit()
 	
