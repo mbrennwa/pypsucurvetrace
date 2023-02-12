@@ -12,7 +12,7 @@ pip3 install --upgrade path/to/PyPSUcurvetrace
 ```
 Uninstall:
 ```bash
-pip3 uninstall pypsucurvetrace
+pip3 uninstall PyPSUcurvetrace
 ```
 
 ## Usage
