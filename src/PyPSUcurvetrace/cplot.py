@@ -13,7 +13,6 @@
 # You should have received a copy of the GNU General Public License
 # along with PyPSUcurvetrace.  If not, see <http://www.gnu.org/licenses/>.
 
-import traceback
 import sys
 import os
 import argparse

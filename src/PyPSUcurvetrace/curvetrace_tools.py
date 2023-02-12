@@ -80,7 +80,7 @@ def format_PSU_reading(value, resolution):
 # start a new file for logging data output #
 ############################################
 
-def start_new_logfile(do_batch=False, basename=None, step=None):
+def start_new_logfile(logger, do_batch=False, basename=None, step=None):
 
 	samplename = None
 
@@ -89,9 +89,9 @@ def start_new_logfile(do_batch=False, basename=None, step=None):
 		# ask for sample name:
 		while basename is None:
 			if do_batch:
-				basename = input('Enter batch base name / label: ')
+				basename = input('Enter DUT/batch base label: ')
 			else:
-				basename = input('Enter base name / label: ')
+				basename = input('Enter DUT label: ')
 			if basename == '':
 				print('Name must not be empty!')
 				basename = None
@@ -125,10 +125,9 @@ def start_new_logfile(do_batch=False, basename=None, step=None):
 	# start logfile:
 	logfile = open(logfilename,'w')
 	if logfile:
-	    print('\nLogging output to ' + logfilename + '...')
+	    logger.info('Logging output to ' + logfilename + '...')
 	else:
-	    print('Could not open log file!')
-	    exit()
+	    error_and_exit('Could not open log file!', logger)
 	    
 	return logfile, samplename, basename, step
 
@@ -160,7 +159,7 @@ def __convert_str_tuple(x):
 # connect to power supply #
 ###########################
 
-def connect_PSU(configTESTER,label):
+def connect_PSU(configTESTER, label, logger):
 
 	import PyPSUcurvetrace.powersupply as powersupply
 
@@ -226,14 +225,14 @@ def connect_PSU(configTESTER,label):
 			pass
 
 		# connect to PSU(s):
-		print ('Connecting to power supply ' + label + '...')
+		logger.info ('Connecting to power supply ' + label + '...')
 		P = powersupply.PSU(port, commandset, label, V_SET_CALPOLY, V_READ_CALPOLY, I_SET_CALPOLY, I_READ_CALPOLY)
 
 		# set number of consistent readings for measurements (optional):
 		if 'NUMSTABLEREAD' in configTESTER[label]:
 			P.NSTABLEREADINGS = int(configTESTER[label]['NUMSTABLEREAD'])
 		else:
-			print ('Number of consistent measurement readings not configured! Using N = 1...')
+			logger.warning ('Number of consistent measurement readings not configured! Using N = 1...')
 			P.NSTABLEREADINGS = 1
 			
 		if P.CONNECTED:
@@ -258,7 +257,6 @@ def connect_PSU(configTESTER,label):
 			print ('* Voltage reading resolution: ' + str(P.VRESREAD) + ' V')
 			print ('* Current reading resolution: ' + str(P.IRESREAD) + ' A')
 			print ('* Number of consistent readings for measurements: ' + str(P.NSTABLEREADINGS))
-			### print ('* Settle time: ' + str(PSU.settletime()) + ' s')
 
 	return P
 
@@ -268,14 +266,14 @@ def connect_PSU(configTESTER,label):
 # configure PSU test settings #
 ###############################
 
-def configure_test_PSU(PSU,configDUT = []):
+def configure_test_PSU(PSU, logger, configDUT = []):
 	
 	if not PSU.CONNECTED:
-		print ('\n' + PSU.LABEL + ' is not connected (or connection is not configured).')
+		logger.info (PSU.LABEL + ' is not connected (or connection is not configured).')
 		PSU.CONFIGURED = False
 	else:
 
-		print ('\n' + 'Configuring ' + PSU.LABEL + ' test settings...')
+		logger.info ('Configuring ' + PSU.LABEL + ' test settings...')
 
 		# take parameters from DUT config file where available, otherwise ask user:
 

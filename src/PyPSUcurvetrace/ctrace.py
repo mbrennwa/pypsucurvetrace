@@ -13,7 +13,6 @@
 # You should have received a copy of the GNU General Public License
 # along with PyPSUcurvetrace.  If not, see <http://www.gnu.org/licenses/>.
 
-import traceback
 import argparse
 import configparser
 import datetime
@@ -36,7 +35,7 @@ if not logger.handlers:
 	logger.setLevel(logging.DEBUG)
 	ch = logging.StreamHandler()
 	ch.setLevel(logging.DEBUG)
-	formatter = logging.Formatter('%(levelname)s (%(name)s): %(message)s')
+	formatter = logging.Formatter('%(name)s %(levelname)s: %(message)s')
 	ch.setFormatter(formatter)
 	logger.addHandler(ch)
 
@@ -45,7 +44,7 @@ if __name__ == "__main__":
     ctrace()
 
 
-def cleanup_exit():
+def cleanup_exit(PSU1, PSU2, HEATER, queue, plt_proc):
 ###################
 # cleanup at exit #
 ###################
@@ -62,13 +61,13 @@ def cleanup_exit():
 
 	try:
 		HEATER.turn_off()
-	except:
-		logger.warning('Could not turn off heater: ' +  traceback.format_exc())
+	except Exception as e:
+		logger.warning('Could not turn off heater: ' + repr(e))
 		pass
 	try:
 		HEATER.terminate_controller_thread()
-	except:
-		logger.warning('Could not terminate heaterblock controller thread: ' +  traceback.format_exc())
+	except Exception as e:
+		logger.warning('Could not terminate heaterblock controller thread: ' + repr(e))
 		pass
 
 	# stop curve-plotter process and wait for the process to finish
@@ -122,11 +121,11 @@ def ctrace():
 	    
     # connect to PSUs:
     try:
-        PSU1 = connect_PSU(configTESTER,'PSU1');
+        PSU1 = connect_PSU(configTESTER, 'PSU1', logger);
     except Exception as e:
         error_and_exit(logger, 'Could not connect to PSU1', e)
     try:
-        PSU2 = connect_PSU(configTESTER,'PSU2');
+        PSU2 = connect_PSU(configTESTER, 'PSU2', logger);
     except Exception as e:
         error_and_exit(logger, 'Could not connect to PSU1', e)
 
@@ -134,17 +133,17 @@ def ctrace():
     HEATER = heaterblock.heater( config=configTESTER, target_temperature=0.0, DUT_PSU1=PSU1, DUT_PSU2=PSU2 )
     HEATER.turn_off()
 
-    logfile, samplename, basename, step = start_new_logfile(batch_mode)
+    logfile, samplename, basename, step = start_new_logfile(logger, batch_mode)
 
     # configure voltage values / current and power limits:
     if 'PSU1' in configDUT:
-	    PSU1 = configure_test_PSU (PSU1,configDUT['PSU1'])
+	    PSU1 = configure_test_PSU (PSU1, logger, configDUT['PSU1'])
     else:
-	    PSU1 = configure_test_PSU (PSU1)
+	    PSU1 = configure_test_PSU (PSU1, logger)
     if 'PSU2' in configDUT:
-	    PSU2 = configure_test_PSU (PSU2,configDUT['PSU2'])
+	    PSU2 = configure_test_PSU (PSU2, logger, configDUT['PSU2'])
     else:
-	    PSU2 = configure_test_PSU (PSU2)
+	    PSU2 = configure_test_PSU (PSU2, logger)
 
     # check if at least one of the power supplies is configured:	
     if not PSU1.CONFIGURED:
@@ -442,7 +441,7 @@ def ctrace():
 		    # DUT break-in / pre-heat
 		    if T_preheat > 0.0:
 			    
-			    logger.info('DUT break-in / pre-heat...\n')
+			    logger.info('DUT break-in / pre-heat...')
 
 			    # set idle conditions:
 			    if TEMP_val != None:
@@ -454,7 +453,7 @@ def ctrace():
 			    do_idle(PSU1, PSU2, HEATER, T_preheat, file=logfile, wait_for_TEMP=do_TEMP_wait)
 
 		    if not quick_mode:
-			    logger.info('Curve tracing started...\n')
+			    logger.info('Curve tracing started...')
 
 			    for V2 in V_steps[1]:
 			    # outer loop (V2)
@@ -630,7 +629,7 @@ def ctrace():
 		    if batch_mode:
 		    
 			    # prepare next step and file:
-			    logfile, samplename, _, step = start_new_logfile(batch_mode, basename, step+1)
+			    logfile, samplename, _, step = start_new_logfile(logger, batch_mode, basename, step+1)
 			    
 			    # reset initial values for idle conditions:
 			    if PSU1.CONFIGURED: PSU1.TEST_VIDLE = Uc_ini_1
@@ -643,10 +642,10 @@ def ctrace():
 			    do_run = False
 
     except KeyboardInterrupt:
-	    logger.info('\nCaught keyboard interrupt, exiting...\n')
+	    logger.info('Caught keyboard interrupt, exiting...')
 	    
-    except:
-	    logger.info('\nOooops, something went wrong during testing: ' +  traceback.format_exc())
+    except Exception as e:
+	    logger.warning('Oooops, something went wrong during testing: ' + repr(e))
 
     finally:
-	    cleanup_exit()
+	    cleanup_exit(PSU1, PSU2, HEATER, queue, plt_proc)
