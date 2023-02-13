@@ -41,6 +41,8 @@ def cprocess():
     # main program #
     ################
 
+    raise NotImplementedError('cprocess / curveprocess not yet implemented.')
+
     # input arguments:
     parser = argparse.ArgumentParser(description='curveprocess is a Python program to extract and calculate parameters from from PyPSUcurvetrace data files.')
     parser.add_argument('datafiles', nargs='+', help='Names (and paths) of PyPSUcurvetrace data files, can use wildcards.')
