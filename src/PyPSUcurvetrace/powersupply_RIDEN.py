@@ -160,8 +160,8 @@ class RIDEN(object):
 		    mul_U = self._voltage_multiplier()
 		    mul_I = self._current_multiplier()
 		    for r in R:
-		        self._set_register(r, OVP_max*mul_U)
-		        self._set_register(r+1, OCP_max*mul_I)
+		       self._set_register(r, OVP_max*mul_U)
+		       self._set_register(r+1, OCP_max*mul_I)
 
 
 	def _set_register(self, register, value):
