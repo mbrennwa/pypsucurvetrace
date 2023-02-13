@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 
 import sys
-
-sys.path.append(r'../src')
+import os
+ 
+sys.path.append( str(os.path.realpath(os.path.dirname(__file__))) + "/../src/PyPSUcurvetrace/" )
 
 from PyPSUcurvetrace.ctrace import ctrace
 ctrace()
