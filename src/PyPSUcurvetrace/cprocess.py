@@ -33,20 +33,20 @@ if not logger.handlers:
 
 
 if __name__ == "__main__":
-    preheatextract()
+    cprocess()
 
 
-def extractpreheat():
+def cprocess():
     ################
     # main program #
     ################
 
     # input arguments:
-    parser = argparse.ArgumentParser(description='extracpreheat is a Python program for extracting the pre-heat data from PyPSUcurvetrace data files.')
+    parser = argparse.ArgumentParser(description='curveprocess is a Python program to extract and calculate parameters from from PyPSUcurvetrace data files.')
     parser.add_argument('datafiles', nargs='+', help='Names (and paths) of PyPSUcurvetrace data files, can use wildcards.')
 
     # Say Hello:
-    say_hello('listpreheat', 'Extract PyPSUcurvetrace preheat data')
+    say_hello('curveprocess', 'Extract and calculate parameters from PyPSUcurvetrace data')
 
     args = parser.parse_args()
 

@@ -6,5 +6,6 @@ def curveplot():
     from PyPSUcurvetrace.cplot  import cplot
     cplot()
     
-def extractpreheat():
-    print("src/PyPSUcurvetrace/__init__.py: Hello extractpreheat")
+def curveprocess():
+    from PyPSUcurvetrace.cprocess  import cprocess
+    cprocess()

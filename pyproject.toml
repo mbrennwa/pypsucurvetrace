@@ -23,9 +23,9 @@ classifiers = [
 
 [project.scripts]
 # as defined in src/pypsucurvetrace/__init__.py
-curvetrace = "PyPSUcurvetrace:curvetrace"
-curveplot = "PyPSUcurvetrace:curveplot"
-extractpreheat = "PyPSUcurvetrace:extractpreheat"
+curvetrace   = "PyPSUcurvetrace:curvetrace"
+curveplot    = "PyPSUcurvetrace:curveplot"
+curveprocess = "PyPSUcurvetrace:cprocess"
 
 [project.urls]
 "Homepage" = "https://github.com/mbrennwa/PyPSUcurvetrace"
