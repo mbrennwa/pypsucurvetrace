@@ -13,7 +13,9 @@ readme = "README.md"
 requires-python = ">=3.7"
 dependencies = [
     "minimalmodbus",
-    "simple_pid"
+    "simple_pid",
+    "pydigitemp",
+    "matplotlib"
 ]
 classifiers = [
     "Programming Language :: Python :: 3",
