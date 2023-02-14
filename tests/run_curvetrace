@@ -4,5 +4,5 @@ import sys
 
 sys.path.append( '../src' )
 
-from PyPSUcurvetrace.ctrace import ctrace
+from pypsucurvetrace.ctrace import ctrace
 ctrace()
