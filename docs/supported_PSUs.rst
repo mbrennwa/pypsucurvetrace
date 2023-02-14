@@ -2,7 +2,7 @@
 Supported power supplies (PSUs)
 *******************************
 
-This document lists the PSU models that are supported by ``pypsucurvetrace`` and describes how to use them with ``pypsucurvetrace``.
+The list below describes the PSU models that are supported by ``pypsucurvetrace`` and how to configure them for ``pypsucurvetrace``.
 
 
 Korad / RND
