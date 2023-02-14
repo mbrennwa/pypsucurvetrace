@@ -16,8 +16,20 @@ Prerequisites
 The installation procedures described below use the Python package manager ``pipx``. Depending on your installation method (see below), you may also need ``git``.
 
 To install these tools on Debian, Ubuntu or similar Linux distros, just run the following command: .. code-block:: console
-	``sudo apt install pipx git``
 
+	``sudo apt install pipx git``
+	
+	
+	
+.. code-block:: ini
+
+   # Configuration for nova-rootwrap
+   # This file should be owned by (and only-writeable by) the root user
+
+   [DEFAULT]
+   # List of directories to load filter definitions from (separated by ',').
+   
+   
 
 Installing, upgrading, and uninstalling
 ---------------------------------------
