@@ -11,7 +11,8 @@ Getting pypsucurvetrace
 
 Prerequisites
 =============
-The installation procedures described below use the Python package manager ``pipx``. Depending on your installation method (see below), you may also need ``git``. To install these tools on Debian, Ubuntu or similar Linux distros, just run ``sudo apt install pipx git``.
+The installation procedures described below use the Python package manager ``pipx``. Depending on your installation method (see below), you may also need ``git``. To install these tools on Debian, Ubuntu or similar Linux distros, just run the following command:
+	sudo apt install pipx git
 
 
 Installing, upgrading, and uninstalling
