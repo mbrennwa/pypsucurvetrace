@@ -1,61 +1,7 @@
 ####################################
 The ``pypsucurvetrace`` curve tracer
 ####################################
-``pypsucurvetrace`` is a software toolbox which uses programmable power supplies to determine curves of current (*I*) flowing through an electronic device as a function of different voltages (*V*) applied to the device.
 
-``pypsucurvetrace`` is written in Python 3. ``pypsucurvetrace`` is developed and tested on Linux, but should run on other systems, too. The source code is available at https://github.com/mbrennwa/pypsucurvetrace .
+.. include:: what_is_pypsucurvetrace.txt
 
-***************************
-Getting ``pypsucurvetrace``
-***************************
-
-
-Prerequisites
-=============
-
-The installation procedures described below use the Python package manager ``pipx``. Depending on your installation method (see below), you may also need ``git``.
-
-To install these tools on Debian, Ubuntu or similar Linux distros, just run the following command:
-
-.. code-block:: console
-
-   sudo apt install pipx git
-
-
-Installing, upgrading, and uninstalling  ``pypsucurvetrace``
-------------------------------------------------------------
-To download and install ``pypsucurvetrace`` in one single command:
-
-.. code-block:: console
-
-   pipx install git+https://github.com/mbrennwa/pypsucurvetrace
-
-To upgrade ``pypsucurvetrace``:
-
-.. code-block:: console
-
-   pipx upgrade pypsucurvetrace
-
-You can also download the ``pypsucurvetrace`` code separately and then install from the local copy:
-
-.. code-block:: console
-
-   pipx install path/to/pypsucurvetrace
-
-To uninstall ``pypsucurvetrace``:
-
-.. code-block:: console
-
-   pipx uninstall pypsucurvetrace
-
-Using ``pypsucurvetrace``
--------------------------
-The ``pypsucurvetrace`` package provides the following command-line programs:
-
-* ``curvetrace`` is the main program to acquire I/V curve data. See ``curvetrace`` manual for details.
-* ``curveplot`` is a helper program to plot curve data. See ``curveplot`` manual for details.
-* ``curveprocess`` is a helper program to determine characteristic parameters from curve data. See ``curveprocess`` manual for details.
-
-License
--------
-See the LICENSE file.
+.. include:: about_pypsucurvetrace.txt
