@@ -1,5 +1,5 @@
-``curveprocess``
-================
+The ``curveprocess`` program
+============================
 
 .. autosummary::
    :toctree: generated
