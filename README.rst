@@ -19,19 +19,8 @@ To install these tools on Debian, Ubuntu or similar Linux distros, just run the 
 
 .. code-block:: console
 
-   ``sudo apt install pipx git``
-	
-	
-	
-.. code-block:: console
+   sudo apt install pipx git
 
-   # Configuration for nova-rootwrap
-   # This file should be owned by (and only-writeable by) the root user
-
-   [DEFAULT]
-   # List of directories to load filter definitions from (separated by ',').
-   
-   
 
 Installing, upgrading, and uninstalling
 ---------------------------------------
