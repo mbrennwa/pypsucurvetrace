@@ -7,7 +7,7 @@ Overview
 
    pypsucurvetrace
 
-.. include:: what:is_pypsucurvetrace.txt
+.. include:: what_is_pypsucurvetrace.txt
 
 
 Using ``pypsucurvetrace``
