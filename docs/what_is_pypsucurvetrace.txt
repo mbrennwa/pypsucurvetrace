@@ -1,4 +1,1 @@
 ``pypsucurvetrace`` is a software toolbox which uses programmable power supplies to determine curves of currents flowing through an electronic device as a function of different voltages applied to the device.
-
-``pypsucurvetrace`` is written in Python 3. ``pypsucurvetrace`` is developed and tested on Linux, but should run on other systems, too. The source code is available at https://github.com/mbrennwa/pypsucurvetrace.
-

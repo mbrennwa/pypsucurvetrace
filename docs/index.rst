@@ -1,11 +1,13 @@
 ``pypsucurvetrace`` documentation
 =================================
 
-``pypsucurvetrace`` is blabla... IMPORT FROM README.rst
+.. include:: what_is_pypsucurvetrace.txt
+
+.. include:: about_pypsucurvetrace.txt
 
 .. note::
 
-   This project is under active development.
+   This the ``pypsucurvetrace`` code and this documentation are under development.
 
 Contents
 --------
@@ -17,3 +19,5 @@ Contents
    curvetrace
    curveplot
    curveprocess
+   supported_PSUs
+   heaterblock

@@ -5,11 +5,11 @@ For two-terminal devices under test (DUTs) like resistors or diodes, a single PS
 
 *PyPSUcurvetrace* also allows using an optional heater block to control the temperature of the DUT during curve tracing. The heater block requires a dedicated PSU for temperature control.
 
-*PyPSUcurvetrace* is developed using Python 3 on Linux. Other software environments may (should) work, too, but have not been tested so far.
 
-*PyPSUcurvetrace* is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version. *PyPSUcurvetrace* is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details. You should have received a copy of the GNU General Public License along with *PyPSUcurvetrace*. If not, see [http://www.gnu.org/licenses/](http://www.gnu.org/licenses/).
 
-There is a discussion thread abut *PyPSUcurvetrace* at the diyAudio forum: https://www.diyaudio.com/community/threads/idea-for-power-transistor-curve-tracer-good-or-not.344199
+
+
+
 
 
 ## Data acquisition
