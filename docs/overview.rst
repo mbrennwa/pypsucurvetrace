@@ -1,11 +1,6 @@
 ********
-OverviWw
+Overview
 ********
-
-.. autosummary::
-   :toctree: generated
-
-   pypsucurvetrace
 
 .. include:: what_is_pypsucurvetrace.txt
 
