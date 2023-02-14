@@ -1,7 +1,7 @@
-# pypsucurvetrace
-`pypsucurvetrace` is a software toolbox for I/V curve tracing of electronic devices using programmable power supplies (PSUs). In short, `pypsucurvetrace` is a *curve tracer*.
+# PyPSUcurvetrace
+`pypsucurvetrace` is a *curve tracer*.
 
-`pypsucurvetrace` is written in Python 3.
+More specifically, `pypsucurvetrace` is a software toolbox which uses programmable power supplies (PSUs) for I/V curve tracing of electronic devices. `pypsucurvetrace` is written in Python 3.
 
 ## Installation
 You can get `pypsucurvetrace` from it's [GitHub repository](https://github.com/mbrennwa/pypsucurvetrace).
