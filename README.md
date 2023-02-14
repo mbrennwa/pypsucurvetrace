@@ -5,7 +5,7 @@ More specifically, `pypsucurvetrace` is a software toolbox which uses programmab
 
 ## Installation
 
-### Prerequisites:
+### Prerequisites
 The installation uses the Python package manager `pipx`, so make sure this is installed on your machine. For example, on Debian or Ubuntu and similar Linux distros, just run `sudo apt install pipx` to install `pipx`.
 Depending on your installation method, you may also need `git` (see below).
 
@@ -20,7 +20,7 @@ pipx install git+https://github.com/mbrennwa/pypsucurvetrace
 
 To upgrade `pypsucurvetrace`:
 ```bash
-pipx upgrade git+https://github.com/mbrennwa/pypsucurvetrace
+pipx upgrade pypsucurvetrace
 ```
 
 You can also download the `pypsucurvetrace` code separately and then install from the local copy:
