@@ -12,6 +12,8 @@ Contents
 
 .. toctree::
 
+   overview
+   installation
    curvetrace
    curveplot
    curveprocess
