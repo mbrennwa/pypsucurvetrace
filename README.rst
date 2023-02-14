@@ -15,9 +15,7 @@ Prerequisites
 
 The installation procedures described below use the Python package manager ``pipx``. Depending on your installation method (see below), you may also need ``git``.
 
-To install these tools on Debian, Ubuntu or similar Linux distros, just run the following command:
-
-.. code-block:: console
+To install these tools on Debian, Ubuntu or similar Linux distros, just run the following command:.. code-block:: console
 
    sudo apt install pipx git
 
