@@ -25,7 +25,7 @@ pipx install path/to/pypsucurvetrace
 
 To uninstall `pypsucurvetrace`:
 ```bash
-pix3 uninstall pypsucurvetrace
+pipx uninstall pypsucurvetrace
 ```
 
 ## Usage
