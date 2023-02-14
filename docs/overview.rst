@@ -7,8 +7,7 @@ Overview
 
    pypsucurvetrace
 
-
-OVERVIEW / INTRODUCTION TO PYPSUCURVETRACE. See old MANUAL.md.
+.. include:: what:is_pypsucurvetrace.txt
 
 
 Using ``pypsucurvetrace``
