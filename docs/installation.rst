@@ -18,6 +18,15 @@ To install these tools on Debian, Ubuntu or similar Linux distros, just run the 
 .. code-block:: console
 
    sudo apt install pipx git
+   
+``pypsucurvetrace`` needs access to the serial ports of you PSUs. Make sure your user account has the required access rights. On Linux, add your username to the ``dialout`` group. If your user account is ``johndoe``, execute the following command:
+
+.. code-block:: console
+
+   sudo adduser johndoe dialout
+
+Then log out and log in again to your user account for this to take effect.
+
 
 
 Installing, upgrading, and uninstalling

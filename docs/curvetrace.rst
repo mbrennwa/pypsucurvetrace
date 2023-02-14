@@ -6,9 +6,122 @@ The ``curvetrace`` program
 
 OVERVIEW, SCHEMATIC, SETUP
 
+
+For two-terminal DUTs like resistors or diodes, a single PSU is sufficient. For three-terminal DUTs like transistors (BJTs, FETs, etc.) or vacuum tubes, two PSUs are required (a single PSU box with two separate programmable outputs would also work). ``pypsucurvetrace`` also allows controlling the temperature of the DUT during curve tracing using a heater block. Such a heater block requires an additional PSU for controlled heating.
+
+
+
+
+
 Configuration
 -------------
 
+To configure the PSU units, you need to creat a file `pypsucurvetrace_config.txt` in your home directoy. This file is used to set up the details of your PSU units and, optionally, also the heaterblock (see below). Take a look at the `pypsucurvetrace_config.txt` for details of the file format. There are separate sections for PSU1 and PSU2. Each section contains the following fields:
+* `COMPORT`: virtual file corresponding to the serial port of the PSU
+* `COMMANDSET`: the "language" for communication with the PSU. Currently supported `COMMANDSET`s are
+	* `VOLTCRAFT` for Voltcraft, Manson, etc.
+	* `KORAD` for Korad, RND, etc.
+	* `BK`, `BK9184B_LOW`, `BK9184B_HIGH`, `BK9185B_LOW`, and `BK9185B_HIGH` for BK Precision.
+* `NUMSTABLEREAD` (optional): number of consecutive readings that must agree to within the measurement resolution in order to achieve stable and low-noise readings
 
-For two-terminal DUTs like resistors or diodes, a single PSU is sufficient. For three-terminal DUTs like transistors (BJTs, FETs, etc.) or vacuum tubes, two PSUs are required (a single PSU box with two separate programmable outputs would also work). ``pypsucurvetrace`` also allows controlling the temperature of the DUT during curve tracing using a heater block. Such a heater block requires an additional PSU for controlled heating.
+If only one PSU is used (PSU1), the PSU2 section can be deleted.
+
+Note that it is possible to connect multiple PSU units in series to each other to accomplish a higher voltage range. Such a series combination of multiple PSU units can be configured as a single PSU object by specifying their `COMPORT` and `COMMANDSET` fields as follows:
+* `COMPORT = ( "/dev/serial/by-id/<xxx_psu1>" , "/dev/serial/by-id/<xxx_psu2>" )`
+* `TYPE = ( "<commandset_psu1>" , "<commandset_psu2>" )`
+
+
+
+
+
+
+DUT/Test configuration file
+---------------------------
+Instead of entering the test parameters manually, the DUT/test parameters can be loaded from a file containing the ranges and step sizes of the test voltages and currents, power limits, etc.
+
+Documentation of the DUT/test configuration file is under constrution! In the meantime, take a look at the example files in the `examples` directory...
+
+
+
+
+
+
+## Data acquisition
+The `curvetrace` program is used to acquire the test data. Basic documentation of the `curvetrace` program can be accessed by executing `curvetrace --help`.
+
+The following figure shows the basic test circuit for for data acquisition using the `curvetrace` program with a three-terminal DUT with two PSUs:
+![alt text](https://github.com/mbrennwa/PyPSUcurvetrace/blob/master/figures/test_setup.png "Basic test circuit")
+
+For two-terminal DUTs, only PSU1 is needed and PSU2 can be ignored. If negative voltages are required at the DUT terminals, the respective PSU terminals are connected with inverted polarity.
+
+Tests are run using the `curvetrace` program. `curvetrace` tests the DUT by varying the voltages $U_1$ and $U_2$ at the PSU terminals, and by reading the corresponding currents $I_1$ and $I_2$. The results are shown on the screen and saved in an ASCII data file for further processing.
+
+Here's a photo showing the test setup for a power MosFET using two RND/Korad PSUs:
+![alt text](https://github.com/mbrennwa/PyPSUcurvetrace/blob/master/figures/test_power_MosFET_photo.jpg "Power MosFET test setup")
+
+`curvetrace` provides different methods to control the DUT temperature during the test:
+1. `curvetrace` may insert idle periods in between the individual readings, or a "pre-heat" period before starting the test. During these periods, the voltages $U_{1,2}$ and currents $I_{1,2}$ are controlled such that the DUT operates at predefined ``idle'' conditions until the DUT is at thermal equilibrium.
+2. `curvetrace` can actively control the temperature of the DUT using a heater block equipped with a heater element and temperature sensor (see below).
+
+`curvetrace` also offers some special operation modes:
+* "quick": run "pre-heat" and measure the DUT operating conditions at the idle conditions only, skip curve tracing (may be useful for simple matching of parts based on static idle operating conditions)
+* "batch": sequential measurement of parts using the same DUT configuration
+
+The procedure implemented in the `curvetrace` program is as follows:
+1. Read a configuration file with the types and serial ports of the programmable PSUs, and then establish the serial connection to the PSUs.
+2. Interactively ask the user for a name or label of the test data, and then open an ASCII data file with that name (an existing file with the same name gets overwritten!).
+3. Determine the test conditions, either by interactively asking for user input, or by reading a configuration file with the test parameters:
+* Start voltages, end voltages, and number of steps for each PSU
+* Max. allowed current and power applied from each PSU to the DUT
+* Polarity of how the PSU terminals are connected to the DUT terminals
+* Optional: number of readings at each voltage step (results will be averaged)
+* Optional: idle time and pre-heat time
+* If idle or pre-heat times are not zero: idle voltage and current conditions for the PSUs
+* Optional: DUT temperature
+4. Check the test configuration versus the limits of the PSUs, and adjust the configuration where needed.
+5. Show a summary of the test configuration and ask the user if it's okay to start the test.
+6. Run the test:
+* If a heater block is used: wait until the DUT has attained the specified temperature.
+* The voltages are stepped in two nested loops. Voltage $U_1$ is varied in the inner loop, $U_2$ is varied in the outer loop.
+* The measured data are shown on the screen and saved to the data file.
+7. Once the test is completed, turn off the PSUs.
+
+### Details
+* For each step of the test procedure (measurement, idle, or pre-heat), `curvetrace` sets the voltages at the PSUs according to voltage values requested for this step. The current values of the PSUs are set to the minima of the current and power limits of the DUT and the PSUs at the given test voltages. If the currents established by the DUT are less than the current limits set at the PSUs, the PSUs will operate in "voltage limiting" mode, so that the voltage values required for this test step will be present at the DUT terminals. If the currents established by the DUT reach the current limits set at the PSUs, it is the task of the PSUs to avoid the currents from exceeding the limits by switching to "current limiting" mode, lowering the voltage values applied to the DUT. `curvetrace` reports the occurrence of "current limiting" mode in the data output using "Current Limit" flags.
+* Once the inner loop (iteration of $U_1$ steps) reaches a point where either $I_1$ or $I_2$ run into the current or power limits of the DUT or the PSUs, `curvetrace` stops the $U_1$ iterations of the inner loop and returns to the next $U_2$ iteration of the outer loop.
+* Once a test voltage has been programmed at a PSU for a DUT measurement, `curvetrace` reads the voltage at the PSU terminals and waits for stabilisation of the read-back output voltage at the set point before continuing. This ensures that measurements are taken only after the voltages applied to the DUT have stabilised at the requested values.
+* Some PSU types provide unreliable readings of the voltage or current values if the readings are taken too early after programming a new set point. To improve the reliability of the data obtains from such PSUs, `curvetrace` can be configured to take repeated readings with short idle periods in between. Readings are taken continuously until a specified number of consecutive readings are consistent within the readback resolution of the PSU, and the mean of those readings is returned as the measurement result. This method helps achieving stable, low-noise readings. For configuration of this feature, see the "PSU configuration file" section below.
+
+
+
+
+
+* Connect your PSUs to the USB or serial ports of your computer and determine their serial port interfaces on your system.
+On Linux:
+```
+ls /dev/serial/by-id
+```
+* Copy the `config_PSU_TEMPLATE.txt` file to `config.txt`. Modify the file to reflect the details of the USB/serial interfaces of your your PSUs. See "Notes" section for further information on the PSU configuration file.
+* *NOTE:* By default, most Voltcraft units use the same serial device ID. Therefore, it is not possible to access more than one PSU unit via `/dev/serial/by-id/`. If you want to use more than one PSU unit, you will need to modify the device IDs of the serial interfaces so that they are different from each other. See "Notes" section below for details.
+* Make sure your user account has permissions to access the serial ports of the PSU units. See "Notes" section below.
+* Optional: configure the heater block (see below).
+
+## Using the software
+To run the software, execute the `curvetrace` program from a console terminal.
+  * The easiest method is to run the program without any arguments and just follow thew the on-screen instructions for fully interactive user input:
+  ```
+  curvetrace
+  ```
+  * You can also use provide a configuration file containing the test parameters (see example files provided). For example:
+  ```
+  curvetrace -c examples/test_config/2SK216_config.txt
+  ```
+  See "Notes" section for further information on test configuration files.
+
+
+
+
+
+
+
 
