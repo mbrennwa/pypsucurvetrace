@@ -4,11 +4,16 @@
 More specifically, `pypsucurvetrace` is a software toolbox which uses programmable power supplies (PSUs) for I/V curve tracing of electronic devices. `pypsucurvetrace` is written in Python 3.
 
 ## Installation
+
+### Prerequisites:
+The installation uses the Python package manager `pipx`, so make sure this is installed on your machine. For example, on Debian or Ubuntu and similar Linux distros, just run `sudo apt install pipx` to install `pipx`.
+Depending on your installation method, you may also need `git` (see below).
+
+
+### Installing, upgrading, and uninstalling
 You can get `pypsucurvetrace` from it's [GitHub repository](https://github.com/mbrennwa/pypsucurvetrace).
 
-The installation uses the Python-3 package manager `pipx`, so make sure this is installed on your machine. For example, on Debian or Ubuntu and similar Linux distros, just run `sudo apt install pipx` so install `pipx`.
-
-You can download and install `pypsucurvetrace` in one single command (you need `git` installed on your machine):
+To download and install `pypsucurvetrace` in one single command:
 ```bash
 pipx install git+https://github.com/mbrennwa/pypsucurvetrace
 ```
