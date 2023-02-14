@@ -11,7 +11,7 @@ There is also a discussion thread about curve tracing with ``pypsucurvetrace`` a
 
 .. note::
 
-   This the ``pypsucurvetrace`` code and this documentation are under development.
+   The ``pypsucurvetrace`` code and this documentation are under development.
 
 Contents
 --------
