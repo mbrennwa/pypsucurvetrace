@@ -6,21 +6,26 @@
 ## Installation
 You can get `pypsucurvetrace` from it's [GitHub repository](https://github.com/mbrennwa/pypsucurvetrace).
 
-The installation uses the Python-3 package manager `pip3`, so make sure this is installed on your machine. For example, on Debian or Ubuntu and similar Linux distros, just run `sudo apt install pip` so install `pip3`.
+The installation uses the Python-3 package manager `pipx`, so make sure this is installed on your machine. For example, on Debian or Ubuntu and similar Linux distros, just run `sudo apt install pipx` so install `pipx`.
 
 You can download and install `pypsucurvetrace` in one single command (you need `git` installed on your machine):
 ```bash
-pip3 install --upgrade git+https://github.com/mbrennwa/pypsucurvetrace
+pipx install git+https://github.com/mbrennwa/pypsucurvetrace
+```
+
+To upgrade `pypsucurvetrace`:
+```bash
+pipx upgrade git+https://github.com/mbrennwa/pypsucurvetrace
 ```
 
 You can also download the `pypsucurvetrace` code separately and then install from the local copy:
 ```bash
-pip3 install --upgrade path/to/pypsucurvetrace
+pipx install path/to/pypsucurvetrace
 ```
 
 To uninstall `pypsucurvetrace`:
 ```bash
-pip3 uninstall pypsucurvetrace
+pix3 uninstall pypsucurvetrace
 ```
 
 ## Usage
