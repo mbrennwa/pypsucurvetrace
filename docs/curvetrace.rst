@@ -48,5 +48,6 @@ For example, if PSU1 is a BK 9185B and PSU2 is a RIDEN 6006P, a minimal `pypsucu
    COMPORT = /dev/serial/by-id/usb-1a86_USB_Serial-if00-port0
 
 Note that it is possible to connect multiple PSU units in series to each other to accomplish a higher voltage range. Such a series combination of multiple PSU units can be configured as a single PSU object by specifying their `TYPE` and `COMPORT` fields as follows:
+
 * `TYPE = ( "<commandset_psu1>" , "<commandset_psu2>" )`
 * `COMPORT = ( "/dev/serial/by-id/<xxx_psu1>" , "/dev/serial/by-id/<xxx_psu2>" )`
