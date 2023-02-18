@@ -1,8 +1,8 @@
 .. _supported_PSUs:
 
-*******************************
-Supported power supplies (PSUs)
-*******************************
+************************
+Supported power supplies
+************************
 
 The list below describes the PSU models that are supported by ``pypsucurvetrace`` and how to configure them for ``pypsucurvetrace``.
 

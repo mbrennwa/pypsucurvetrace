@@ -36,8 +36,8 @@ The basic configuration required for ``curvetrace`` to work is to specify the PS
    TYPE    = <PSU TYPE OR MODEL>
    COMPORT = <COM PORT>
 
-* `COMPORT`: path of the virtual file corresponding to the serial port of the PSU
-* `COMMANDSET`: the type or model of the PSU. See :ref:`supported_PSUs` for details.
+* ``TYPE``: the type or model of the PSU. See :ref:`supported_PSUs` for details.
+* ``COMPORT``: path of the virtual file corresponding to the serial port of the PSU
 
 For example, if PSU1 is a BK 9185B and PSU2 is a RIDEN 6006P, a minimal ``pypsucurvetrace_config.txt`` file might look like this::
 
@@ -51,8 +51,8 @@ For example, if PSU1 is a BK 9185B and PSU2 is a RIDEN 6006P, a minimal ``pypsuc
 
 Note that it is possible to connect multiple PSU units in series to each other to accomplish a higher voltage range. Such a series combination of multiple PSU units can be configured as a single PSU object by specifying their `TYPE` and `COMPORT` fields as follows:
 
-* `TYPE = ( "<commandset_psu1>" , "<commandset_psu2>" )`
-* `COMPORT = ( "/dev/serial/by-id/<xxx_psu1>" , "/dev/serial/by-id/<xxx_psu2>" )`
+* ``TYPE = ( "<type_psu1>" , "<type_psu2>" )``
+* ``COMPORT = ( "<comport_psu1>" , "<comport_psu2>" )``
 
 There are further configuration options to improve the the quality of the the PSU data (FULL DOCUMENTATION FOR THESE IS UNDER CONSTRUCTION):
 
