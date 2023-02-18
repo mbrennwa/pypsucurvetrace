@@ -24,9 +24,21 @@ Configuration in ``pypsucurvetrace_config.txt``::
 
 Riden / Ruiden
 --------------
-DESCRIBE HERE...
+Riden / Ruiden offer a number of different power supply modules and accessories that allow building very cost-effective power-supply units with high power output and, at the same time, good voltage and current resolution.
 
-confirmed: ...
+``pypsucurvetrace`` has built-in support for the following models:
+
+   * Tested / confirmed: RD6006P, RD6012P
+   * Untested / unconfirmed: RD6006, RD6012   
+   
+Configuration in ``pypsucurvetrace_config.txt``::
+
+   TYPE = RIDEN
+   
+The RD6012P unit needs special configuration to select the current range and resolution:
+
+   * ``TYPE = RIDEN_6A`` for 6~A current range and 0.1~mA resoltuion
+   * ``TYPE = RIDEN_12A`` for 12~A current range and 1~mA resoltuion
 
 
 BK Precision
