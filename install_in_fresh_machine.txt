@@ -1,6 +1,0 @@
-sudo apt install pip git
-pip3 install git+https://github.com/mbrennwa/pypsucurvetrace
-
-missing: matplotlib pydigitemp
-
-
