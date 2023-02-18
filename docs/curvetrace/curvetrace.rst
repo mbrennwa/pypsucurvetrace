@@ -1,3 +1,5 @@
+.. _curvetrace:
+
 The ``curvetrace`` program
 ==========================
 

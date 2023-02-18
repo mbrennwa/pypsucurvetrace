@@ -1,3 +1,5 @@
+.. _curveplot:
+
 The ``curveplot`` program
 =========================
 

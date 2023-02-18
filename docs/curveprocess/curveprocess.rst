@@ -1,3 +1,5 @@
+.. _curveprocess:
+
 The ``curveprocess`` program
 ============================
 
