@@ -8,7 +8,7 @@ version = "0.0.1"
 authors = [
   { name="Matthias Brennwald", email="mbrennwa@gmail.com" },
 ]
-description = "A software toolbox for I/V curve tracing of electronic devices using programmable power supplies (PSUs)."
+description = "A software toolbox for I/V curve tracing of electronic devices using programmable power supplies."
 readme = "README.md"
 requires-python = ">=3.7"
 dependencies = [
@@ -25,10 +25,10 @@ classifiers = [
 
 [project.scripts]
 # as defined in src/pypsucurvetrace/__init__.py
-curvetrace   = "PyPSUcurvetrace:curvetrace"
-curveplot    = "PyPSUcurvetrace:curveplot"
-curveprocess = "PyPSUcurvetrace:cprocess"
+curvetrace   = "pypsucurvetrace:curvetrace"
+curveplot    = "pypsucurvetrace:curveplot"
+curveprocess = "pypsucurvetrace:cprocess"
 
 [project.urls]
-"Homepage" = "https://github.com/mbrennwa/PyPSUcurvetrace"
-"Bug Tracker" = "https://github.com/mbrennwa/PyPSUcurvetrace/issues"
+"Homepage" = "https://github.com/mbrennwa/pypsucurvetrace"
+"Bug Tracker" = "https://github.com/mbrennwa/pypsucurvetrace/issues"

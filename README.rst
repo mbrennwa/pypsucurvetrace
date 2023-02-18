@@ -2,10 +2,14 @@
 ``pypsucurvetrace``
 ###################
 
-``pypsucurvetrace`` is a software toolbox which uses programmable power supplies to determine curves of currents flowing through an electronic device as a function of different voltages applied to the device.
+``pypsucurvetrace`` is a software toolbox for I/V curve tracing of electronic devices. ``pypsucurvetrace`` uses programmable power supplies to determine curves of currents flowing through the device as a function of different voltages applied to the device. 
 
-``pypsucurvetrace`` is written in Python 3. ``pypsucurvetrace`` is developed and tested on Linux, but should run on other systems, too. The source code is hosted and managed at http://github.com/mbrennwa/pypsucurvetrace.
+* Documentation for ``pypsucurvetrace`` is available `here <http://pypsucurvetrace.readthedocs.io>`_.
 
-Documentation for ``pypsucurvetrace`` is available at http://pypsucurvetrace.readthedocs.io. There is also a discussion thread about curve tracing with ``pypsucurvetrace`` at http://www.diyaudio.com/community/threads/idea-for-power-transistor-curve-tracer-good-or-not.344199.
+* ``pypsucurvetrace`` is free software and uses the GPL-3 license (see LICENSE.txt or http://www.gnu.org/licenses).
 
-``pypsucurvetrace`` is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version (see LICENSE.txt or http://www.gnu.org/licenses).
+* ``pypsucurvetrace`` is written in Python 3. It is developed and tested on Linux, but should run on other systems, too. The source code is hosted and managed `at GitHub <http://github.com/mbrennwa/pypsucurvetrace>`_.
+
+* Report issues and bugs `here <http://github.com/mbrennwa/pypsucurvetrace/issues>`_ 
+
+* Discussion thread about curve tracing with ``pypsucurvetrace`` `here <https://www.diyaudio.com/community/threads/idea-for-power-transistor-curve-tracer-good-or-not.344199>`_ 
