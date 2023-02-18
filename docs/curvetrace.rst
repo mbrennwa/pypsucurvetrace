@@ -15,7 +15,7 @@ The ``curvetrace`` program
   :width: 658
   :alt: Schematic of test circuit
 
-The figure shows the circuit used to analyse a device under test (DUT) using two programmable power supplies (PSU1 and PSU2). The ``curvetrace`` program controls the voltages |U1| and |U2| at the terminals of PSU1 and PSU2, and records the currents |I1| and |I2| using the built-in meters of PSU1 and PSU2. The ``curvetrace`` program either asks the user to enter the desired values of |U1| and |U2|, or uses a configuration file with |U1| and |U2| presets required for a specific test. ``curvetrace`` also allows limiting the |I1| and |I2| currents or the power values |U1| × I1| and |I2| × |U2| to prevent overloading the DUT. The figure shows a test setup where both |U1| and |U2| are positive. ``curvetrace`` also allows using negative voltages by reversing the polarity of the PSUs.
+The figure shows the circuit used to analyse a device under test (DUT) using two programmable power supplies (PSU1 and PSU2). The ``curvetrace`` program controls the voltages |U1| and |U2| at the terminals of PSU1 and PSU2, and records the currents |I1| and |I2| using the built-in meters of PSU1 and PSU2. The ``curvetrace`` program either asks the user to enter the desired values of |U1| and |U2|, or uses a configuration file with |U1| and |U2| presets required for a specific test. ``curvetrace`` also allows limiting the |I1| and |I2| currents or the power values |U1| × |I1| and |I2| × |U2| to prevent overloading the DUT. The figure shows a test setup where both |U1| and |U2| are positive. ``curvetrace`` also allows using negative voltages by reversing the polarity of the PSUs.
 
 The ``curvetrace`` program supports a number of different PSU models. See :ref:`supported_PSUs` for details.
 
