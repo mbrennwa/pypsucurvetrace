@@ -4,7 +4,7 @@
 Supported power supplies
 ************************
 
-``pypsucurvetrace`` has built-in support for a number of different PSU models. Choosing suitable PSU models for your curve-tracing setup will mainly depend on the voltage and current ranges as well as the set and readback resolution required for your DUT tests. For example, testing a power transistor may require a high-power PSU that can output several 100~W, while a data resolution of 0.01~V and 0.01~A may be more than sufficient. In contrast, testing a small-signal transistor will require much higher resolution to set and read voltages and currents at small increments of 0.1~mV and 0.1~mA or so, while the power will be 1~W or less. Yet another situation arises with vacuum tubes, which typically require high-voltage PSUs (or several PSUs connected in series).
+``pypsucurvetrace`` has built-in support for a number of different PSU models. Choosing suitable PSU models for your curve-tracing setup will mainly depend on the voltage and current ranges as well as the set and readback resolution required for your DUT tests. For example, testing a power transistor may require a high-power PSU that can output several 100 W, while a data resolution of 0.01 V and 0.01 A may be more than sufficient. In contrast, testing a small-signal transistor will require much higher resolution to set and read voltages and currents at small increments of 0.1 mV and 0.1 mA or so, while the power will be 1 W or less. Yet another situation arises with vacuum tubes, which typically require high-voltage PSUs (or several PSUs connected in series).
 
 The list below describes the PSU models that are supported by ``pypsucurvetrace``, and how to configure them in the ``pypsucurvetrace_config.txt`` file.
 
