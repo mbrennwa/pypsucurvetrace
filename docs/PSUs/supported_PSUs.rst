@@ -16,6 +16,10 @@ Korad make a number of different cost-effective power supplies which make for a 
 
    * Tested / confirmed: KA3005P, KWR103
    * Untested / unconfirmed: KA3003P, KD3005P, KA3010P, KA6002P, KA6003P, KA6005P, KD6005P
+   
+Configuration in ``pypsucurvetrace_config.txt``::
+
+   TYPE = KORAD
 
 
 Riden / Ruiden
