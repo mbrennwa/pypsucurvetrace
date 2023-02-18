@@ -84,9 +84,9 @@ def ctrace():
 
     # parse input arguments (if any):
     parser = argparse.ArgumentParser(description='curvetrace (pypsucurvetrace) is a Python program for I-V curve tracing of electronic parts using programmable power supplies.')
-    parser.add_argument('-c', help='path to configuration file with DUT test parameters')
-    parser.add_argument('-b', action='store_true', help='Batch mode (loop of repeated test tuns)')
-    parser.add_argument('-q', action='store_true', help='Quick mode (pre-heating only, no curve tracing)')
+    parser.add_argument('-c', '--config', help='path to configuration file with DUT test parameters')
+    parser.add_argument('-b', '--batch', action='store_true', help='batch mode (loop of repeated test tuns)')
+    parser.add_argument('-q', '--quick', action='store_true', help='quick mode (pre-heating only, no curve tracing)')
     args = parser.parse_args()
 
     # Say Hello:
