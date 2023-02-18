@@ -11,12 +11,12 @@ Contents
    :maxdepth: 1
 
    overview
-   installation
-   curvetrace
-   curveplot
-   curveprocess
-   supported_PSUs
-   heaterblock
+   installation/installation
+   curvetrace/curvetrace
+   curveplot/curveplot
+   curveprocess/curveprocess
+   PSUs/supported_PSUs
+   heaterblock/heaterblock
    
 .. note::
 
