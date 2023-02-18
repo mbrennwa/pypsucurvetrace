@@ -2,9 +2,14 @@
 Overview
 ********
 
-.. include:: what_is_pypsucurvetrace.txt
+``pypsucurvetrace`` uses programmable power supplies to apply different voltages to an electronic device and to determine the currents flowing through the device as a function of the voltages applied (the «curve data»). ``pypsucurvetrace`` also provides tools to process the data and to plot the «curves» of these data.
 
-.. include:: about_pypsucurvetrace.txt
+``pypsucurvetrace`` is written in Python 3. It is developed and tested on Linux, but should run on other systems, too. The source code is hosted and managed at https://github.com/mbrennwa/pypsucurvetrace.
+
+There is also a discussion thread about curve tracing with ``pypsucurvetrace`` at https://www.diyaudio.com/community/threads/idea-for-power-transistor-curve-tracer-good-or-not.344199.
+
+``pypsucurvetrace`` is free software and uses the GPL-3 license (see LICENSE.txt or http://www.gnu.org/licenses).
+
 
 The ``pypsucurvetrace`` package provides the following command-line programs:
 
