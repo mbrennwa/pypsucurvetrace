@@ -1,3 +1,5 @@
+.. _supported_PSUs:
+
 *******************************
 Supported power supplies (PSUs)
 *******************************

@@ -4,4 +4,5 @@ The ``curveprocess`` program
 .. autosummary::
    :toctree: generated
 
-   pypsucurvetrace
+
+The ``curveprocess`` program is under construction, and there is currently no documentation.
