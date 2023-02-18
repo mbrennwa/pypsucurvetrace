@@ -72,3 +72,9 @@ The ``curvetrace`` program is invoked from the command line. Full documentation 
 .. code-block:: console
 
    curvetrace --help
+
+
+Examples
+--------
+UNDER CONSTRUCTION...
+
