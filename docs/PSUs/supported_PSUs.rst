@@ -39,11 +39,11 @@ The RD6012P unit needs special configuration to select the current range and res
 
    * For 6 A current range and 0.1 mA resoltuion::
    
-   TYPE = RIDEN_6A
+      TYPE = RIDEN_6A
    
    * For 12 A current range and 1 mA resoltuion::
    
-   TYPE = RIDEN_12A
+      TYPE = RIDEN_12A
 
 
 BK Precision
