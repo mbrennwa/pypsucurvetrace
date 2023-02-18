@@ -10,7 +10,7 @@ The list below describes the PSU models that are supported by ``pypsucurvetrace`
 
 Korad / RND
 -----------
-Korad make a number of different cost-effective power supplies which make for a flexible all-purpose test setup. The Korad PSUs are sometimes also available from RND brand.
+Korad make cost-effective power supplies which make for a flexible all-purpose test setup. The Korad PSUs are sometimes also available from RND brand.
 
 ``pypsucurvetrace`` has built-in support for the following models:
 
@@ -24,7 +24,7 @@ Configuration in ``pypsucurvetrace_config.txt``::
 
 Riden / Ruiden
 --------------
-Riden / Ruiden offer a number of different power supply modules and accessories that allow building very cost-effective power-supply units with high power output and, at the same time, good voltage and current resolution.
+Riden / Ruiden offer power supply modules and accessories that allow building very cost-effective power-supply units with high power output and, at the same time, good voltage and current resolution.
 
 ``pypsucurvetrace`` has built-in support for the following models:
 
