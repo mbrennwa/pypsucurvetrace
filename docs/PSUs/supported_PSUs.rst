@@ -37,11 +37,11 @@ Configuration in ``pypsucurvetrace_config.txt``::
    
 The RD6012P unit needs special configuration to select the current range and resolution:
 
-   * For 6 A current range and 0.1 mA resoltuion::
+   * For 6 A current range and 0.1 mA resolution::
    
       TYPE = RIDEN_6A
    
-   * For 12 A current range and 1 mA resoltuion::
+   * For 12 A current range and 1 mA resolution::
    
       TYPE = RIDEN_12A
 
