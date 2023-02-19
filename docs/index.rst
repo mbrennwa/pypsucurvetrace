@@ -1,7 +1,9 @@
 ``pypsucurvetrace`` documentation
 =================================
 
-``pypsucurvetrace`` is a software toolbox for curve tracing of electronic devices. ``pypsucurvetrace`` uses programmable power supplies to determine curves of currents flowing through the device as a function of different voltages applied to the device. 
+``pypsucurvetrace`` is a software toolbox for curve tracing of electronic devices.
+
+``pypsucurvetrace`` uses programmable power supplies to determine curves of currents flowing through the device as a function of different voltages applied to the device. 
 
 
 Contents
