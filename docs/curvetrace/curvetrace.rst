@@ -3,8 +3,7 @@
 The ``curvetrace`` program
 ==========================
 
-.. |U1| replace:: :math:`U_1`
-
+.. |U1| replace:: :math:`\rm U_1`
 .. |U2| replace:: :math:`U_2`
 .. |I1| replace:: :math:`I_1`
 .. |I2| replace:: :math:`I_2`
