@@ -9,9 +9,9 @@ The ``curvetrace`` program
 .. |I2| replace:: :math:`I_2`
 .. |R2| replace:: :math:`R_2`
 .. |Ohm| unicode:: U+02126
-.. |kOhm| replace:: k|Ohm|
+.. |kOhm| k unicode:: U+02126
 .. |Vbe| replace:: :math:`V_{\rm BE}`
-.. |Ib| replace:: :math:`V_{\rm BE}`
+.. |Ib| replace:: :math:`I_{\rm B}`
 
 .. autosummary::
    :toctree: generated
