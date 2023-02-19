@@ -3,13 +3,13 @@
 The ``curvetrace`` program
 ==========================
 
-.. |U1| replace:: :math:`\rm U_1`
+.. |U1| replace:: :math:`U_1`
 .. |U2| replace:: :math:`U_2`
 .. |I1| replace:: :math:`I_1`
 .. |I2| replace:: :math:`I_2`
 .. |R2| replace:: :math:`R_2`
 .. |Ohm| unicode:: U+02126
-.. |kOhm| replace:: k |Ohm|
+.. |kOhm| replace:: k|Ohm|
 .. |Vbe| replace:: :math:`V_{\rm BE}`
 .. |Ib| replace:: :math:`V_{\rm BE}`
 
