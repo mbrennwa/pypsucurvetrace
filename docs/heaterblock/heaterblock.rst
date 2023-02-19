@@ -1,10 +1,10 @@
 .. _heaterblock:
 
-***********
-Heaterblock
-***********
+************
+Heater block
+************
 
-DESCRIBE THE HEATERBLOCK TO CONTROL THE DUT TEMPERATURE DURING CURVE TRACING...
+DESCRIBE THE HEATER BLOCK TO CONTROL THE DUT TEMPERATURE DURING CURVE TRACING...
 
 
 Documentation for the heater block is under construction.

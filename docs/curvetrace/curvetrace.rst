@@ -105,9 +105,9 @@ There are further configuration options to improve the the quality of the the PS
 * ``V_SET_CALPOLY``, ``I_SET_CALPOLY``, ``V_READ_CALPOLY`` and ``I_READ_CALPOLY``: coefficients to specify external calibration data to set and read the voltage and current values at the PSU.
 
 
-Heaterblock configuration
--------------------------
-The configuration of the heaterblock is only required if a heater block is used. The heaterblock configuration is also specified in the ``pypsucurvetrace_config.txt`` file. See :ref:`heaterblock` for details.
+Heater block configuration
+--------------------------
+The configuration of the heater block is only required if a heater block is used. The heater block configuration is also specified in the ``pypsucurvetrace_config.txt`` file. See :ref:`heaterblock` for details.
 
 
 Running ``curvetrace``
