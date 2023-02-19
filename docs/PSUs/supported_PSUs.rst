@@ -48,53 +48,70 @@ The RD6012P unit needs special configuration to select the current range and res
 
 BK Precision
 ------------
-DESCRIBE HERE...
+``pypsucurvetrace`` supports the BK Precision 9120A and 9185B models, which both provide 0.01 mA current readback resolution. The 9120A is very suitable for testing small-signal transistors, because it provides 0.1 mV voltage readback resolution with a max voltage of 32 V. The 9185B is suitable for high-voltage devices like electron tubes, because it provides a maximum output voltage of 610 V (with 0.3 V voltage readback resolution).
 
-confirmed: model BK9185B, 9120A, other models not tested
+Configuration of the 9120A in ``pypsucurvetrace_config.txt``::
+
+   TYPE = BK
+   
+Configuration of the 9185B in ``pypsucurvetrace_config.txt``::
+
+   * For high voltage range (up to 610 V, max. current 350 mA)::
+   
+      TYPE = BK9185B_HIGH
+   
+   * For low voltage range (up to 400 V, max. current 500 mA)::
+   
+      TYPE = BK9185B_LOW
+
+
 
 
 Voltcraft PPS
 -------------
-DESCRIBE HERE...
+The Voltcraft PPS models have been around for a long time and have served as cost-effective general-purpose PSUs and many work benches. They were used in the first steps in the development of ``pypsucurvetrace``.
 
-confirmed: ...
+``pypsucurvetrace`` has built-in support for the following models:
 
-In their stock condition, the Silabs CP2102 USB/serial interfaces of the Voltcraft PPS power supplies all use the same ID. The serial interfaces of multiple PPS units connected to the same computer therefore show up at the same file node under /dev/serial/by-id/ (usb-Silicon_Labs_CP2102_USB_to_UART_Bridge_Controller_0001-if00-port0 or similar). In order to simultaneously use more than one PPS unit, the serial interface IDs therefore need to be reconfigured to use unique IDs. This is achieved using the `cp210x-cfg` program:
+   * Tested / confirmed: PPS11360, PPS16005, PPS11810
+   * Untested / unconfirmed: PPS11603, PPS13610, PPS11815
 
-* Download the `cp210x-cfg` code:
-```
-svn co https://github.com/DiUS/cp210x-cfg.git
-```
+Configuration in ``pypsucurvetrace_config.txt``::
 
-* Install USB library stuff needed to compile the `cp210x-cfg` program:
-```
-sudo apt install libusb-1.0-0-dev 
-```
+   TYPE = VOLTCRAFT
 
-* Compile the `cp210x-cfg` program:
-```
-cd path/to/cp210x-cfg/
-make
-```
 
-* Display HELP information for `cp210x-cfg`, and make *sure* you understand how the program works:
-```
-./cp210x-cfg -h
-```
+The Voltcraft PPS power supplies use a Silabs CP2102 USB/serial interface. In stock condition, the Silabs interface of all Voltcraft PPS power supplies always use the same ID. If your setup involves multiplie Voltcraft PPS units, their serial interfaces therefore show up at the same virtual file node under ``/dev/serial/by-id/`` (``usb-Silicon_Labs_CP2102_USB_to_UART_Bridge_Controller_0001-if00-port0`` or similar). In order to simultaneously use more than one PPS unit, you may use the virtual file nodes under ``/dev/serial/by-path/`` instead. However, you may also reconfigure the Silabs interfaces to use unique IDs. This using the ``cp210x-cfg`` program:
 
-* Make sure only one Silabs CP210x interface is connected (the PPS unit one you want to reconfigure), then show its information:
-```
-./cp210x-cfg
-```
+* Download the `cp210x-cfg` code::
 
-* Change the serial ID of the device (don't mess this up!):
-```
-./cp210x-cfg -S 0002
-```
+   svn co https://github.com/DiUS/cp210x-cfg.git
+   
 
-* Plug in the other PPS device and make sure that both serial interfaces now show up separately at `/dev/serial/by_id`:
-```
-ls /dev/serial/by-id/
-usb-Silicon_Labs_CP2102_USB_to_UART_Bridge_Controller_0001-if00-port0
-usb-Silicon_Labs_CP2102_USB_to_UART_Bridge_Controller_0002-if00-port0
-```
+* Install USB library stuff needed to compile the `cp210x-cfg` code::
+
+   sudo apt install libusb-1.0-0-dev 
+
+
+* Compile the `cp210x-cfg` program::
+
+   cd path/to/cp210x-cfg/
+   make
+
+* Display HELP information for `cp210x-cfg`, and make *sure* you understand how the program works::
+
+   ./cp210x-cfg -h
+
+* Make sure only one Silabs CP210x interface is connected (the PPS unit one you want to reconfigure), then show its information::
+
+   ./cp210x-cfg
+
+* Change the serial ID of the device (don't mess this up!)::
+
+   ./cp210x-cfg -S 0002
+
+* Plug in the other PPS device and make sure that both serial interfaces now show up separately at `/dev/serial/by_id`::
+
+   ls /dev/serial/by-id/
+   usb-Silicon_Labs_CP2102_USB_to_UART_Bridge_Controller_0001-if00-port0
+   usb-Silicon_Labs_CP2102_USB_to_UART_Bridge_Controller_0002-if00-port0
