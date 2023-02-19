@@ -6,6 +6,6 @@ Overview
 
 The ``pypsucurvetrace`` package provides the following command-line programs:
 
-* ``curvetrace`` is the main program to acquire curve data. See :ref:`curvetrace` details.
-* ``curveplot`` is a helper program to plot curve data. See :ref:`curveplot` manual for details.
-* ``curveprocess`` is a helper program to determine characteristic parameters from curve data. See :ref:`curveprocess` manual for details.
+* ``curvetrace`` is the main program to acquire curve data. See :ref:`curvetrace` for details.
+* ``curveplot`` is a helper program to plot curve data. See :ref:`curveplot` for details.
+* ``curveprocess`` is a helper program to determine characteristic parameters from curve data. See :ref:`curveprocess` for details.
