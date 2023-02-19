@@ -3,7 +3,8 @@
 The ``curvetrace`` program
 ==========================
 
-.. |U1| replace:: U\ :sub:`1`\
+.. |U1| replace:: :math:`U_1`
+
 .. |U2| replace:: U\ :sub:`2`\
 .. |I1| replace:: I\ :sub:`1`\
 .. |I2| replace:: I\ :sub:`2`\
@@ -25,7 +26,7 @@ The figure shows the circuit used to analyse a device under test (DUT) using two
 The resistor |R2| serves multiple purposes:
 
    * For voltage controlled DUTs like FETs or vacuum tubes, the resistor prevents high-frequency oscillation at the FET gate or tube grid. An |R2| value of approximately 1 k|Ohm| is recommended, but the exact value is not critical and will not have an effect on the test results.
-   * For current controlled DUTs like BJTs, the resistor is used to convert the control voltage to the control current |Ib| using Ohm's Law. The voltage drop across |R2| is equalt to |U2| - |Vbe|, where |Vbe| is the base-emitter on voltage of the BJT. Therefore, the control current is |Ib| = (|U2| - |Vbe|) / |R2|.
+   * For current controlled DUTs like BJTs, the resistor is used to convert the control voltage to the control current |Ib| using Ohm's Law. The voltage drop across |R2| is equal to |U2| - |Vbe|, where |Vbe| is the base-emitter on voltage of the BJT. Therefore, the control current is |Ib| = (|U2| - |Vbe|) / |R2|.
 
 ``curvetrace`` also allows limiting the |I1| and |I2| currents or the power values |U1| × |I1| and |I2| × |U2| to prevent overloading the DUT. The figure shows a test setup where both |U1| and |U2| are positive.
 
