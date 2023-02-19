@@ -5,13 +5,13 @@ The ``curvetrace`` program
 
 .. |U1| replace:: :math:`U_1`
 
-.. |U2| replace:: U\ :sub:`2`\
-.. |I1| replace:: I\ :sub:`1`\
-.. |I2| replace:: I\ :sub:`2`\
-.. |R2| replace:: R\ :sub:`2`\
+.. |U2| replace:: :math:`U_2`
+.. |I1| replace:: :math:`I_1`
+.. |I2| replace:: :math:`I_2`
+.. |R2| replace:: :math:`R_2`
 .. |Ohm| unicode:: U+02126
-.. |Vbe| replace:: V\ :sub:`BE`\
-.. |Ib| replace:: I\ :sub:`B`\
+.. |Vbe| replace:: :math:`V_{\rm BE}`
+.. |Ib| replace:: :math:`V_{\rm BE}`
 
 .. autosummary::
    :toctree: generated
