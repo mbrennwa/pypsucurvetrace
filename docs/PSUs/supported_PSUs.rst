@@ -54,7 +54,7 @@ Configuration of the 9120A in ``pypsucurvetrace_config.txt``::
 
    TYPE = BK
    
-Configuration of the 9185B in ``pypsucurvetrace_config.txt``::
+Configuration of the 9185B in ``pypsucurvetrace_config.txt``:
 
    * For high voltage range (up to 610 V, max. current 350 mA)::
    
