@@ -7,7 +7,10 @@ The ``curvetrace`` program
 .. |U2| replace:: U\ :sub:`2`\
 .. |I1| replace:: I\ :sub:`1`\
 .. |I2| replace:: I\ :sub:`2`\
-
+.. |R2| replace:: R\ :sub:`2`\
+.. |Ohm| unicode:: U+02126
+.. |Vbe| replace:: V\ :sub:`BE`\
+.. |Ib| replace:: I\ :sub:`B`\
 
 .. autosummary::
    :toctree: generated
@@ -17,11 +20,39 @@ The ``curvetrace`` program
   :width: 658
   :alt: Schematic of test circuit
 
-The figure shows the circuit used to analyse a device under test (DUT) using two programmable power supplies (PSU1 and PSU2). The ``curvetrace`` program controls the voltages |U1| and |U2| at the terminals of PSU1 and PSU2, and records the currents |I1| and |I2| using the built-in meters of PSU1 and PSU2. The ``curvetrace`` program either asks the user to enter the desired values of |U1| and |U2|, or uses a configuration file with |U1| and |U2| presets required for a specific test. ``curvetrace`` also allows limiting the |I1| and |I2| currents or the power values |U1| × |I1| and |I2| × |U2| to prevent overloading the DUT. The figure shows a test setup where both |U1| and |U2| are positive. ``curvetrace`` also allows using negative voltages by reversing the polarity of the PSUs.
+The figure shows the circuit used to analyse a device under test (DUT) using two programmable power supplies (PSU1 and PSU2). The ``curvetrace`` program controls the voltages |U1| and |U2| at the terminals of PSU1 and PSU2, and records the currents |I1| and |I2| using the built-in meters of PSU1 and PSU2. ``curvetrace`` also allows using negative voltages by reversing the polarity of the PSUs.
+
+The resistor |R2| serves multiple purposes:
+
+   * For voltage controlled DUTs like FETs or vacuum tubes, the resistor prevents high-frequency oscillation at the FET gate or tube grid. An |R2| value of approximately 1 k|Ohm| is recommended, but the exact value is not critical and will not have an effect on the test results.
+   * For current controlled DUTs like BJTs, the resistor is used to convert the control voltage to the control current |Ib| using Ohm's Law. The voltage drop across |R2| is equalt to |U2| - |Vbe|, where |Vbe| is the base-emitter on voltage of the BJT. Therefore, the control current is |Ib| = (|U2| - |Vbe|) / |R2|.
+
+``curvetrace`` also allows limiting the |I1| and |I2| currents or the power values |U1| × |I1| and |I2| × |U2| to prevent overloading the DUT. The figure shows a test setup where both |U1| and |U2| are positive.
 
 The ``curvetrace`` program supports a number of different PSU models. See :ref:`supported_PSUs` for details.
 
 The ``curvetrace`` program also allows using a heater block to control the temperature of the DUT during curve tracing. See :ref:`heaterblock` for details.
+
+
+The procedure implemented in the ``curvetrace`` program is as follows:
+
+   1. Read the ``pypsucurvetrace_config.txt`` configuration file with the types and serial ports of the PSUs, and then establish the serial connection to the PSUs (see below).
+   2. Interactively ask the user for a name or label of the test data, and then open an ASCII data file with that name (an existing file with the same name gets overwritten!).
+   3. Determine the test conditions, either by interactively asking for user input, or by reading a configuration file with the test parameters:
+      * Start voltages, end voltages, and number of steps for each PSU
+      * Max. allowed current and power applied from each PSU to the DUT
+      * Polarity of how the PSU terminals are connected to the DUT terminals
+      * Optional: number of readings at each voltage step (results will be averaged)
+      * Optional: idle time and pre-heat time
+      * If idle or pre-heat times are not zero: idle voltage and current conditions for the PSUs
+      * Optional: DUT temperature
+   4. Check the test configuration versus the limits of the PSUs, and adjust the configuration where needed.
+   5. Show a summary of the test configuration and ask the user if it's okay to start the test.
+   6. Run the test:
+         * If a heater block is used: wait until the DUT has attained the specified temperature.
+         * The voltages are stepped in two nested loops. Voltage |U1| is varied in the inner loop, |U2| is varied in the outer loop.
+         * The measured data are shown on the screen and saved to the data file.
+   7. Once the test is completed, turn off the PSUs.
 
 
 Power supply configuration
@@ -65,8 +96,8 @@ Heaterblock configuration
 The configuration of the heaterblock is only required if a heater block is used. The heaterblock configuration is also specified in the ``pypsucurvetrace_config.txt`` file. See :ref:`heaterblock` for details.
 
 
-Using ``curvetrace``
---------------------
+Running ``curvetrace``
+----------------------
 The ``curvetrace`` program is invoked from the command line. Full documentation is not yet available in this document, but can be accessed from the ``curvetrace`` program directly:
 
 .. code-block:: console
@@ -77,4 +108,3 @@ The ``curvetrace`` program is invoked from the command line. Full documentation 
 Examples
 --------
 UNDER CONSTRUCTION...
-
