@@ -2,7 +2,7 @@
 Overview
 ********
 
-``pypsucurvetrace`` uses programmable power supplies to apply different voltages to an electronic device and to determine the currents flowing through the device as a function of the voltages applied (the «curve data»). ``pypsucurvetrace`` also provides tools to process the data and to plot the «curves» of these data.
+``pypsucurvetrace`` uses programmable power supplies to apply different voltages to an electronic device and to determine corresponding the currents flowing through the device. ``pypsucurvetrace`` also provides tools to process the data and to plot the data «curves».
 
 The ``pypsucurvetrace`` package provides the following command-line programs:
 
