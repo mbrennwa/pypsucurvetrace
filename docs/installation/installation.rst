@@ -17,7 +17,7 @@ The installation procedures described below use the Python package manager ``pip
 
       .. code-block:: console
    
-      sudo apt install pipx git
+         sudo apt install pipx git
       
     * On Windows, macOS or other Linux distros, use the respective software installer channels or follow the instructions `here <http://pypa.github.io/pipx>`_  (for ``pipx``) and `here <http://git-scm.com/>`_ (for ``git``).
    
@@ -27,11 +27,12 @@ The installation procedures described below use the Python package manager ``pip
 
       .. code-block:: console
 
-      sudo adduser johndoe dialout
+         sudo adduser johndoe dialout
+         
+     Then reboot the computer for this to take effect.
       
    * On Windows, use the Device Manager program to control the COM port permissions.
 
-Then log out and log in again to your user account for this to take effect.
 
 
 
