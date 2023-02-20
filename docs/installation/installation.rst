@@ -11,7 +11,7 @@ Installation
 Prerequisites
 -------------
 
-The installation procedures described below use the Python package manager ``pipx``. Depending on your installation method (see below), you may also need ``git``.
+The installation procedures described below use the Python package manager ``pipx`` (see `here <http://pypa.github.io/pipx>`_ for details). Depending on your installation method (see below), you may also need ``git``.
 
 To install these tools on Debian, Ubuntu or similar Linux distros, just run the following command:
 
