@@ -19,11 +19,11 @@ The installation procedures described below use the Python package manager ``pip
    
          sudo apt install pipx git
       
-    * On Windows, macOS or other Linux distros, use the respective software installer channels or follow the instructions `here <http://pypa.github.io/pipx>`_  (for ``pipx``) and `here <http://git-scm.com/>`_ (for ``git``).
+   * On Windows, macOS or other Linux distros, use the respective software installer channels or follow the instructions `here <http://pypa.github.io/pipx>`_  (for ``pipx``) and `here <http://git-scm.com/>`_ (for ``git``).
    
 ``pypsucurvetrace`` needs access to the serial ports of you PSUs. Make sure your user account has the required access rights:
 
-    * On Linux, add your username to the ``dialout`` group. If your user account is ``johndoe``, execute the following command:
+   * On Linux, add your username to the ``dialout`` group. If your user account is ``johndoe``, execute the following command:
 
       .. code-block:: console
 
