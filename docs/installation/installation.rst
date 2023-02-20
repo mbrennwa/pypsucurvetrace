@@ -15,7 +15,7 @@ The installation procedures described below use the Python package manager ``pip
 
    * To install these tools on Debian, Ubuntu or similar Linux distros, just run the following command:
 
-   .. code-block:: console
+      .. code-block:: console
    
       sudo apt install pipx git
       
@@ -25,7 +25,7 @@ The installation procedures described below use the Python package manager ``pip
 
     * On Linux, add your username to the ``dialout`` group. If your user account is ``johndoe``, execute the following command:
 
-   .. code-block:: console
+      .. code-block:: console
 
       sudo adduser johndoe dialout
       
