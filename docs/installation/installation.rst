@@ -11,19 +11,25 @@ Installation
 Prerequisites
 -------------
 
-The installation procedures described below use the Python package manager ``pipx`` (see `here <http://pypa.github.io/pipx>`_ for details). Depending on your installation method (see below), you may also need ``git``.
+The installation procedures described below use the Python package manager ``pipx``. Depending on your installation method (see below), you may also need ``git``:
 
-To install these tools on Debian, Ubuntu or similar Linux distros, just run the following command:
+   * To install these tools on Debian, Ubuntu or similar Linux distros, just run the following command:
 
-.. code-block:: console
-
-   sudo apt install pipx git
+   .. code-block:: console
    
-``pypsucurvetrace`` needs access to the serial ports of you PSUs. Make sure your user account has the required access rights. On Linux, add your username to the ``dialout`` group. If your user account is ``johndoe``, execute the following command:
+      sudo apt install pipx git
+      
+    * On Windows, macOS or other Linux distros, use the respective software installer channels or follow the instructions `here <http://pypa.github.io/pipx>`_  (for ``pipx``) and `here <http://git-scm.com/>`_ (for ``git``).
+   
+``pypsucurvetrace`` needs access to the serial ports of you PSUs. Make sure your user account has the required access rights:
 
-.. code-block:: console
+    * On Linux, add your username to the ``dialout`` group. If your user account is ``johndoe``, execute the following command:
 
-   sudo adduser johndoe dialout
+   .. code-block:: console
+
+      sudo adduser johndoe dialout
+      
+   * On Windows, use the Device Manager program to control the COM port permissions.
 
 Then log out and log in again to your user account for this to take effect.
 
