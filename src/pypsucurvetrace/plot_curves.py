@@ -9,7 +9,7 @@ import logging
 from queue import Empty
 
 from pypsucurvetrace.read_datafile import measurement_data
-from pypsucurvetrace.curvetrace_tools import get_logger
+from pypsucurvetrace.curvetrace_tools import get_logger, convert_to_bjt
 
 # set up logger:
 logger = get_logger('plot_curves')
@@ -118,7 +118,7 @@ def plot_curves( data,			# measurement_data object (or tuple of measurement_data
 			if bjt_vbe is not None:
 			    if bjt_r2 is not None:
 			        try:
-			            u = (u-bjt_vbe) / bjt_r2
+			            u = convert_to_bjt(u, bjt_vbe, bjt_r2)
 			        except:
 			            print('could not convert PSU-U2 to BJT base current.')
 			C += (u/csc,)

@@ -497,3 +497,18 @@ def get_logger(name):
     
     return logger
 
+
+
+def convert_to_bjt(Uc, BJT_Vbe, R2):
+    # convert U2 control voltage to BJT base current Ib
+    #
+    # INPUT:
+    # Uc: array of control voltage(s) applied to R2
+    # BJT_Vbe: BJT Vbe-ON voltage (or equivalent 'ON' voltage parameter for other current-controlled devices)
+    # R2: base resistor value
+    # 
+    # OUTPUT:
+    # Ib: base current
+    
+    Ib = (Uc-BJT_Vbe) / R2
+    return Ib

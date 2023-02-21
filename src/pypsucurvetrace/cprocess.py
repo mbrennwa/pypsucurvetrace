@@ -17,7 +17,7 @@ import argparse
 from pathlib import Path
 
 from pypsucurvetrace.read_datafile import read_datafile
-from pypsucurvetrace.curvetrace_tools import say_hello, get_logger
+from pypsucurvetrace.curvetrace_tools import say_hello, get_logger, convert_to_bjt
 
 
 
@@ -154,39 +154,90 @@ def proc_curves(cdata, U1, I1, R2_val=None, BJT_VBE=None):
     # dU1_dX2: dU1/dU2 or dU1/dI2 derivative(s) at point(s) (U1/I1)
     # dI1_dU1: dI1/dU1 derivative(s) at point(s) (U1/I1)
     
-    if R2_val is not None:
-        if BJT_VBE is not None:
-            logger.info('...need to convert U2 to I2 using BJT formula...')
-
-    dI1_dX2 = None
-    dU1_dX2 = None
-    dI1_dU1 = None
-
+    # make sure U1 and I1 are lists, not scalars:
+    try:
+        u = len(U1)
+    except:
+        U1 = [U1,]
+    try:
+        u = len(I1)
+    except:
+        I1 = [I1,]
+    
+    # number of (U1/I1) points where the DUT parameters need to be calculated
+    N = len(U1)
+    if len(I1) != N:
+        logger.error('U1 and I1 must be same length')
+    
 
     logger.warning('toying around with grid data and interpolation, CALCULATION OR DERIVATIVES NOT YET IMPLEMENTED...')
 
-    # get U1, U2, I1 data:
-    U1 = cdata.get_U1_meas(exclude_CC = True)
-    U2 = cdata.get_U2_set(exclude_CC = True)
-    I1 = cdata.get_I1_meas(exclude_CC = True)
+    # get curve data:
+    cU1 = cdata.get_U1_meas(exclude_CC = True)
+    cX2 = cdata.get_U2_set(exclude_CC = True)
+    cI1 = cdata.get_I1_meas(exclude_CC = True)
+    
+
+     
+    if R2_val is not None:
+        if BJT_VBE is not None:
+            X2 = convert_to_bjt(cX2, BJT_VBE, R2_val)
+            
+            
+
+   
 
     # plot raw data:
     plt.ion()
     fig = plt.figure()
     ax = fig.add_subplot(111, projection='3d')
-    ax.plot_trisurf(U1, U2, I1, color='white', edgecolors='grey', alpha=0.5)
-    ax.scatter(U1, U2, I1, c='red')
+    ax.plot_trisurf(cU1, cX2, cI1, color='white', edgecolors='grey', alpha=0.5)
+    ax.scatter(cU1, cX2, cI1, c='red')
     plt.show()
+    
+    # prepare interpolation:
+    N_u1 = len(np.unique(cU1))*10;
+    N_x2 = len(np.unique(cX2))*10;
+    N_i1 = len(np.unique(cI1))*10;
+    
+    print(N_u1)
+    print(N_x2)
+    print(N_i1)
+    
+    
+    # init arrays:
+    dI1_dX2 = np.empty(N); dI1_dX2[:] = np.nan;
+    dU1_dX2 = np.empty(N); dU1_dX2[:] = np.nan;
+    dI1_dU1 = np.empty(N); dI1_dU1[:] = np.nan;
+    
+    print('linspace')
+    u1 = np.linspace(cU1.min(), cU1.max(), N_u1)  # interpolation coordinates for U1
+    x2 = np.linspace(cX2.min(), cX2.max(), N_x2)  # interpolation coordinates for X2
+    
+    
+    print('meshgrid')
+    UU1, XX2 = np.meshgrid(u1,x2)
+    
+    print('griddata')
+    II1 = griddata((cU1, cX2), cI1, (UU1, XX2), method='cubic')  # cubic spline interpolation
+    
+    print('gradient')
+    g = np.gradient(II1)
+    
+    print('dI1_dU1')
+    print(g[0])
 
-    # interpolate:
-    u1 = np.linspace(U1.min(), U1.max(), 1000)
-    u2 = np.linspace(U2.min(), U2.max(), 1000)
-    UU1, UU2 = np.meshgrid(u1,u2)
-    II1 = griddata((U1, U2), I1, (UU1, UU2), method='cubic')
+    print('dI1_dX2')
+    print(g[1])
+
+
+        
+
+
 
     # plot interpolated data (contours):
     fig, ax = plt.subplots(nrows=1, ncols=1)
-    ax.contour(UU1, UU2, II1)
+    ax.contour(UU1, XX2, II1)
     plt.ioff()
     plt.show()
     
