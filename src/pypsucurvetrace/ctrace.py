@@ -25,19 +25,12 @@ from pathlib import Path
 
 import pypsucurvetrace.powersupply as powersupply
 import pypsucurvetrace.heaterblock as heaterblock
-from pypsucurvetrace.curvetrace_tools import error_and_exit, say_hello, printit, connect_PSU, configure_test_PSU, configure_idle_PSU, do_idle, start_new_logfile, format_PSU_reading
+from pypsucurvetrace.curvetrace_tools import error_and_exit, say_hello, printit, connect_PSU, configure_test_PSU, configure_idle_PSU, do_idle, start_new_logfile, format_PSU_reading, get_logger
 from pypsucurvetrace.plot_curves import curve_plotter
 
 
 # set up logger:
-logger = logging.getLogger('curvetrace')
-if not logger.handlers:
-	logger.setLevel(logging.DEBUG)
-	ch = logging.StreamHandler()
-	ch.setLevel(logging.DEBUG)
-	formatter = logging.Formatter('%(name)s %(levelname)s: %(message)s')
-	ch.setFormatter(formatter)
-	logger.addHandler(ch)
+logger = get_ogger('curvetrace')
 
 
 if __name__ == "__main__":

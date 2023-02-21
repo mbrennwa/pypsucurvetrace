@@ -10,16 +10,10 @@ from simple_pid import PID
 from threading import Thread
 from pypsucurvetrace.temperaturesensor_MAXIM import temperaturesensor_MAXIM as TSENS
 from pypsucurvetrace.powersupply import PSU
+from pypsucurvetrace.curvetrace_tools import get_logger
 
 # set up logger:
-logger = logging.getLogger('heaterblock')
-if not logger.handlers:
-    logger.setLevel(logging.DEBUG)
-    ch = logging.StreamHandler()
-    ch.setLevel(logging.DEBUG)
-    formatter = logging.Formatter('%(name)s %(levelname)s: %(message)s')
-    ch.setFormatter(formatter)
-    logger.addHandler(ch)
+logger = get_logger('heaterblock')
 
 
 # heater class (dummy):

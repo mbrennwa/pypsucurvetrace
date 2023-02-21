@@ -7,6 +7,7 @@ import sys
 import time
 import math
 import os.path
+import logging
 
 
 #############
@@ -478,3 +479,21 @@ def do_idle(PSU1, PSU2, HEATER, seconds, file=None, wait_for_TEMP=False):
 			    "Ic = " + format_PSU_reading(REG.TEST_POLARITY*Ir, REG.IRESREAD) + " A" + '  ' + \
 			    "T = " + T_HB + " °C"
 			printit(t, file , '%')
+
+
+###############
+# get logger  #
+###############
+
+def get_logger(name):
+    logger = logging.getLogger(name)
+    if not logger.handlers:
+        logger.setLevel(logging.DEBUG)
+        ch = logging.StreamHandler()
+        ch.setLevel(logging.DEBUG)
+        formatter = logging.Formatter('%(levelname)s (%(name)s): %(message)s')
+        ch.setFormatter(formatter)
+        logger.addHandler(ch)
+    
+    return logger
+

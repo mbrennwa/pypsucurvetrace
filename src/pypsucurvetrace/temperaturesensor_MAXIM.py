@@ -22,23 +22,16 @@
 try:
 	import sys
 	import time
-	import logging
 	from digitemp.master import UART_Adapter
 	from digitemp.device import AddressableDevice
 	from digitemp.device import DS18B20
+	from pypsucurvetrace.curvetrace_tools import get_logger 
 except ImportError as e:
 	print (e)
 	raise
 	
 # set up logger:
-logger = logging.getLogger('temperaturesensor_MAXIM')
-if not logger.handlers:
-    logger.setLevel(logging.DEBUG)
-    ch = logging.StreamHandler()
-    ch.setLevel(logging.DEBUG)
-    formatter = logging.Formatter('%(name)s %(levelname)s: %(message)s')
-    ch.setFormatter(formatter)
-    logger.addHandler(ch)
+logger = get_logger('temperaturesensor_MAXIM')
 
 
 # check Python version and print warning if we're running version < 3:

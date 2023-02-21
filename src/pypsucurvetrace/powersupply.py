@@ -6,7 +6,7 @@ Classes of specific real-world power supplies will derive from this class.
 import time
 import numpy as np
 from numpy.polynomial.polynomial import polyval
-import logging
+from pypsucurvetrace.curvetrace_tools import get_logger
 
 import pypsucurvetrace.powersupply_VOLTCRAFT as powersupply_VOLTCRAFT
 import pypsucurvetrace.powersupply_KORAD as powersupply_KORAD
@@ -14,14 +14,7 @@ import pypsucurvetrace.powersupply_BK as powersupply_BK
 import pypsucurvetrace.powersupply_RIDEN as powersupply_RIDEN
 
 # set up logger:
-logger = logging.getLogger('powersupply')
-if not logger.handlers:
-    logger.setLevel(logging.DEBUG)
-    ch = logging.StreamHandler()
-    ch.setLevel(logging.DEBUG)
-    formatter = logging.Formatter('%(name)s %(levelname)s: %(message)s')
-    ch.setFormatter(formatter)
-    logger.addHandler(ch)
+logger = get_logger('powersupply')
 
 # PSU object:
 #    .setVoltage(voltage)   set voltage

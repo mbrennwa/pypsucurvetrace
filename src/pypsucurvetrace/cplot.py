@@ -24,17 +24,10 @@ import logging
 
 from pypsucurvetrace.read_datafile import read_datafile
 from pypsucurvetrace.plot_curves import plot_curves
-from pypsucurvetrace.curvetrace_tools import say_hello
+from pypsucurvetrace.curvetrace_tools import say_hello, get_logger
 
 # set up logger:
-logger = logging.getLogger('curveplot')
-if not logger.handlers:
-    logger.setLevel(logging.DEBUG)
-    ch = logging.StreamHandler()
-    ch.setLevel(logging.DEBUG)
-    formatter = logging.Formatter('%(levelname)s (%(name)s): %(message)s')
-    ch.setFormatter(formatter)
-    logger.addHandler(ch)
+logger = get_logger('curveplot')
 
 
 if __name__ == "__main__":

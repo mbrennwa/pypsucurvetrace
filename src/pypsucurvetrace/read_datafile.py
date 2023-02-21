@@ -4,17 +4,10 @@ Function to read pypsucurvetrace data files
 
 # imports:
 import numpy as np
-import logging
+from pypsucurvetrace.curvetrace_tools import get_logger
 
 # set up logger:
-logger = logging.getLogger('read_datafile')
-if not logger.handlers:
-    logger.setLevel(logging.DEBUG)
-    ch = logging.StreamHandler()
-    ch.setLevel(logging.DEBUG)
-    formatter = logging.Formatter('%(name)s %(levelname)s: %(message)s')
-    ch.setFormatter(formatter)
-    logger.addHandler(ch)
+logger = get_logger('read_datafile')
 
 
 ############################

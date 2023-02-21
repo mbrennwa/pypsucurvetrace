@@ -10,17 +10,10 @@ Python class to control KORAD (RND) power supplies
 import serial
 import sys
 import time
-import logging
+from pypsucurvetrace.curvetrace_tools import get_logger
 
 # set up logger:
-logger = logging.getLogger('powersupply_KORAD')
-if not logger.handlers:
-    logger.setLevel(logging.DEBUG)
-    ch = logging.StreamHandler()
-    ch.setLevel(logging.DEBUG)
-    formatter = logging.Formatter('%(name)s %(levelname)s: %(message)s')
-    ch.setFormatter(formatter)
-    logger.addHandler(ch)
+logger = get_logger('powersupply_KORAD')
 
 
 # Python dictionary of known KORAD (RND) power supply models (Vmin,Vmax,Imax,Pmax,VresolutionSet,IresolutionSet,VresolutionRead,IresolutionRead,VoffsetMax,IoffsetMax,MaxSettleTime)

@@ -8,17 +8,10 @@ import sys
 import math
 import warnings
 import time
-import logging
+from pypsucurvetrace.curvetrace_tools import get_logger
 
 # set up logger:
-logger = logging.getLogger('powersupply_VOLTCRAFT')
-if not logger.handlers:
-    logger.setLevel(logging.DEBUG)
-    ch = logging.StreamHandler()
-    ch.setLevel(logging.DEBUG)
-    formatter = logging.Formatter('%(name)s %(levelname)s: %(message)s')
-    ch.setFormatter(formatter)
-    logger.addHandler(ch)
+logger = get_logger('powersupply_VOLTCRAFT')
 
 
 # The model can be identified by the maximum voltage and maximum current.

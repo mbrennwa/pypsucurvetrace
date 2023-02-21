@@ -15,10 +15,9 @@
 
 import argparse
 from pathlib import Path
-import logging
 
 from pypsucurvetrace.read_datafile import read_datafile
-from pypsucurvetrace.curvetrace_tools import say_hello
+from pypsucurvetrace.curvetrace_tools import say_hello, get_logger
 
 
 
@@ -28,16 +27,9 @@ import matplotlib.pyplot as plt
 
 
 
-# set up logger:
-logger = logging.getLogger('curveprocess')
-if not logger.handlers:
-    logger.setLevel(logging.DEBUG)
-    ch = logging.StreamHandler()
-    ch.setLevel(logging.DEBUG)
-    formatter = logging.Formatter('%(levelname)s (%(name)s): %(message)s')
-    ch.setFormatter(formatter)
-    logger.addHandler(ch)
 
+# set up logger:
+logger = get_logger('curveprocess')
 
 if __name__ == "__main__":
     cprocess()

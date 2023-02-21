@@ -9,16 +9,10 @@ import logging
 from queue import Empty
 
 from pypsucurvetrace.read_datafile import measurement_data
+from pypsucurvetrace.curvetrace_tools import get_logger
 
 # set up logger:
-logger = logging.getLogger('plot_curves')
-if not logger.handlers:
-    logger.setLevel(logging.DEBUG)
-    ch = logging.StreamHandler()
-    ch.setLevel(logging.DEBUG)
-    formatter = logging.Formatter('%(name)s %(levelname)s: %(message)s')
-    ch.setFormatter(formatter)
-    logger.addHandler(ch)
+logger = get_logger('plot_curves')
 
 
 ###############
@@ -416,5 +410,3 @@ def curve_plotter(queue):
 		
 	# close figure:
 	plt.close()
-
-
