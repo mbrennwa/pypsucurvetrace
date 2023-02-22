@@ -251,6 +251,9 @@ def proc_curves(cdata, U1, I1, R2_val=None, BJT_VBE=None):
     
     
     logger.info('...find gradient values of the specifed (U1,I1) positions -- how do I do this????...')
+    
+    THIS DOES THE TRICK: https://stackoverflow.com/a/54023844
+    
     # interpolate the gradient data calculated above to the specified (U1/I1) point(s)
 
     # plot interpolated data (contours):
