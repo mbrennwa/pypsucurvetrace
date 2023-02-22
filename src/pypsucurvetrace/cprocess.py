@@ -60,6 +60,11 @@ def cprocess():
 
 
     logger.warning('cprocess / curveprocess is under construction!')
+    logger.warning('cprocess / curveprocess is under construction!')
+    logger.warning('cprocess / curveprocess is under construction!')
+    logger.warning('cprocess / curveprocess is under construction!')
+    logger.warning('cprocess / curveprocess is under construction!')
+    logger.warning('cprocess / curveprocess is under construction!')
 
 
 
@@ -97,14 +102,18 @@ def cprocess():
 
 
 
-    # prepare output:
+    # prepare output, header:
     sep = ', '
-    if BJT_VBE is None:
+    label_U1 = 'U0 (V)' # operating point voltage
+    label_I1 = 'I0 (A)' # operating point current
+    label_X2 = 'Ug (V)' # gate / grid current
+    label_dI1_dX2 = 'gm (A/V)' # gain
+    label_dI1_dU1 = 'go (A/V)' # output impedance
+    if BJT_VBE is not None:
         # voltage controlled DUT
-        print( 'Filename' + sep + 'Label' + sep + 'U1' + sep + 'I1' + sep + 'U2' + sep + 'dI1_dU2' + sep + 'dU1_dU2' + sep + 'dI1_dU1' + sep + 'T')
-    else:
-        # current controlled DUT
-        print( 'Filename' + sep + 'Label' + sep + 'U1' + sep + 'I1' + sep + 'I2' + sep + 'dI1_dI2' + sep + 'dU1_dI2' + sep + 'dI1_dU1' + sep + 'T')
+        label_X2 = 'Ib (A)' # base current
+        label_dI1_dX2 = 'hfe (A/A)' # gain
+    print( 'Filename' + sep + 'Sample' + sep + label_U1 + sep + label_I1 + sep + label_X2 + sep + label_dI1_dX2 + sep + label_dI1_dU1 + sep + 'T (°C)')
     
     # process all datafiles:
     for i in range(len(datafiles)):
@@ -122,22 +131,28 @@ def cprocess():
 	            I1 = float(p.I0)
 	            X2 = float(p.Uc)
 	            T  = float(p.T)
+	            if BJT_VBE is not None:
+	                X2 = convert_to_bjt(X2, BJT_VBE, R2_val)
+	                
 	        except Exception as e:
-	             error_and_exit(logger, 'Could not determine U1, I1 and U2 from preheat data', e)
+	            error_and_exit(logger, 'Could not determine U1, I1 and U2 from preheat data', e)
 	    
 	    else:
-	        logger.info('...use I1 and U1 from args, determine U2 or I2 and T from data...')
-	        X2 = None
+	        logger.info('...determine T from data...')
 	        T  = None
 
 
 
-	    dI1_dX2, dU1_dX2, dI1_dU1 = proc_curves(d, U1, I1, R2_val, BJT_VBE)
+	    XX2, dI1_dX2, dI1_dU1 = proc_curves(d, U1, I1, R2_val, BJT_VBE)
+	    if X2 is None:
+	        X2 = XX2
+	        
 	    
 	    
 	    
-	    # print header:
-	    print( Path(d.datafile).stem + sep + l + sep + str(U1) + sep + str(I1) + sep + str(X2) + sep + str(dI1_dX2) + sep + str(dU1_dX2) + sep + str(dI1_dU1) + sep + str(T))
+	    
+	    # print parameters:
+	    print( Path(d.datafile).stem + sep + l + sep + str(U1) + sep + str(I1) + sep + str(X2) + sep + str(dI1_dX2) + sep + str(dI1_dU1) + sep + str(T))
 	    
 	    
 	    
@@ -150,9 +165,9 @@ def proc_curves(cdata, U1, I1, R2_val=None, BJT_VBE=None):
     # I1: array of I1 values where outputs should be calculated
     #
     # OUTPUT:
-    # dI1_dX2: dI1/dU2 or dI1/dI2 derivative(s) at point(s) (U1/I1)
-    # dU1_dX2: dU1/dU2 or dU1/dI2 derivative(s) at point(s) (U1/I1)
-    # dI1_dU1: dI1/dU1 derivative(s) at point(s) (U1/I1)
+    # X2: U2 or I2 corresponding to specified (U1/I1) point(s)
+    # dI1_dX2: dI1/dU2 or dI1/dI2 derivative(s) at point(s) (U1/I1), aka. gm (transconductance) of hfe (current gain)
+    # dI1_dU1: dI1/dU1 derivative(s) at point(s) (U1/I1), aka. go (output impedance)
     
     # make sure U1 and I1 are lists, not scalars:
     try:
@@ -181,6 +196,7 @@ def proc_curves(cdata, U1, I1, R2_val=None, BJT_VBE=None):
         if BJT_VBE is not None:
             cX2 = convert_to_bjt(cX2, BJT_VBE, R2_val)
             
+            
    
 
     # plot raw data:
@@ -191,15 +207,16 @@ def proc_curves(cdata, U1, I1, R2_val=None, BJT_VBE=None):
     ax.scatter(cU1, cX2, cI1, c='red')
     plt.show()
     
-    # number of grid points for interpolation:
-    N_u1 = (len(np.unique(cU1))-1)*10 + 1;
-    N_x2 = (len(np.unique(cX2))-1)*10 + 1;
-    ### N_i1 = (len(np.unique(cI1))-1)*10 + 1;
-    
+    # grid points for interpolation:
+    NG = 10
+    N_u1 = (len(np.unique(cU1))-1)*NG + 1;
+    N_x2 = (len(np.unique(cX2))-1)*NG + 1;
+    N_i1 = (len(np.unique(cI1))-1)*NG + 1;
     
     # data grids:
     u1 = np.linspace(cU1.min(), cU1.max(), N_u1)  # interpolation coordinates for U1
     x2 = np.linspace(cX2.min(), cX2.max(), N_x2)  # interpolation coordinates for X2
+    i1 = np.linspace(cI1.min(), cI1.max(), N_i1)  # interpolation coordinates for I1
     
     delta_u1 = (u1[-1]-u1[0])/N_u1
     if delta_u1 == 0:
@@ -207,12 +224,12 @@ def proc_curves(cdata, U1, I1, R2_val=None, BJT_VBE=None):
     delta_x2 = (x2[-1]-x2[0])/N_x2
     if delta_x2 == 0:
         error_and_exit(logger, 'U2 range must be greater than zero!')
-        
-    UU1, XX2 = np.meshgrid(u1,x2)
-    del(u1)
-    del(x2)
+    delta_i1 = (i1[-1]-i1[0])/N_i1
+    if delta_i1 == 0:
+        error_and_exit(logger, 'I1 range must be greater than zero!')
     
-    # interpolate I1 data on UU1 and XX2 grid:
+    # interpolate II1 = f(u1,x2) using smooth cublic splines:
+    UU1, XX2 = np.meshgrid(u1,x2)
     II1 = griddata((cU1, cX2), cI1, (UU1, XX2), method='cubic')  # cubic spline interpolation
     
     # determine vector gradient of I1(U1,X2) surface (vector elements are gradients along the U1 and X2 axes)
@@ -220,13 +237,13 @@ def proc_curves(cdata, U1, I1, R2_val=None, BJT_VBE=None):
     # dI1_dX2 <--> g[0] is the gradient in horizontal direction
     # dI1_dU1 <--> g[1] is the gradient in vertical direction
     
-    # init arrays:
+    # init arrays for gradient values:
     dI1_dX2 = np.empty(N); dI1_dX2[:] = np.nan;
-    dU1_dX2 = np.empty(N); dU1_dX2[:] = np.nan;
     dI1_dU1 = np.empty(N); dI1_dU1[:] = np.nan;
     
     # find gradient values of the specifed (U1,I1) positions:
     logger.info('...find gradient values of the specifed (U1,I1) positions...')
+    # interpolate the gradient data calculated above to the specified (U1/I1) point(s)
 
     # plot interpolated data (contours):
     ### fig = plt.figure()
@@ -236,5 +253,17 @@ def proc_curves(cdata, U1, I1, R2_val=None, BJT_VBE=None):
     ### plt.ioff()
     ### plt.show()
     
-    return dI1_dX2, dU1_dX2, dI1_dU1
+    
+    
+    # determine X2 (either U2 or I2) that corresponds to the specified (U1/I1) point(s):
+    X2 = None
+    logger.info('...find X2 values of the specifed (U1,I1) positions...')
+    # interpolate X2 = f(U1,I1) in the same way above (smooth spline interpolation) to calculate the X2 value(s) at the (U1/I1) point(s)
+    # interpolate II1 = f(u1,x2) using smooth cublic splines:
+    UU1, II1 = np.meshgrid(u1,i1)
+    X2 = griddata((cU1, cI1), cX2, (U1, I1), method='cubic')  # cubic spline interpolation
+
+    
+    
+    return X2, dI1_dX2, dI1_dU1
 
