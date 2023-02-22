@@ -85,14 +85,14 @@ def cprocess():
         use_preheat = True
     else:
         use_preheat = False
-        try:
-    	    U1 = args.U1
-        except Exception as e:
-    	    error_and_exit(logger, 'U1 value missing or invalid', e)
-        try:
-    	    I1 = args.I1
-        except Exception as e:
-    	    error_and_exit(logger, 'I1 value missing or invalid', e)
+        U1 = args.U1
+        if U1 is None:
+            error_and_exit(logger, 'U1 value missing or invalid')
+        I1 = args.I1
+        if I1 is None:
+   	    	error_and_exit(logger, 'I1 value missing or invalid')
+
+   	
    	
     # BJT Vbe-on value:
     BJT_VBE = None # default
