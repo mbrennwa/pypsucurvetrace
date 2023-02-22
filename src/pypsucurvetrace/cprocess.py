@@ -15,17 +15,11 @@
 
 import argparse
 from pathlib import Path
+import numpy as np
+from scipy.interpolate import griddata
 
 from pypsucurvetrace.read_datafile import read_datafile
 from pypsucurvetrace.curvetrace_tools import say_hello, get_logger, convert_to_bjt, error_and_exit
-
-
-
-import numpy as np
-from scipy.interpolate import griddata, RegularGridInterpolator
-import matplotlib.pyplot as plt
-
-
 
 
 # set up logger:
@@ -116,7 +110,7 @@ def cprocess():
 	            N = 1
 	            U1 = float(p.U0)
 	            I1 = float(p.I0)
-	            X2 = float(p.Uc)
+	            X2 = np.array([float(p.Uc)])
 	            
 	            if BJT_VBE is not None:
 	                X2 = convert_to_bjt(X2, BJT_VBE, R2_val)
@@ -141,7 +135,6 @@ def cprocess():
 	           "{:.{}g}".format( dI1_dX2[0], Nd ) + sep +
 	           "{:.{}g}".format( dI1_dU1[0], Nd ) + sep +
 	           T )
-	    
 	    
 	    
 def proc_curves(cdata, U1, I1, R2_val=None, BJT_VBE=None):
@@ -181,28 +174,24 @@ def proc_curves(cdata, U1, I1, R2_val=None, BJT_VBE=None):
         if BJT_VBE is not None:
             cX2 = convert_to_bjt(cX2, BJT_VBE, R2_val)
             
-    
     # grid points for interpolation:
-    NG = 50
-    N_u1 = (len(np.unique(cU1))-1)*NG + 1;
-    N_x2 = (len(np.unique(cX2))-1)*NG + 1;
-    N_i1 = (len(np.unique(cI1))-1)*NG + 1;
-    
-    # data grids:
-    u1 = np.linspace(cU1.min(), cU1.max(), N_u1)  # interpolation coordinates for U1
-    x2 = np.linspace(cX2.min(), cX2.max(), N_x2)  # interpolation coordinates for X2
-    i1 = np.linspace(cI1.min(), cI1.max(), N_i1)  # interpolation coordinates for I1
-    
-    delta_u1 = (u1[-1]-u1[0])/N_u1
+    scale = 100
+    u = np.unique(cU1); delta_u1 = (u.max()-u.min())/(len(u)-1)/scale
+    u = np.unique(cI1); delta_i1 = (u.max()-u.min())/(len(u)-1)/scale
+    u = np.unique(cX2); delta_x2 = (u.max()-u.min())/(len(u)-1)/scale
     if delta_u1 == 0:
         error_and_exit(logger, 'U1 range must be greater than zero!')
-    delta_x2 = (x2[-1]-x2[0])/N_x2
-    if delta_x2 == 0:
-        error_and_exit(logger, 'U2 range must be greater than zero!')
-    delta_i1 = (i1[-1]-i1[0])/N_i1
     if delta_i1 == 0:
         error_and_exit(logger, 'I1 range must be greater than zero!')
+    if delta_x2 == 0:
+        error_and_exit(logger, 'U2 range must be greater than zero!')
     
+    # interpolation coordinates for U1, I1 and X2 (only use the range that is relevant for analysis around the (U1/I1) point)
+    NG = 3
+    u1 = np.arange(U1-NG*delta_u1, U1+NG*delta_u1+delta_u1/2, delta_u1)
+    i1 = np.arange(I1-NG*delta_i1, I1+NG*delta_i1+delta_i1/2, delta_i1)
+    x2 = np.arange(cX2.min(), cX2.max()+delta_x2/2, delta_x2)
+
     # determine smooth function II1 = f(u1,x2) using cublic-spline interpolation:
     UU1, XX2 = np.meshgrid(u1,x2)
     II1 = griddata((cU1, cX2), cI1, (UU1, XX2), method='cubic')  # cubic spline interpolation
@@ -233,8 +222,5 @@ def proc_curves(cdata, U1, I1, R2_val=None, BJT_VBE=None):
     UU1, II1 = np.meshgrid(u1,i1)
     for ii in range(N):
         X2[ii] = griddata((cU1, cI1), cX2, (U1[ii], I1[ii]), method='cubic') # cubic spline interpolation
-
-    
     
     return X2, dI1_dX2, dI1_dU1
-
