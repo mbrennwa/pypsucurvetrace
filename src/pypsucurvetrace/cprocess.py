@@ -237,12 +237,20 @@ def proc_curves(cdata, U1, I1, R2_val=None, BJT_VBE=None):
     # dI1_dX2 <--> g[0] is the gradient in horizontal direction
     # dI1_dU1 <--> g[1] is the gradient in vertical direction
     
-    # init arrays for gradient values:
+    # init arrays for X2 and gradient values:
+    X2      = np.empty(N); X2[:] = np.nan;
     dI1_dX2 = np.empty(N); dI1_dX2[:] = np.nan;
     dI1_dU1 = np.empty(N); dI1_dU1[:] = np.nan;
     
     # find gradient values of the specifed (U1,I1) positions:
-    logger.info('...find gradient values of the specifed (U1,I1) positions...')
+    
+    print(UU1.shape)
+    print(XX2.shape)
+    print(g[0].shape)
+    
+    
+    
+    logger.info('...find gradient values of the specifed (U1,I1) positions -- how do I do this????...')
     # interpolate the gradient data calculated above to the specified (U1/I1) point(s)
 
     # plot interpolated data (contours):
@@ -256,7 +264,6 @@ def proc_curves(cdata, U1, I1, R2_val=None, BJT_VBE=None):
     
     
     # determine X2 (either U2 or I2) that corresponds to the specified (U1/I1) point(s):
-    X2 = None
     logger.info('...find X2 values of the specifed (U1,I1) positions...')
     # interpolate X2 = f(U1,I1) in the same way above (smooth spline interpolation) to calculate the X2 value(s) at the (U1/I1) point(s)
     # interpolate II1 = f(u1,x2) using smooth cublic splines:
