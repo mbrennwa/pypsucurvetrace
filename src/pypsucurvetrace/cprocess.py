@@ -22,7 +22,7 @@ from pypsucurvetrace.curvetrace_tools import say_hello, get_logger, convert_to_b
 
 
 import numpy as np
-from scipy.interpolate import griddata
+from scipy.interpolate import griddata, RegularGridInterpolator
 import matplotlib.pyplot as plt
 
 
@@ -57,19 +57,6 @@ def cprocess():
     parser.add_argument('--bjtvbe', help='BJT VBE-on voltage for conversion of PSU U2 voltage to base current using R2CONTROL from the data file: Ibase = (U2-BJTVBE)/R2CONTROL')
 
 
-
-
-    logger.warning('cprocess / curveprocess is under construction!')
-    logger.warning('cprocess / curveprocess is under construction!')
-    logger.warning('cprocess / curveprocess is under construction!')
-    logger.warning('cprocess / curveprocess is under construction!')
-    logger.warning('cprocess / curveprocess is under construction!')
-    logger.warning('cprocess / curveprocess is under construction!')
-
-
-
-
-
     # Say Hello:
     say_hello('curveprocess', 'Extract and calculate parameters from pypsucurvetrace data')
 
@@ -91,16 +78,11 @@ def cprocess():
         I1 = args.I1
         if I1 is None:
    	    	error_and_exit(logger, 'I1 value missing or invalid')
-
-   	
    	
     # BJT Vbe-on value:
     BJT_VBE = None # default
     if args.bjtvbe:
 	    BJT_VBE = float(args.bjtvbe)
-
-
-
 
     # prepare output, header:
     sep = ', '
@@ -118,41 +100,47 @@ def cprocess():
     # process all datafiles:
     for i in range(len(datafiles)):
     
-        # init
-	    X2 = None # U2 or I2 (depending if DUT is voltage controlled or current controlled)
-	    T  = None
-        
         # read data file:
 	    d, l, p, R2_val = read_datafile(datafiles[i])
 	    
-	    if use_preheat:
+	    T = None
+	    try:
+	        T  = float(p.T)
+	    except:
+	        pass
+	    
+	    if not use_preheat:
+	        X2 = None # X2 = U2 or I2 (depending if DUT is voltage controlled or current controlled)
+	    else:
 	        try:
+	            N = 1
 	            U1 = float(p.U0)
 	            I1 = float(p.I0)
 	            X2 = float(p.Uc)
-	            T  = float(p.T)
+	            
 	            if BJT_VBE is not None:
 	                X2 = convert_to_bjt(X2, BJT_VBE, R2_val)
 	                
 	        except Exception as e:
 	            error_and_exit(logger, 'Could not determine U1, I1 and U2 from preheat data', e)
-	    
-	    else:
-	        logger.info('...determine T from data...')
-	        T  = None
-
-
 
 	    XX2, dI1_dX2, dI1_dU1 = proc_curves(d, U1, I1, R2_val, BJT_VBE)
 	    if X2 is None:
 	        X2 = XX2
-	        
-	    
-	    
-	    
 	    
 	    # print parameters:
-	    print( Path(d.datafile).stem + sep + l + sep + str(U1) + sep + str(I1) + sep + str(X2) + sep + str(dI1_dX2) + sep + str(dI1_dU1) + sep + str(T))
+	    Nd = 4
+	    if T is None:
+	        T = "NA"
+	    else:
+	        T = "{:.{}g}".format( T, Nd )
+	    print( Path(d.datafile).stem + sep + l + sep +
+	           "{:.{}g}".format( U1, Nd ) + sep +
+	           "{:.{}g}".format( I1, Nd ) + sep +
+	           "{:.{}g}".format( X2[0], Nd ) + sep +
+	           "{:.{}g}".format( dI1_dX2[0], Nd ) + sep +
+	           "{:.{}g}".format( dI1_dU1[0], Nd ) + sep +
+	           T )
 	    
 	    
 	    
@@ -183,9 +171,6 @@ def proc_curves(cdata, U1, I1, R2_val=None, BJT_VBE=None):
     N = len(U1)
     if len(I1) != N:
         error_and_exit(logger, 'U1 and I1 must be same length')
-    
-
-    logger.warning('toying around with grid data and interpolation, CALCULATION OR DERIVATIVES NOT YET IMPLEMENTED...')
 
     # get curve data:
     cU1 = cdata.get_U1_meas(exclude_CC = True)
@@ -196,19 +181,9 @@ def proc_curves(cdata, U1, I1, R2_val=None, BJT_VBE=None):
         if BJT_VBE is not None:
             cX2 = convert_to_bjt(cX2, BJT_VBE, R2_val)
             
-            
-   
-
-    # plot raw data:
-    plt.ion()
-    fig = plt.figure()
-    ax = fig.add_subplot(111, projection='3d')
-    ax.plot_trisurf(cU1, cX2, cI1, color='white', edgecolors='grey', alpha=0.5)
-    ax.scatter(cU1, cX2, cI1, c='red')
-    plt.show()
     
     # grid points for interpolation:
-    NG = 10
+    NG = 50
     N_u1 = (len(np.unique(cU1))-1)*NG + 1;
     N_x2 = (len(np.unique(cX2))-1)*NG + 1;
     N_i1 = (len(np.unique(cI1))-1)*NG + 1;
@@ -228,50 +203,36 @@ def proc_curves(cdata, U1, I1, R2_val=None, BJT_VBE=None):
     if delta_i1 == 0:
         error_and_exit(logger, 'I1 range must be greater than zero!')
     
-    # interpolate II1 = f(u1,x2) using smooth cublic splines:
+    # determine smooth function II1 = f(u1,x2) using cublic-spline interpolation:
     UU1, XX2 = np.meshgrid(u1,x2)
     II1 = griddata((cU1, cX2), cI1, (UU1, XX2), method='cubic')  # cubic spline interpolation
     
-    # determine vector gradient of I1(U1,X2) surface (vector elements are gradients along the U1 and X2 axes)
+    # determine vector gradient of II1(u1,x2) surface (vector elements are gradients along the u1 and x2 axes)
     g = np.gradient(II1, delta_x2, delta_u1)
     # dI1_dX2 <--> g[0] is the gradient in horizontal direction
     # dI1_dU1 <--> g[1] is the gradient in vertical direction
     
-    # init arrays for X2 and gradient values:
-    X2      = np.empty(N); X2[:] = np.nan;
+    ### determine gradient values:
+    
+    # init arrays for and gradient values:
     dI1_dX2 = np.empty(N); dI1_dX2[:] = np.nan;
     dI1_dU1 = np.empty(N); dI1_dU1[:] = np.nan;
     
     # find gradient values of the specifed (U1,I1) positions:
-    
-    print(UU1.shape)
-    print(XX2.shape)
-    print(g[0].shape)
-    
-    
-    
-    logger.info('...find gradient values of the specifed (U1,I1) positions -- how do I do this????...')
-    
-    THIS DOES THE TRICK: https://stackoverflow.com/a/54023844
-    
-    # interpolate the gradient data calculated above to the specified (U1/I1) point(s)
+    for ii in range(N):
+        try:
+            l = np.nanargmin(abs(u1-U1)) # index to u1 value closest to U1
+            k = np.nanargmin(abs(II1[:,l]-I1)) # index to II1[:,l] value closest to I1
+            dI1_dX2[ii] = g[0][k,l]
+            dI1_dU1[ii] = g[1][k,l]
+        except:
+            dI1_dX2[ii] = np.nan
 
-    # plot interpolated data (contours):
-    ### fig = plt.figure()
-    ### ax = fig.add_subplot(111, projection='3d')
-    ### ax.plot_surface(UU1, XX2, II1)
-    ## ax.plot_surface(UU1, XX2, g[1])
-    ### plt.ioff()
-    ### plt.show()
-    
-    
-    
-    # determine X2 (either U2 or I2) that corresponds to the specified (U1/I1) point(s):
-    logger.info('...find X2 values of the specifed (U1,I1) positions...')
-    # interpolate X2 = f(U1,I1) in the same way above (smooth spline interpolation) to calculate the X2 value(s) at the (U1/I1) point(s)
-    # interpolate II1 = f(u1,x2) using smooth cublic splines:
+    ### determine X2 values:
+    X2 = np.empty(N); X2[:] = np.nan;
     UU1, II1 = np.meshgrid(u1,i1)
-    X2 = griddata((cU1, cI1), cX2, (U1, I1), method='cubic')  # cubic spline interpolation
+    for ii in range(N):
+        X2[ii] = griddata((cU1, cI1), cX2, (U1[ii], I1[ii]), method='cubic') # cubic spline interpolation
 
     
     
