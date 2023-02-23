@@ -164,11 +164,11 @@ def proc_curves(cdata, U1, I1, R2_val=None, BJT_VBE=None):
     u = np.unique(cU1); delta_u1 = (u.max()-u.min())/(len(u)-1)/scale
     u = np.unique(cI1); delta_i1 = (u.max()-u.min())/(len(u)-1)/scale
     u = np.unique(cX2); delta_x2 = (u.max()-u.min())/(len(u)-1)/scale
-    if delta_u1 == 0:
+    if delta_u1 == 0 or np.isnan(delta_u1):
         error_and_exit(logger, 'U1 range must be greater than zero!')
-    if delta_i1 == 0:
+    if delta_i1 == 0 or np.isnan(delta_i1):
         error_and_exit(logger, 'I1 range must be greater than zero!')
-    if delta_x2 == 0:
+    if delta_x2 == 0 or np.isnan(delta_x2):
         error_and_exit(logger, 'U2 range must be greater than zero!')
     
     # interpolation coordinates for U1, I1 and X2 (only use the range that is relevant for analysis around the (U1/I1) point)
