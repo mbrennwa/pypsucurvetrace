@@ -110,7 +110,7 @@ def cprocess():
 	            N = 1
 	            U1 = float(p.U0)
 	            I1 = float(p.I0)
-	            X2 = np.array([float(p.Uc)])
+	            X2 = float(p.Uc)
 	            
 	            if BJT_VBE is not None:
 	                X2 = convert_to_bjt(X2, BJT_VBE, R2_val)
@@ -131,9 +131,9 @@ def cprocess():
 	    print( Path(d.datafile).stem + sep + l + sep +
 	           "{:.{}g}".format( U1, Nd ) + sep +
 	           "{:.{}g}".format( I1, Nd ) + sep +
-	           "{:.{}g}".format( X2[0], Nd ) + sep +
-	           "{:.{}g}".format( dI1_dX2[0], Nd ) + sep +
-	           "{:.{}g}".format( dI1_dU1[0], Nd ) + sep +
+	           "{:.{}g}".format( X2, Nd ) + sep +
+	           "{:.{}g}".format( dI1_dX2, Nd ) + sep +
+	           "{:.{}g}".format( dI1_dU1, Nd ) + sep +
 	           T )
 	    
 	    
@@ -142,29 +142,14 @@ def proc_curves(cdata, U1, I1, R2_val=None, BJT_VBE=None):
     #
     # INPUT:
     # cdata: curve-data object (output from read_datafile)
-    # U1: array of U1 values where outputs should be calculated
-    # I1: array of I1 values where outputs should be calculated
+    # U1: U1 value where outputs should be calculated (float)
+    # I1: I1 value where outputs should be calculated (float)
     #
     # OUTPUT:
-    # X2: U2 or I2 corresponding to specified (U1/I1) point(s)
-    # dI1_dX2: dI1/dU2 or dI1/dI2 derivative(s) at point(s) (U1/I1), aka. gm (transconductance) of hfe (current gain)
-    # dI1_dU1: dI1/dU1 derivative(s) at point(s) (U1/I1), aka. go (output impedance)
+    # X2: U2 or I2 corresponding to specified (U1/I1) poins
+    # dI1_dX2: dI1/dU2 or dI1/dI2 derivative(s) at point (U1/I1), aka. gm (transconductance) of hfe (current gain)
+    # dI1_dU1: dI1/dU1 derivative(s) at point (U1/I1), aka. go (output impedance)
     
-    # make sure U1 and I1 are lists, not scalars:
-    try:
-        u = len(U1)
-    except:
-        U1 = [U1,]
-    try:
-        u = len(I1)
-    except:
-        I1 = [I1,]
-    
-    # number of (U1/I1) points where the DUT parameters need to be calculated
-    N = len(U1)
-    if len(I1) != N:
-        error_and_exit(logger, 'U1 and I1 must be same length')
-
     # get curve data:
     cU1 = cdata.get_U1_meas(exclude_CC = True)
     cX2 = cdata.get_U2_set(exclude_CC = True)
@@ -187,12 +172,12 @@ def proc_curves(cdata, U1, I1, R2_val=None, BJT_VBE=None):
         error_and_exit(logger, 'U2 range must be greater than zero!')
     
     # interpolation coordinates for U1, I1 and X2 (only use the range that is relevant for analysis around the (U1/I1) point)
-    NG = 3
+    NG = 3 # number of grid points near U1 and I1 (don't need much)
     u1 = np.arange(U1-NG*delta_u1, U1+NG*delta_u1+delta_u1/2, delta_u1)
     i1 = np.arange(I1-NG*delta_i1, I1+NG*delta_i1+delta_i1/2, delta_i1)
     x2 = np.arange(cX2.min(), cX2.max()+delta_x2/2, delta_x2)
 
-    # determine smooth function II1 = f(u1,x2) using cublic-spline interpolation:
+    # determine smooth function II1 = f(u1,x2):
     UU1, XX2 = np.meshgrid(u1,x2)
     II1 = griddata((cU1, cX2), cI1, (UU1, XX2), method='cubic')  # cubic spline interpolation
     
@@ -203,24 +188,17 @@ def proc_curves(cdata, U1, I1, R2_val=None, BJT_VBE=None):
     
     ### determine gradient values:
     
-    # init arrays for and gradient values:
-    dI1_dX2 = np.empty(N); dI1_dX2[:] = np.nan;
-    dI1_dU1 = np.empty(N); dI1_dU1[:] = np.nan;
-    
-    # find gradient values of the specifed (U1,I1) positions:
-    for ii in range(N):
-        try:
-            l = np.nanargmin(abs(u1-U1)) # index to u1 value closest to U1
-            k = np.nanargmin(abs(II1[:,l]-I1)) # index to II1[:,l] value closest to I1
-            dI1_dX2[ii] = g[0][k,l]
-            dI1_dU1[ii] = g[1][k,l]
-        except:
-            dI1_dX2[ii] = np.nan
+    # find gradient values of the specifed (U1,I1) position:
+    try:
+        l = np.nanargmin(abs(u1-U1)) # index to u1 value closest to U1
+        k = np.nanargmin(abs(II1[:,l]-I1)) # index to II1[:,l] value closest to I1
+        dI1_dX2 = g[0][k,l]
+        dI1_dU1 = g[1][k,l]
+    except:
+        dI1_dX2 = np.nan
+        dI1_dU1 = np.nan
 
-    ### determine X2 values:
-    X2 = np.empty(N); X2[:] = np.nan;
-    UU1, II1 = np.meshgrid(u1,i1)
-    for ii in range(N):
-        X2[ii] = griddata((cU1, cI1), cX2, (U1[ii], I1[ii]), method='cubic') # cubic spline interpolation
+    ### determine X2 value:
+    X2 = griddata((cU1, cI1), cX2, (U1, I1), method='linear') # linear interpolation (cublic spline tends to screw up somehow...)
     
     return X2, dI1_dX2, dI1_dU1
