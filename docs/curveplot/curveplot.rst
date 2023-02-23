@@ -16,5 +16,5 @@ The ``curveplot`` documentation is not yet available in this document, but can b
 
 Examples
 --------
-UNDER CONSTRUCTION...
 
+UNDER CONSTRUCTION...
