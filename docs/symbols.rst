@@ -6,3 +6,8 @@
 .. |Ohm| unicode:: U+02126
 .. |Vbe| replace:: :math:`V_{\rm BE}`
 .. |Ib| replace:: :math:`I_{\rm B}`
+.. |Vg| replace:: :math:`V_{\rm g}`
+.. |Ib| replace:: :math:`I_{\rm b}`
+.. |hfe| replace:: :math:`h_{\rm fe}`
+.. |gm| replace:: :math:`g_{\rm m}`
+.. |go| replace:: :math:`g_{\rm o}`
