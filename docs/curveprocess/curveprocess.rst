@@ -11,7 +11,7 @@ The ``curveprocess`` program
 
 The ``curveprocess`` program extracts and calculates DUT parameters from the curve data in ``pypsucurvetrace`` files:
 
-   * Gate/grid voltage (|Vg|) or base current (|Ib|) needed for a given operating point (|U1|, |I1|)
+   * Gate/grid voltage (|Vg|) or base current (|Ib|) corresponding to a given operating point (|U1|, |I1|)
    * Transconductance (|gm|) or current gain (|hfe|) at a given operating point (|U1|, |I1|)
    * Output conductance (|gm|) at a given operating point (|U1|, |I1|)
 
