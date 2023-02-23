@@ -1,5 +1,7 @@
 .. _curveprocess:
 
+.. include:: ../symbols.rst
+
 The ``curveprocess`` program
 ============================
 
