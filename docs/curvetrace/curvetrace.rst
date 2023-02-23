@@ -98,6 +98,13 @@ There are further configuration options to improve the the quality of the the PS
 * ``V_SET_CALPOLY``, ``I_SET_CALPOLY``, ``V_READ_CALPOLY`` and ``I_READ_CALPOLY``: coefficients to specify external calibration data to set and read the voltage and current values at the PSU.
 
 
+DUT test configuration
+----------------------
+While it is possible to run ``pypsucurvetrace`` by manually entering all the test parameters, it is usually more convenient to use configuration files that contain all the DUT specific test parameters.
+
+DESCRIBE THE FILES, UNDER CONSTRUCTION...
+
+
 Heater block configuration
 --------------------------
 The configuration of the heater block is only required if a heater block is used. The heater block configuration is also specified in the ``pypsucurvetrace_config.txt`` file. See :ref:`heaterblock` for details.
