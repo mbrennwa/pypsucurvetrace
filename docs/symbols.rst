@@ -4,10 +4,9 @@
 .. |I2| replace:: :math:`I_2`
 .. |R2| replace:: :math:`R_2`
 .. |Ohm| unicode:: U+02126
-.. |Vbe| replace:: :math:`V_{\rm BE}`
-.. |Ib| replace:: :math:`I_{\rm B}`
-.. |Vg| replace:: :math:`V_{\rm g}`
+.. |Vbe| replace:: :math:`V_{\rm be}`
 .. |Ib| replace:: :math:`I_{\rm b}`
+.. |Vg| replace:: :math:`V_{\rm g}`
 .. |hfe| replace:: :math:`h_{\rm fe}`
 .. |gm| replace:: :math:`g_{\rm m}`
 .. |go| replace:: :math:`g_{\rm o}`
