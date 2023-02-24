@@ -1,5 +1,5 @@
-``pypsucurvetrace`` documentation
-=================================
+``pypsucurvetrace`` curve tracer
+================================
 
 ``pypsucurvetrace`` is a software toolbox for «curve tracing» of electronic devices like transistors or vacuum tubes.
 
