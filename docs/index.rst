@@ -9,7 +9,7 @@ The toolbox provides the following command-line programs:
 * ``curveplot`` produces high-quality plots of the curve data.
 * ``curveprocess`` determines characteristic DUT parameters from the curve data (operating points, gain, output conductance).
 
-The ``pypsucurvetrace`` tools are written in Python 3 and will therefore work on all modern computers.
+The ``pypsucurvetrace`` tools are written in Python 3 and will therefore work on all computers running a modern operating system.
 
 Contents
 --------
