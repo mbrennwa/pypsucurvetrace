@@ -1,10 +1,15 @@
 ``pypsucurvetrace`` documentation
 =================================
 
-``pypsucurvetrace`` is a software toolbox for «curve tracing» of electronic devices.
+``pypsucurvetrace`` is a software toolbox for «curve tracing» of electronic devices like transistors or vacuum tubes.
 
-``pypsucurvetrace`` uses programmable power supplies to apply different voltages to the device under test and to determine the corresponding currents flowing through the device. 
+The toolbox provides the following command-line programs:
 
+* ``curvetrace`` uses programmable power supplies (PSUs) to determine the «curve data». It controls the PSUs to apply different voltages to the device under test and to determine the corresponding currents flowing through the device under test (DUT).
+* ``curveplot`` produces high-quality plots of the curve data.
+* ``curveprocess`` determines characteristic parameters of the DUT from the curve data.
+
+The ``pypsucurvetrace`` tools are written in Python 3 and will therefore work on all modern computers.
 
 Contents
 --------
@@ -12,7 +17,6 @@ Contents
 .. toctree::
    :maxdepth: 1
 
-   overview
    installation/installation
    curvetrace/curvetrace
    curveplot/curveplot
