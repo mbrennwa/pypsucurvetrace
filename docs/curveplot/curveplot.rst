@@ -13,8 +13,3 @@ The ``curveplot`` documentation is not yet available in this document, but can b
 .. code-block:: console
 
    curveplot --help
-
-Examples
---------
-
-UNDER CONSTRUCTION...

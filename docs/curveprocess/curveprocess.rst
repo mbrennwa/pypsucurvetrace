@@ -20,8 +20,3 @@ The ``curveprocess`` documentation can be accessed from the ``curveprocess`` pro
 .. code-block:: console
 
    curveprocess --help
-
-Examples
---------
-UNDER CONSTRUCTION...
-
