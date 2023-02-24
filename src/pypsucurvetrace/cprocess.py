@@ -19,7 +19,7 @@ import numpy as np
 from scipy.interpolate import griddata
 
 from pypsucurvetrace.read_datafile import read_datafile
-from pypsucurvetrace.curvetrace_tools import say_hello, get_logger, convert_to_bjt, error_and_exit
+from pypsucurvetrace.curvetrace_tools import say_hello, get_logger, convert_to_bjt, error_and_exit, argpair
 
 
 # set up logger:
@@ -38,11 +38,8 @@ def cprocess():
     parser = argparse.ArgumentParser(description='curveprocess is a Python program to determine DUT parameters from from pypsucurvetrace data files.')
     parser.add_argument('datafiles', nargs='+', help='Names (and paths) of pypsucurvetrace data files, can use wildcards.')
 
-    # U1 value  list for parameter calculation:
-    parser.add_argument('--U1', nargs='+', type=float, help='U1 value(s) for parameter calculation (can be list of multiple values, e.g. --U1 1 3 10')
-
-    # I1 value for parameter calculation:
-    parser.add_argument('--I1', nargs='+', type=float, help='I1 value(s) for parameter calculation (can be list of multiple values, e.g. --I1 0.1 0.2 0.3')
+    # U1/I1 value(s) for parameter calculation:
+    parser.add_argument('--U1I1', nargs='+', type=argpair, help='U1/I1 point(s) where the DUT parameters are determined. A U1/I1 value pair is specified as [U1,I1] (for example: --U1I1 [20,0.5]). Multiple pairs can be specified as a list of pairs (for example: --U1I1 [15,0.5] [15,1] [20,0.7]).')
 
     # use preheat values as target point for the parameter extraction:
     parser.add_argument('--preheat', action='store_true', help='Determine the parameters at the preheat values of U1 and I1; use the measured U2 preheat value instead of interpolating U2 from the curve data.')
@@ -60,29 +57,18 @@ def cprocess():
     datafiles = args.datafiles
 
     # U1, I1:
-    U1 = []
-    I1 = []
+    U1I1 = []
     if args.preheat:
         use_preheat = True
-        N = 1
     else:
         use_preheat = False
         try:
-            U1 = args.U1
+            U1I1 = args.U1I1
+            if U1I1 is None:
+                raise RuntimeError('U1I1 argument missing.')
         except Exception as e:
-            error_and_exit(logger, 'U1 value(s) missing or invalid', e)
-        try:
-            I1 = args.I1
-        except Exception as e:
-   	    	error_and_exit(logger, 'I1 value(s) missing or invalid', e)
-        if len(U1) < 1:
-   	        error_and_exit(logger, 'Missing U1 value(s)')
-        if len(I1) < 1:
-   	        error_and_exit(logger, 'Missing I1 value(s)')
-        N = len(U1)
-        if len(I1) != N:
-            error_and_exit(logger, 'U1 and I1 lists are not the same length')
-   	
+            error_and_exit(logger, 'U1/I1 value(s) missing or invalid', e)
+    
     # BJT Vbe-on value:
     BJT_VBE = None # default
     if args.bjtvbe:
@@ -115,17 +101,16 @@ def cprocess():
 	    
 	    if use_preheat:
 	        try:
-	            U1 = [ float(p.U0) ]
-	            I1 = [ float(p.I0) ]
+	            U1I1 = [ [ float(p.U0), float(p.I0) ] ]
 	            X2 = float(p.Uc)
 	            if BJT_VBE is not None:
 	                X2 = convert_to_bjt(X2, BJT_VBE, R2_val)
 	        except Exception as e:
 	            error_and_exit(logger, 'Could not determine U1, I1 and U2 from preheat data', e)
 
-	    for j in range(N):
-            # determine DUT parameters at U1[j] and I1[j]
-	        XX2, dI1_dX2, dI1_dU1 = proc_curves(d, U1[j], I1[j], R2_val, BJT_VBE)
+	    for j in range(len(U1I1)):
+            # determine DUT parameters at U1/I1 point(s):
+	        XX2, dI1_dX2, dI1_dU1 = proc_curves(d, U1I1[j][0], U1I1[j][1], R2_val, BJT_VBE)
 	        if not use_preheat:
 	            X2 = XX2
 	        
@@ -136,8 +121,8 @@ def cprocess():
 	        else:
 	            TT = "{:.{}g}".format( T, Nd )
 	        print( Path(d.datafile).stem + sep + l + sep +
-	               "{:.{}g}".format( U1[j], Nd ) + sep +
-	               "{:.{}g}".format( I1[j], Nd ) + sep +
+	               "{:.{}g}".format( U1I1[j][0], Nd ) + sep +
+	               "{:.{}g}".format( U1I1[j][1], Nd ) + sep +
 	               "{:.{}g}".format( X2, Nd ) + sep +
 	               "{:.{}g}".format( dI1_dX2, Nd ) + sep +
 	               "{:.{}g}".format( dI1_dU1, Nd ) + sep +

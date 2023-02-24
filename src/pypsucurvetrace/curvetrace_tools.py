@@ -29,8 +29,12 @@ def say_hello(progname, purpose):
 def error_and_exit(logger, message, exception = None):
 	print('\n')
 	if exception is not None:
-	    message = message + '\n' + repr(exception)	
-	logger.error(message)
+	    message = message + '\n' + repr(exception)
+	try:
+	    logger.error(message)
+	except:
+	    print(message)
+	    pass
 	sys.exit()
 	
 
@@ -512,3 +516,15 @@ def convert_to_bjt(Uc, BJT_Vbe, R2):
     
     Ib = (Uc-BJT_Vbe) / R2
     return Ib
+
+
+def argpair(arg):
+    # argparse: deal with value pairs as input arguments in the form [x,y]
+    try:
+        p = eval(arg)
+    except Exception as e:
+        error_and_exit(None, 'Could not parse value-pair agrument', e)
+    if len(p) != 2:
+        raise ValueError('A value pair [x,y] must contain exactly 2 values, not ' + str(len(p)) + '.')
+    return p
+
