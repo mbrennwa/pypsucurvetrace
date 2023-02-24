@@ -9,3 +9,7 @@ def curveplot():
 def curveprocess():
     from pypsucurvetrace.cprocess  import cprocess
     cprocess()
+
+def curvematch():
+    from pypsucurvetrace.cmatch  import cmatch
+    cmatch()

@@ -39,10 +39,10 @@ def cmatch():
     parser.add_argument('datafiles', nargs='+', help='Names (and paths) of pypsucurvetrace data files, can use wildcards.')
 
     # U1 range:
-    parser.add_argument('--U1range', nargs='+', type=argpair, help='U1 range to consider (value pair with min. and max value, e.g. --U1range 5,20')
+    parser.add_argument('--U1range', nargs=1, type=argpair, help='U1 range to consider (value pair with min. and max value, e.g. --U1range [5,20]')
 
     # I1 range:
-    parser.add_argument('--I1range', nargs='+', type=argpair, help='I1 range to consider (value pair with min. and max value, e.g. --I1range 0.1,0.5')
+    parser.add_argument('--I1range', nargs=1, type=argpair, help='I1 range to consider (value pair with min. and max value, e.g. --I1range [5,20]')
 
     # BJT option:
     parser.add_argument('--bjtvbe', help='BJT VBE-on voltage for conversion of PSU U2 voltage to base current using R2CONTROL from the data file: Ibase = (U2-BJTVBE)/R2CONTROL')

@@ -28,6 +28,7 @@ classifiers = [
 curvetrace   = "pypsucurvetrace:curvetrace"
 curveplot    = "pypsucurvetrace:curveplot"
 curveprocess = "pypsucurvetrace:cprocess"
+curvematch   = "pypsucurvetrace:curvematch"
 
 [project.urls]
 "Homepage" = "https://github.com/mbrennwa/pypsucurvetrace"
