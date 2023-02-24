@@ -38,11 +38,11 @@ def cprocess():
     parser = argparse.ArgumentParser(description='curveprocess is a Python program to determine DUT parameters from from pypsucurvetrace data files.')
     parser.add_argument('datafiles', nargs='+', help='Names (and paths) of pypsucurvetrace data files, can use wildcards.')
 
-    # U1 value for parameter calculation:
-    parser.add_argument('--U1', type=float, help='U1 value for parameter calculation.')
+    # U1 value  list for parameter calculation:
+    parser.add_argument('--U1', nargs='+', type=float, help='U1 value(s) for parameter calculation (can be list of multiple values, e.g. --U1 1 3 10')
 
     # I1 value for parameter calculation:
-    parser.add_argument('--I1', type=float, help='I1 value for parameter calculation.')
+    parser.add_argument('--I1', nargs='+', type=float, help='I1 value(s) for parameter calculation (can be list of multiple values, e.g. --I1 0.1 0.2 0.3')
 
     # use preheat values as target point for the parameter extraction:
     parser.add_argument('--preheat', action='store_true', help='Determine the parameters at the preheat values of U1 and I1; use the measured U2 preheat value instead of interpolating U2 from the curve data.')
@@ -60,18 +60,28 @@ def cprocess():
     datafiles = args.datafiles
 
     # U1, I1:
-    U1 = None
-    I1 = None
+    U1 = []
+    I1 = []
     if args.preheat:
         use_preheat = True
+        N = 1
     else:
         use_preheat = False
-        U1 = args.U1
-        if U1 is None:
-            error_and_exit(logger, 'U1 value missing or invalid')
-        I1 = args.I1
-        if I1 is None:
-   	    	error_and_exit(logger, 'I1 value missing or invalid')
+        try:
+            U1 = args.U1
+        except Exception as e:
+            error_and_exit(logger, 'U1 value(s) missing or invalid', e)
+        try:
+            I1 = args.I1
+        except Exception as e:
+   	    	error_and_exit(logger, 'I1 value(s) missing or invalid', e)
+        if len(U1) < 1:
+   	        error_and_exit(logger, 'Missing U1 value(s)')
+        if len(I1) < 1:
+   	        error_and_exit(logger, 'Missing I1 value(s)')
+        N = len(U1)
+        if len(I1) != N:
+            error_and_exit(logger, 'U1 and I1 lists are not the same length')
    	
     # BJT Vbe-on value:
     BJT_VBE = None # default
@@ -80,8 +90,8 @@ def cprocess():
 
     # prepare output, header:
     sep = ', '
-    label_U1 = 'U0 (V)' # operating point voltage
-    label_I1 = 'I0 (A)' # operating point current
+    label_U1 = 'U1 (V)' # operating point voltage
+    label_I1 = 'I1 (A)' # operating point current
     label_X2 = 'Ug (V)' # gate / grid current
     label_dI1_dX2 = 'gm (A/V)' # gain
     label_dI1_dU1 = 'go (A/V)' # output impedance
@@ -103,38 +113,35 @@ def cprocess():
 	    except:
 	        pass
 	    
-	    if not use_preheat:
-	        X2 = None # X2 = U2 or I2 (depending if DUT is voltage controlled or current controlled)
-	    else:
+	    if use_preheat:
 	        try:
-	            N = 1
-	            U1 = float(p.U0)
-	            I1 = float(p.I0)
+	            U1 = [ float(p.U0) ]
+	            I1 = [ float(p.I0) ]
 	            X2 = float(p.Uc)
-	            
 	            if BJT_VBE is not None:
 	                X2 = convert_to_bjt(X2, BJT_VBE, R2_val)
-	                
 	        except Exception as e:
 	            error_and_exit(logger, 'Could not determine U1, I1 and U2 from preheat data', e)
 
-	    XX2, dI1_dX2, dI1_dU1 = proc_curves(d, U1, I1, R2_val, BJT_VBE)
-	    if X2 is None:
-	        X2 = XX2
-	    
-	    # print parameters:
-	    Nd = 4
-	    if T is None:
-	        T = "NA"
-	    else:
-	        T = "{:.{}g}".format( T, Nd )
-	    print( Path(d.datafile).stem + sep + l + sep +
-	           "{:.{}g}".format( U1, Nd ) + sep +
-	           "{:.{}g}".format( I1, Nd ) + sep +
-	           "{:.{}g}".format( X2, Nd ) + sep +
-	           "{:.{}g}".format( dI1_dX2, Nd ) + sep +
-	           "{:.{}g}".format( dI1_dU1, Nd ) + sep +
-	           T )
+	    for j in range(N):
+            # determine DUT parameters at U1[j] and I1[j]
+	        XX2, dI1_dX2, dI1_dU1 = proc_curves(d, U1[j], I1[j], R2_val, BJT_VBE)
+	        if not use_preheat:
+	            X2 = XX2
+	        
+	        # print parameters:
+	        Nd = 4
+	        if T is None:
+	            TT = "NA"
+	        else:
+	            TT = "{:.{}g}".format( T, Nd )
+	        print( Path(d.datafile).stem + sep + l + sep +
+	               "{:.{}g}".format( U1[j], Nd ) + sep +
+	               "{:.{}g}".format( I1[j], Nd ) + sep +
+	               "{:.{}g}".format( X2, Nd ) + sep +
+	               "{:.{}g}".format( dI1_dX2, Nd ) + sep +
+	               "{:.{}g}".format( dI1_dU1, Nd ) + sep +
+	               TT )
 	    
 	    
 def proc_curves(cdata, U1, I1, R2_val=None, BJT_VBE=None):
