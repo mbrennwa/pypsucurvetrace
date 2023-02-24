@@ -23,6 +23,7 @@ Contents
    curveprocess/curveprocess
    PSUs/supported_PSUs
    heaterblock/heaterblock
+   examples/examples
    
 .. note::
 
