@@ -5,9 +5,9 @@
 
 The toolbox provides the following command-line programs:
 
-* ``curvetrace`` uses programmable power supplies (PSUs) to determine the «curve data». It controls the PSUs to apply different voltages to the device under test and to determine the corresponding currents flowing through the device under test (DUT).
+* ``curvetrace`` uses programmable power supplies (PSUs) to determine the «curve data». It controls the PSUs to apply different voltages to the device under test and to determine the corresponding currents flowing through the device under test (DUT). The ``curvetrace`` program can control the DUT temperature during curve tracing using an optional heater block.
 * ``curveplot`` produces high-quality plots of the curve data.
-* ``curveprocess`` determines characteristic parameters of the DUT from the curve data.
+* ``curveprocess`` determines characteristic DUT parameters from the curve data (operating points, gain, output conductance).
 
 The ``pypsucurvetrace`` tools are written in Python 3 and will therefore work on all modern computers.
 
