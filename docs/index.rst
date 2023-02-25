@@ -21,6 +21,7 @@ Contents
    curvetrace/curvetrace
    curveplot/curveplot
    curveprocess/curveprocess
+   curvematch/curvematch
    PSUs/supported_PSUs
    heaterblock/heaterblock
    examples/examples
