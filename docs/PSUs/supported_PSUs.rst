@@ -8,7 +8,7 @@ Supported power supplies
 
 Choosing suitable PSU models for your curve-tracing setup will mainly depend on the voltage and current ranges as well as the set and readback resolution required for your DUT tests:
 
-   * Testing power transistors requires a high-power PSU that can output several 100 W, while a data resolution of 10 mV and 1-10 mA may be more than sufficient.
+   * Testing power transistors requires a high-power PSU that can output 100 W or more, while a data resolution of 10 mV and 1-10 mA may be more than sufficient.
    * Testing small-signal transistors requires a high-resolution PSU that can set and read voltages and currents at small increments of about 10-100 μV and 10-100 μA, while the power will be 1 W or less.
    * Testing vacuum tubes also benefits from good low-current resolution, but typically requires high-voltage PSUs (or multiple PSUs connected in series).
 
