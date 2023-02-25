@@ -47,7 +47,6 @@ def cmatch():
     # BJT option:
     parser.add_argument('--bjtvbe', help='BJT VBE-on voltage for conversion of PSU U2 voltage to base current using R2CONTROL from the data file: Ibase = (U2-BJTVBE)/R2CONTROL')
 
-
     # Say Hello:
     say_hello('curveprocess', 'Extract and calculate parameters from pypsucurvetrace data')
 
@@ -68,7 +67,6 @@ def cmatch():
     BJT_VBE = None # default
     if args.bjtvbe:
 	    BJT_VBE = float(args.bjtvbe)
-
 
     # prepare output, header:
     sep = ', '
@@ -132,7 +130,6 @@ def cmatch():
                 try: dx2_cRMS = "{:.{}g}".format( dx2_cRMS, Nd )
                 except: dx2_cRMS = 'N/A'
                     
-                
                 print( Path(d1.datafile).stem + sep + l1 + sep +
 	                   Path(d2.datafile).stem + sep + l2 + sep +
 	                   U1_low + sep +
@@ -191,19 +188,20 @@ def curves_RMSdelta(cdata1, cdata2, U1range, I1range, R2_val1=None, R2_val2=None
     
     dx2_c = dx2_0 - np.mean(dx2_0) # ignoring constant offset
     
-    
-    dx2_0RMS = np.sqrt( sum(dx2_0**2) / len(dx2_0) )
-    dx2_cRMS = np.sqrt( sum(dx2_c**2) / len(dx2_c) )
+    try:
+        dx2_0RMS = np.sqrt( sum(dx2_0**2) / len(dx2_0) )
+    except:
+        dx2_0RMS = None
+    try:
+        dx2_cRMS = np.sqrt( sum(dx2_c**2) / len(dx2_c) )
+    except:
+        dx2_cRMS = None
     
     return dx2_0RMS, dx2_cRMS
     
 
 def X2_surface(U1, I1, X2, u1, i1):
     # determine the 2D surface representing the function x2 = f(u1,i1) at the grid points defined by (u1,i1)
-    
-
     uu1, ii1 = np.meshgrid(u1,i1)
-    
     x2 = griddata((U1, I1), X2, (uu1, ii1), method='linear')
-
     return x2
