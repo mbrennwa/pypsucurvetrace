@@ -201,6 +201,6 @@ def proc_curves(cdata, U1, I1, R2_val=None, BJT_VBE=None):
         dI1_dU1 = np.nan
 
     ### determine X2 value:
-    X2 = griddata((cU1, cI1), cX2, (U1, I1), method='linear') # linear interpolation (cublic spline tends to screw up somehow...)
+    X2 = griddata((cU1, cI1), cX2, (U1, I1), method='linear') # linear interpolation (cubic spline tends to screw up somehow...)
     
     return X2, dI1_dX2, dI1_dU1
