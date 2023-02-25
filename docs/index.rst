@@ -1,7 +1,9 @@
 ``pypsucurvetrace`` curve tracer
 ================================
 
-``pypsucurvetrace`` is a software toolbox for «curve tracing» of electronic devices like transistors or vacuum tubes. It uses standard off-the-shelf programmable power supplies (PSUs) to apply different voltages to the device under test (DUT) and to determine the corresponding currents flowing through the DUT. ``pypsucurvetrace`` provides the following command-line tools:
+``pypsucurvetrace`` is a software toolbox for «curve tracing» of electronic devices like transistors or vacuum tubes. It uses standard off-the-shelf programmable power supplies (PSUs) to apply different voltages to the device under test (DUT) and to determine the corresponding currents flowing through the DUT.
+
+``pypsucurvetrace`` provides the following command-line tools:
 
 * ``curvetrace`` controls the PSUs and records the «curve data» of the DUT and saves them to a data file. The ``curvetrace`` program can also control the DUT temperature during curve tracing using an optional heater block.
 * ``curveplot`` produces high-quality plots of the curve data.
