@@ -15,7 +15,8 @@ dependencies = [
     "minimalmodbus",
     "simple_pid",
     "pydigitemp",
-    "matplotlib"
+    "matplotlib",
+    "scipy"
 ]
 classifiers = [
     "Programming Language :: Python :: 3",
