@@ -8,6 +8,7 @@ import time
 import math
 import os.path
 import logging
+import numpy as np
 
 
 #############
@@ -519,11 +520,33 @@ def convert_to_bjt(Uc, BJT_Vbe, R2):
 
 
 def argpair(arg):
-    # argparse: deal with value pairs as input arguments in the form [x,y]
+    # argparse: deal with value pairs as input arguments in the form [x,y] or [x1:x2,y1:y2,N,lin/log]
     try:
+        # try if arg is formatted as [x,y]:
         p = eval(arg)
-    except Exception as e:
-        error_and_exit(None, 'Could not parse value-pair agrument', e)
+        p = [ [float(p[0]),], [float(p[1]),] ]
+    except:
+        # try if arg is formatted as [x1:x2,y1:y2,N]:
+        try:
+            arg = arg.replace('[', '').replace(']', '')
+            p = arg.split(',')
+            X = p[0].split(':')
+            Y = p[1].split(':')
+            N = int(p[2])
+            do_log = False
+            try:
+                if p[3].upper() == 'LOG':
+                    do_log = True
+            except:
+                pass
+            if do_log:
+                p = [ list(np.logspace(np.log10(float(X[0])), np.log10(float(X[1])), num=N, endpoint=True)),
+                      list(np.logspace(np.log10(float(Y[0])), np.log10(float(Y[1])), num=N, endpoint=True)) ]
+            else:
+                p = [ list(np.linspace(float(X[0]), float(X[1]), num=N, endpoint=True)),
+                      list(np.linspace(float(Y[0]), float(Y[1]), num=N, endpoint=True)) ]
+        except Exception as e:
+            error_and_exit(None, 'Could not parse value-pair agrument (format is not [x,y] or [x1:x2,y1:y2,N]).', e)
     if len(p) != 2:
         raise ValueError('A value pair [x,y] must contain exactly 2 values, not ' + str(len(p)) + '.')
     return p

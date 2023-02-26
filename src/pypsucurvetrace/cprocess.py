@@ -39,7 +39,7 @@ def cprocess():
     parser.add_argument('datafiles', nargs='+', help='Names (and paths) of pypsucurvetrace data files, can use wildcards.')
 
     # U1/I1 value(s) for parameter calculation:
-    parser.add_argument('--U1I1', nargs='+', type=argpair, help='U1/I1 point(s) where the DUT parameters are determined. A U1/I1 value pair is specified as [U1,I1] (for example: --U1I1 [20,0.5]). Multiple pairs can be specified as a list of pairs (for example: --U1I1 [15,0.5] [15,1] [20,0.7]).')
+    parser.add_argument('--U1I1', type=argpair, help='U1/I1 point(s) where the DUT parameters are determined. A single U1/I1 value pair is specified as [U1,I1] (for example: --U1I1 [20,0.5]). Multiple pairs can be specified as a list of pairs (for example: --U1I1 [15,0.5] [15,1] [20,0.7]), or as [U1_start:U1_end,I1_start:I1_end,N,scale] (for example: --U1I1 [0:30,0.1:1,10] for 10 points spaced linearly from U1=0...30V and I1=0.1...1A; or --U1I1 [0:30,0.1:1,10,log] for log spacing)')
 
     # use preheat values as target point for the parameter extraction:
     parser.add_argument('--preheat', action='store_true', help='Determine the parameters at the preheat values of U1 and I1; use the measured U2 preheat value instead of interpolating U2 from the curve data.')
@@ -101,16 +101,16 @@ def cprocess():
 	    
 	    if use_preheat:
 	        try:
-	            U1I1 = [ [ float(p.U0), float(p.I0) ] ]
+	            U1I1 = [ [float(p.U0),], [float(p.I0),] ]
 	            X2 = float(p.Uc)
 	            if BJT_VBE is not None:
 	                X2 = convert_to_bjt(X2, BJT_VBE, R2_val)
 	        except Exception as e:
 	            error_and_exit(logger, 'Could not determine U1, I1 and U2 from preheat data', e)
 
-	    for j in range(len(U1I1)):
+	    for j in range(len(U1I1[0])):
             # determine DUT parameters at U1/I1 point(s):
-	        XX2, dI1_dX2, dI1_dU1 = proc_curves(d, U1I1[j][0], U1I1[j][1], R2_val, BJT_VBE)
+	        XX2, dI1_dX2, dI1_dU1 = proc_curves(d, U1I1[0][j], U1I1[1][j], R2_val, BJT_VBE)
 	        if not use_preheat:
 	            X2 = XX2
 	        
@@ -121,8 +121,8 @@ def cprocess():
 	        else:
 	            TT = "{:.{}g}".format( T, Nd )
 	        print( Path(d.datafile).stem + sep + l + sep +
-	               "{:.{}g}".format( U1I1[j][0], Nd ) + sep +
-	               "{:.{}g}".format( U1I1[j][1], Nd ) + sep +
+	               "{:.{}g}".format( U1I1[0][j], Nd ) + sep +
+	               "{:.{}g}".format( U1I1[1][j], Nd ) + sep +
 	               "{:.{}g}".format( X2, Nd ) + sep +
 	               "{:.{}g}".format( dI1_dX2, Nd ) + sep +
 	               "{:.{}g}".format( dI1_dU1, Nd ) + sep +
