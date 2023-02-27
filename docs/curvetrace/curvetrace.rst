@@ -91,6 +91,11 @@ There are further configuration options to improve the the quality of the the PS
 * ``V_SET_CALPOLY``, ``I_SET_CALPOLY``, ``V_READ_CALPOLY`` and ``I_READ_CALPOLY``: coefficients to specify external calibration data to set and read the voltage and current values at the PSU.
 
 
+Heater block configuration
+--------------------------
+The configuration of the heater block is only required if a heater block is used. The heater block configuration is also specified in the ``pypsucurvetrace_config.txt`` file. See :ref:`heaterblock` for details.
+
+
 DUT test configuration
 ----------------------
 While it is possible to run ``pypsucurvetrace`` by manually entering all the test parameters, it is usually more convenient to use configuration files that contain all the DUT specific test parameters.
@@ -128,24 +133,22 @@ The test configuration file contains three secTions ``[PSU1]``, ``[PSU2]``, and 
    T_TOL       = ...
    
 Parameters in the ``[PSU1]`` section:
+
 * ``POLARITY`` is either 1 for normal polarity, or -1 for inverted polarity
 * ``VSTART`` and ``VEND`` are the start and stop values of |U1|, and ``VSTEP`` is the |U1| increment size.
 * ``IMAX`` and ``PMAX`` are the |I1| and |U1| × |I1| limits to prevent overloading the DUT.
 * ``IIDLE`` and ``VIDLE`` are the |I1| and |U1| values for the pre-heat and idle periods.
 
 The ``[PSU2]`` section works the same as ``[PSU1]``, but may have additional parameters:
+
 * ``VIDLE_MIN`` and ``VIDLE_MAX`` indicate the range of allowed idle voltages during pre-heat and idle periods.
 * ``IDLE_GM`` is the transconductance value (in A/V) to be used for regulation of |I1| during pre-heat and idle by adjusting the |U2| voltage: ``IDLE_GM`` = |deltaI1| / |deltaU2| at the idle operating point.
 
 Parameters in the ``[EXTRA]`` section:
+
 * ``PREHEATSECS`` and ``IDLESECS`` are the length (seconds) of the pre-heat and idle periods.
 * ``NREP`` is the number of repeated readings at each measurement step. Note that each reading is preceeded by an idle period if ``IDLECECS`` > 0.
 * Optional: ``T_TARGET`` and ``T_TOL`` are the temperature target value and tolerance of the heater block (°C).
-
-
-Heater block configuration
---------------------------
-The configuration of the heater block is only required if a heater block is used. The heater block configuration is also specified in the ``pypsucurvetrace_config.txt`` file. See :ref:`heaterblock` for details.
 
 
 Running ``curvetrace``
