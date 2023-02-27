@@ -2,7 +2,7 @@
 
 .. include:: ../symbols.rst
 
-The ``curvetrace`` program
+The |curvetrace| program
 ==========================
 
 .. autosummary::
@@ -13,7 +13,7 @@ The ``curvetrace`` program
   :width: 658
   :alt: Schematic of test circuit
 
-The figure shows the circuit used to analyse a device under test (DUT) using two programmable power supplies (PSU1 and PSU2). The ``curvetrace`` program controls the voltages |U1| and |U2| at the terminals of PSU1 and PSU2, and records the currents |I1| and |I2| using the built-in meters of PSU1 and PSU2.
+The figure shows the circuit used to analyse a device under test (DUT) using two programmable power supplies (PSU1 and PSU2). The |curvetrace| program controls the voltages |U1| and |U2| at the terminals of PSU1 and PSU2, and records the currents |I1| and |I2| using the built-in meters of PSU1 and PSU2.
 
 The figure shows a test setup where both |U1| and |U2| are positive, while negative voltages are achieved by reversing the polarity of one or both PSUs.
 
@@ -23,17 +23,17 @@ The resistor |R2| serves multiple purposes:
    * For voltage-controlled DUTs like FETs or vacuum tubes, the resistor prevents high-frequency oscillation at the FET gate or tube grid. An |R2| value of approximately 10\ :sup:`3` |Ohm| is recommended, but the exact value is not critical and will not have an effect on the test results.
    * For current-controlled DUTs like BJTs, the resistor is used to convert the control voltage to the control current |Ib|. The voltage drop across |R2| is equal to |U2| - |Vbe|, where |Vbe| is the base-emitter on voltage of the BJT. Therefore, the control current is given by Ohm's Law as |Ib| = (|U2| - |Vbe|) / |R2|.
 
-The ``curvetrace`` program allows limiting the currents (|I1|, |I2|) and power (|U1| × |I1|, |I2| × |U2|) to prevent overloading the DUT during testing.
+The |curvetrace| program allows limiting the currents (|I1|, |I2|) and power (|U1| × |I1|, |I2| × |U2|) to prevent overloading the DUT during testing.
 
-The ``curvetrace`` program supports a number of different PSU models. See :ref:`supported_PSUs` for details.
+The |curvetrace| program supports a number of different PSU models. See :ref:`supported_PSUs` for details.
 
-The ``curvetrace`` program allows using a heater block to control the temperature of the DUT during curve tracing. See :ref:`heaterblock` for details.
+The |curvetrace| program allows using a heater block to control the temperature of the DUT during curve tracing. See :ref:`heaterblock` for details.
 
 
 Test procedure
 --------------
 
-The procedure implemented in the ``curvetrace`` program is as follows:
+The procedure implemented in the |curvetrace| program is as follows:
 
    1. Read the ``pypsucurvetrace_config.txt`` configuration file with the PSU details, and connect to the PSUs (see below).
    
@@ -65,7 +65,7 @@ The procedure implemented in the ``curvetrace`` program is as follows:
 
 Power supply configuration
 --------------------------
-The basic configuration required for ``curvetrace`` to work is to specify the PSU models used, and their communication port is connected to the computer. To specify these configurations, create a file ``pypsucurvetrace_config.txt`` and enter the PSU configurations as follows:::
+The basic configuration required for |curvetrace| to work is to specify the PSU models used, and their communication port is connected to the computer. To specify these configurations, create a file ``pypsucurvetrace_config.txt`` and enter the PSU configurations as follows:::
 
    [PSU1]
    TYPE    = ...
@@ -151,9 +151,9 @@ Parameters in the ``[EXTRA]`` section:
 * Optional: ``T_TARGET`` and ``T_TOL`` are the temperature target value and tolerance of the heater block (°C).
 
 
-Running ``curvetrace``
+Running |curvetrace|
 ----------------------
-The ``curvetrace`` program is invoked from the command line. Full documentation is not yet available in this document, but can be accessed from the ``curvetrace`` program directly:
+The |curvetrace| program is invoked from the command line. Full documentation is not yet available in this document, but can be accessed from the |curvetrace| program directly:
 
 .. code-block:: console
 

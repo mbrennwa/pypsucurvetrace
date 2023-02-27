@@ -1,3 +1,8 @@
+.. |curvetrace| ``curvetrace``
+.. |curveplot| ``curveplot``
+.. |curveprocess| ``curveprocess``
+.. |curvematch| ``curvematch``
+
 .. |U1| replace:: :math:`U_1`
 .. |U2| replace:: :math:`U_2`
 .. |I1| replace:: :math:`I_1`
