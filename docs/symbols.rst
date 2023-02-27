@@ -1,7 +1,7 @@
-.. |curvetrace| ``curvetrace``
-.. |curveplot| ``curveplot``
-.. |curveprocess| ``curveprocess``
-.. |curvematch| ``curvematch``
+.. |curvetrace| replace:: ``curvetrace``
+.. |curveplot| replace:: ``curveplot``
+.. |curveprocess| replace:: ``curveprocess``
+.. |curvematch| replace:: ``curvematch``
 
 .. |U1| replace:: :math:`U_1`
 .. |U2| replace:: :math:`U_2`
