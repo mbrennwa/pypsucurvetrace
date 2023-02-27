@@ -100,7 +100,7 @@ DUT test configuration
 ----------------------
 While it is possible to run ``pypsucurvetrace`` by manually entering all the test parameters, it is usually more convenient to use configuration files that contain all the DUT specific test parameters.
 
-The test configuration file contains three sections ``[PSU1]``, ``[PSU2]``, and ``[EXTRA]`` (see also :ref:`examples`)::
+A test configuration file contains three sections ``[PSU1]``, ``[PSU2]``, and ``[EXTRA]`` (see also :ref:`examples`)::
 
    [PSU1]
    POLARITY    = ...
