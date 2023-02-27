@@ -139,7 +139,7 @@ Parameters in the ``[PSU1]`` section:
 * ``IMAX`` and ``PMAX`` are the |I1| and |U1| × |I1| limits to prevent overloading the DUT.
 * ``IIDLE`` and ``VIDLE`` are the |I1| and |U1| values for the pre-heat and idle periods.
 
-The ``[PSU2]`` section works the same as ``[PSU1]``, but may have additional parameters:
+The parameters in ``[PSU2]`` for PSU2 are analogous to those in ``[PSU1]``. The ``[PSU2]`` section may contain the following additional parameters:
 
 * ``VIDLE_MIN`` and ``VIDLE_MAX`` indicate the range of allowed idle voltages during pre-heat and idle periods.
 * ``IDLE_GM`` is the transconductance value (in A/V) to be used for regulation of |I1| during pre-heat and idle by adjusting the |U2| voltage: ``IDLE_GM`` = |deltaI1| / |deltaU2| at the idle operating point.
