@@ -1,3 +1,4 @@
+.. |pypsucurvetrace| replace:: ``pypsucurvetrace``
 .. |curvetrace| replace:: ``curvetrace``
 .. |curveplot| replace:: ``curveplot``
 .. |curveprocess| replace:: ``curveprocess``

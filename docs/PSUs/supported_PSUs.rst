@@ -4,7 +4,7 @@
 Supported power supplies
 ************************
 
-``pypsucurvetrace`` has built-in support for different PSU models. Support for other PSUs can be added on request.
+|pypsucurvetrace| has built-in support for different PSU models. Support for other PSUs can be added on request.
 
 Choosing suitable PSU models for your curve-tracing setup will mainly depend on the voltage and current ranges as well as the set and readback resolution required for your DUT tests:
 
@@ -12,13 +12,13 @@ Choosing suitable PSU models for your curve-tracing setup will mainly depend on 
    * Testing small-signal transistors requires a high-resolution PSU that can set and read voltages and currents at small increments of about 10-100 μV and 10-100 μA, while the power will be 1 W or less.
    * Testing vacuum tubes also benefits from good low-current resolution, but typically requires high-voltage PSUs (or multiple PSUs connected in series).
 
-The list below describes the PSU models that are supported by ``pypsucurvetrace``, and how to configure them in the ``pypsucurvetrace_config.txt`` file.
+The list below describes the PSU models that are supported by |pypsucurvetrace|, and how to configure them in the ``pypsucurvetrace_config.txt`` file.
 
 Korad / RND
 -----------
 Korad make cost-effective power supplies which make for a flexible all-purpose test setup. The Korad PSUs are sometimes also available from RND brand.
 
-``pypsucurvetrace`` has built-in support for the following models:
+|pypsucurvetrace| has built-in support for the following models:
 
    * Tested / confirmed: KA3005P, KWR103
    * Untested / unconfirmed: KA3003P, KD3005P, KA3010P, KA6002P, KA6003P, KA6005P, KD6005P
@@ -32,7 +32,7 @@ Riden / Ruiden
 --------------
 Riden / Ruiden offer power supply modules and accessories that allow building very cost-effective power-supply units with high power output and, at the same time, good voltage and current resolution.
 
-``pypsucurvetrace`` has built-in support for the following models:
+|pypsucurvetrace| has built-in support for the following models:
 
    * Tested / confirmed: RD6006P, RD6012P
    * Untested / unconfirmed: RD6006, RD6012   
@@ -54,7 +54,7 @@ The RD6012P unit needs special configuration to select the current range and res
 
 BK Precision
 ------------
-``pypsucurvetrace`` supports the BK Precision 9120A and 9185B models, which both provide 0.01 mA current readback resolution. The 9120A is very suitable for testing small-signal transistors, because it provides 0.1 mV voltage readback resolution with a max voltage of 32 V. The 9185B is suitable for high-voltage devices like electron tubes, because it provides a maximum output voltage of 610 V (with 0.3 V voltage readback resolution).
+|pypsucurvetrace| supports the BK Precision 9120A and 9185B models, which both provide 0.01 mA current readback resolution. The 9120A is very suitable for testing small-signal transistors, because it provides 0.1 mV voltage readback resolution with a max voltage of 32 V. The 9185B is suitable for high-voltage devices like electron tubes, because it provides a maximum output voltage of 610 V (with 0.3 V voltage readback resolution).
 
 Configuration of the 9120A in ``pypsucurvetrace_config.txt``::
 
@@ -75,9 +75,9 @@ Configuration of the 9185B in ``pypsucurvetrace_config.txt``:
 
 Voltcraft PPS
 -------------
-The Voltcraft PPS models have been around for a long time and have served as cost-effective general-purpose PSUs and many work benches. They were used in the first steps in the development of ``pypsucurvetrace``.
+The Voltcraft PPS models have been around for a long time and have served as cost-effective general-purpose PSUs and many work benches. They were used in the first steps in the development of |pypsucurvetrace|.
 
-``pypsucurvetrace`` has built-in support for the following models:
+|pypsucurvetrace| has built-in support for the following models:
 
    * Tested / confirmed: PPS11360, PPS16005, PPS11810
    * Untested / unconfirmed: PPS11603, PPS13610, PPS11815

@@ -9,7 +9,7 @@ Examples
 
 UNDER CONSTRUCTION...
 
-STRUCTURE: SECTIONS ``curvetrace`` (incl. PSU config, DUT config, connections setups for pos/negative parts, FETs, BJTs, tubes), ``curveplot``, ``curveprocess``, ``curvematch``, Heaterblock
+STRUCTURE: SECTIONS |curvetrace| (incl. PSU config, DUT config, connections setups for pos/negative parts, FETs, BJTs, tubes), |curveplot|, |curveprocess|, |curvematch|, Heaterblock
 
     * Setup examples (PSUs, heaterblock)
     * Application examples (different DUT types, curve plotting, parameter extraction, matching,...)
@@ -18,7 +18,7 @@ STRUCTURE: SECTIONS ``curvetrace`` (incl. PSU config, DUT config, connections se
     
 .. _examples_curvetrace:
 
-``curvetrace``
+|curvetrace|
 --------------
 
 If PSU1 is a BK 9185B and PSU2 is a RIDEN 6006P, a minimal ``pypsucurvetrace_config.txt`` file might look like this::
@@ -30,3 +30,24 @@ If PSU1 is a BK 9185B and PSU2 is a RIDEN 6006P, a minimal ``pypsucurvetrace_con
    [PSU2]
    TYPE    = RIDEN
    COMPORT = /dev/serial/by-id/usb-1a86_USB_Serial-if00-port0
+   
+   
+.. _examples_curvetrace:
+
+
+|curveplot|
+--------------
+
+UNDER CONSTRUCTION
+
+
+|curveprocess|
+--------------
+
+UNDER CONSTRUCTION
+
+
+|curvematch|
+--------------
+
+UNDER CONSTRUCTION
