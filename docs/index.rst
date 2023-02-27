@@ -3,7 +3,7 @@
 |pypsucurvetrace| curve tracer
 ================================
 
-|pypsucurvetrace| is a software toolbox for «curve tracing» of electronic devices like transistors or vacuum tubes. It uses standard off-the-shelf programmable power supplies (PSUs) to apply different voltages to the device under test (DUT) and to determine the corresponding currents flowing through the DUT.
+|pypsucurvetrace| is a software toolbox for «curve tracing» of electronic devices like transistors or vacuum tubes. It uses standard off-the-shelf programmable power supplies (PSUs) to apply predefined voltages to the device under test (DUT) and to determine the corresponding currents flowing through the DUT.
 
 |pypsucurvetrace| provides the following command-line tools:
 
