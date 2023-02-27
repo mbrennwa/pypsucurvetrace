@@ -55,8 +55,9 @@ The procedure implemented in the ``curvetrace`` program is as follows:
    
    6. Run the test:
    
-         * If a heater block is used: wait until the DUT has attained the specified temperature.
-         * The voltages are stepped in two nested loops. Voltage |U1| is varied in the inner loop, |U2| is varied in the outer loop.
+         * Optional (if a heater block is used): wait until the DUT has attained the specified temperature.
+         * Optional: the DUT is conditioned for the test (this is especially useful for vacuum tubes). During a «pre-heat» period, |U1| is set to a predefined value, and and |U2| is automatically adjusted to attain a predefined |I1| value. The |U1|, |I1| and |U2| values at the end of the pre-heat are written to the data file.
+         * The voltages are stepped in two nested loops. Voltage |U1| is varied in the inner loop, |U2| is varied in the outer loop. Optional: between readings, the DUT is re-conditioned during a (short) idle period in the same way as the pre-heat.
          * The measured data are shown on the screen and saved to the data file.
          
    7. Once the test is completed, turn off the PSUs.
@@ -67,25 +68,17 @@ Power supply configuration
 The basic configuration required for ``curvetrace`` to work is to specify the PSU models used, and their communication port is connected to the computer. To specify these configurations, create a file ``pypsucurvetrace_config.txt`` and enter the PSU configurations as follows:::
 
    [PSU1]
-   TYPE    = <PSU TYPE OR MODEL>
-   COMPORT = <COM PORT>
+   TYPE    = ...
+   COMPORT = ...
 
    [PSU2]
-   TYPE    = <PSU TYPE OR MODEL>
-   COMPORT = <COM PORT>
+   TYPE    = ...
+   COMPORT = ...
 
 * ``TYPE``: the type or model of the PSU. See :ref:`supported_PSUs` for details.
 * ``COMPORT``: path of the virtual file corresponding to the serial port of the PSU
 
-For example, if PSU1 is a BK 9185B and PSU2 is a RIDEN 6006P, a minimal ``pypsucurvetrace_config.txt`` file might look like this::
-
-   [PSU1]
-   TYPE    = BK
-   COMPORT = /dev/serial/by-id/usb-Silicon_Labs_CP2102_USB_to_UART_Bridge_Controller_508D19126-if00-port0
-
-   [PSU2]
-   TYPE    = RIDEN
-   COMPORT = /dev/serial/by-id/usb-1a86_USB_Serial-if00-port0
+See :ref:`examples_curvetrace` for examples of ``pypsucurvetrace_config.txt`` files.
 
 Note that it is possible to connect multiple PSU units in series to each other to accomplish a higher voltage range. Such a series combination of multiple PSU units can be configured as a single PSU object by specifying their `TYPE` and `COMPORT` fields as follows:
 
@@ -102,7 +95,7 @@ DUT test configuration
 ----------------------
 While it is possible to run ``pypsucurvetrace`` by manually entering all the test parameters, it is usually more convenient to use configuration files that contain all the DUT specific test parameters.
 
-The test configuration file contains three secions ``[PSU1]``, ``[PSU2]``, and ``[EXTRA]``.
+The test configuration file contains three secions ``[PSU1]``, ``[PSU2]``, and ``[EXTRA]`` (see also :ref:`examples`)
 
 The ``[PSU1]`` section::
 
@@ -119,11 +112,31 @@ The ``[PSU1]`` section::
 * ``POLARITY`` is either 1 for normal polarity, or -1 for inverted polarity
 * ``VSTART`` and ``VEND`` are the start and stop values of |V1|, and ``VSTEP`` is the |V1| increment size.
 * ``IMAX`` and ``PMAX`` are the |I1| and |U1| × |I1| limits to prevent overloading the DUT.
-* DESCRIBE VIDLE AND IIDLE
+* ``VIDLE`` and ``IIDLE`` are the |U1| and |I1| values for the pre-heat and idle periods.
 
+The ``[PSU2]`` section works the same as [PSU1], but may have additional parameters::
 
+   [PSU2]
+   ...
+   VIDLE_MIN = ...
+   VIDLE_MAX = ...
+   IDLE_GM   = ...
 
-DESCRIBE THE FILES, UNDER CONSTRUCTION...
+* ``VIDLE_MIN`` and ``VIDLE_MAX`` indicate the range of allowed idle voltages during pre-heat and idle periods.
+* ``IDLE_GM`` is the transconductance value (in A/V) to be used for regulation of the |I1| idle current by adjusting the |U2| voltage: ``IDLE_GM`` = |deltaI1| / |deltaI1| at the idle operating point.
+
+The ``[EXTRA]`` section::
+
+   [EXTRA]
+   PREHEATSECS = ...
+   IDLESECS    = ...
+   NREP        = ...
+   T_TARGET    = ...
+   T_TOL       = ...
+
+* ``PREHEATSECS`` and ``IDLESECS`` are the length (seconds) of the pre-heat and idle periods.
+* ``NREP`` is the number of repeated readings at each measurement step. Note that each reading is preceeded by an idle period if ``IDLECECS`` > 0.
+* Optional: ``T_TARGET`` and ``T_TOL`` are the temperature target value and tolerance of the heater block (°C).
 
 
 Heater block configuration
