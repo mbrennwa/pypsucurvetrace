@@ -21,7 +21,7 @@ STRUCTURE: SECTIONS ``curvetrace`` (incl. PSU config, DUT config, connections se
 ``curvetrace``
 --------------
 
-For example, if PSU1 is a BK 9185B and PSU2 is a RIDEN 6006P, a minimal ``pypsucurvetrace_config.txt`` file might look like this::
+If PSU1 is a BK 9185B and PSU2 is a RIDEN 6006P, a minimal ``pypsucurvetrace_config.txt`` file might look like this::
 
    [PSU1]
    TYPE    = BK
