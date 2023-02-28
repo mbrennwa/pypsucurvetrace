@@ -526,7 +526,7 @@ def argpair(arg):
         p = eval(arg)
         p = [ [float(p[0]),], [float(p[1]),] ]
     except:
-        # try if arg is formatted as [x1:x2,y1:y2,N]:
+        # try if arg is formatted as [x1:x2,y1:y2,N] or [x1:x2,y1:y2,N,LOG]:
         try:
             arg = arg.replace('[', '').replace(']', '')
             p = arg.split(',')
