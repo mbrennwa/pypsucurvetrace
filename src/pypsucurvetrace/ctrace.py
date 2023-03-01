@@ -105,7 +105,7 @@ def ctrace():
 	    logger.info('Running in quick mode (pre-heating only, no curve tracing)...')
 	    quick_mode = True
 
-    # read DUT configTESTER file (if any):
+    # read DUT test config file (if any):
     configDUT = []
     if args.c:
 	    logger.info('Reading DUT configuration in file ' + args.c + '...')

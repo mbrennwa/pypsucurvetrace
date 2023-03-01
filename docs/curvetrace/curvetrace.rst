@@ -63,6 +63,8 @@ The procedure implemented in the |curvetrace| program is as follows:
    7. Once the test is completed, turn off the PSUs.
 
 
+.. _curvetrace_PSUconfig:
+
 Power supply configuration
 --------------------------
 The basic configuration required for |curvetrace| to work is to specify the PSU models used, and their communication port is connected to the computer. To specify these configurations, create a file ``pypsucurvetrace_config.txt`` and enter the PSU configurations as follows:::
@@ -95,6 +97,8 @@ Heater block configuration
 --------------------------
 The configuration of the heater block is only required if a heater block is used. The heater block configuration is also specified in the ``pypsucurvetrace_config.txt`` file. See :ref:`heaterblock` for details.
 
+
+.. _curvetrace_DUTconfig:
 
 DUT test configuration
 ----------------------
