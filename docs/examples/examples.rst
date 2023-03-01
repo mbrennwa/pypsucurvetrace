@@ -47,7 +47,7 @@ The DUT considered in this example is a 2SK2013 N-channel FET. To avoid large te
    * PSU2-red to the Gate pin
    * PSU2-black to PSU1-black
    
-The test parameters for the 2SK2013 are defined by creating a ``2SK2013_test.txt`` file containing the following parameters (see also :ref:`curvetrace_DUTconfig`):::
+The test parameters for the 2SK2013 are defined by creating a ``2SK2013_config.txt`` file containing the following parameters (see also :ref:`curvetrace_DUTconfig`):::
 
    [PSU1]
    POLARITY = 1
