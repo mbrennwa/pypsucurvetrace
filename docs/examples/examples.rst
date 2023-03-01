@@ -40,7 +40,7 @@ This first example demonstrates test configurations for the PSUs and the DUT (an
 
 The easiest method to determine the correct ``COMPORT`` settings for PSU1 is to disconnect all serial interfaces except PSU1, and the list the virtual files in ``/dev/serial/by-path/`` directory. Then repeat with PSU2.
 
-The DUT considered in this example is a 2SK2013 N-channel FET. To avoid large temperature changes of the DUT during the test, the 2SK2013 is clamped to a chunk of metal or a heatsink using a thermal pad for electrical insulation betwee the FET and the metal. The PSU terminals are connected to the DUT pins following the schematic in :ref:`curvetrace`, whereby PSU1 is used with normal polarity and PSU2 with reversed polarity:
+The DUT considered in this example is a 2SK2013 N-channel FET. To avoid large temperature changes of the DUT during the test, the 2SK2013 is clamped to a chunk of metal or a heatsink using a thermal pad for electrical insulation betwee the FET and the metal. The PSU terminals are connected to the DUT pins following the schematic in :ref:`curvetrace`:
 
    * PSU1-red to the Drain pin
    * PSU1-black to the Source pin and to PSU2-red
