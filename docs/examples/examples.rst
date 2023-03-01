@@ -1,3 +1,5 @@
+.. include:: ../symbols.rst
+
 .. _examples:
 
 Examples
@@ -36,7 +38,7 @@ This first example demonstrates test configurations for the PSUs and the DUT (an
    TYPE    = RIDEN
    COMPORT = /dev/serial/by-path/pci-0000:00:14.0-usb-0:2.4.2:1.0-port0
 
-The easiest method to determine the correct ``COMPORT`` settings for PSU1 is to disconnect all serial interfaces except PSU1, and the list the content of the ``/dev/serial/by-path/`` directory. Then repeat with PSU2.
+The easiest method to determine the correct ``COMPORT`` settings for PSU1 is to disconnect all serial interfaces except PSU1, and the list the virtual files in ``/dev/serial/by-path/`` directory. Then repeat with PSU2.
 
 The DUT considered in this example is a 2SK2013 N-channel FET. The PSU terminals are connected to the DUT pins following the schematic in :ref:`curvetrace`, whereby PSU1 is used with normal polarity and PSU2 with reversed polarity:
 

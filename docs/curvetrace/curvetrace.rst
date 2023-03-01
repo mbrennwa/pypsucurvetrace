@@ -1,6 +1,6 @@
-.. _curvetrace:
-
 .. include:: ../symbols.rst
+
+.. _curvetrace:
 
 The |curvetrace| program
 ==========================
