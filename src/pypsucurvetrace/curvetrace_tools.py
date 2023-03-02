@@ -312,7 +312,12 @@ def configure_test_PSU(PSU, logger, configDUT = []):
 			PSU.TEST_PLIMIT = __get_number('* ' + PSU.LABEL + ' maximum allowed power (W): ',allowZero=False,allowNegative=False,typ='float')
 			
 		if 'POLARITY' in configDUT:
-			PSU.TEST_POLARITY = int(configDUT['POLARITY'])
+			if int(configDUT['POLARITY']) > 0:
+			    PSU.TEST_POLARITY = 1
+			elif int(configDUT['POLARITY']) < 0:
+			    PSU.TEST_POLARITY = -1
+			else:
+			    raise ValueError('PSU must either be positive or negative.')
 		else:
 			try:
 				pol = (input('* OPTIONAL: ' + PSU.LABEL + ' polarity of outputs -- N: normal / I: inverted [default=N]: '))
