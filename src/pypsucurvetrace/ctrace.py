@@ -162,7 +162,10 @@ def ctrace():
 
     # set up repeats:
     if 'EXTRA' in configDUT:
-	    N_rep = int(configDUT['EXTRA']['NREP'])
+        try:
+    	    N_rep = int(configDUT['EXTRA']['NREP'])
+    	except:
+            N_rep = 1
     else:
 	    try:
 		    N_rep = int(input('\nOPTIONAL: Number of repeats per reading [default=1]: '))
