@@ -30,7 +30,7 @@ from pypsucurvetrace.plot_curves import curve_plotter
 
 
 # set up logger:
-logger = get_ogger('curvetrace')
+logger = get_logger('curvetrace')
 
 
 if __name__ == "__main__":
