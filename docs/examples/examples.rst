@@ -82,7 +82,7 @@ Execute the following command to start the curve tracing:
 
    curvetrace -c J112_config.txt
    
-The |curvetrace| program will connect the PSUs, configure the test parameters, and ask you for a file name to save the DUT test data. Once everything is ready, the |curvetrace| program will start the pre-heat process by setting |U1| to the PSU1-``VIDLE`` value and adjust |U2| until |I1| attains the PSU1-``IIDLE`` value. After 20 seconds of pre-heat is stopped, and the curve tracing starts. |U2| is set to 0.0 V, and |U1| is stepped from 0-15 V in 1 V steps. This is repeated for |U2| = -0.5 V, -1.0 V, ... , and -3.5 V. At each step, |U1|, |I1|, |U2|, and |I2| are measured and saved to the data file. The ``curvetrace`` program shows a live plot of the curve data during the measurement.
+The |curvetrace| program will start communication with the PSUs, configure the test parameters, and ask you for a file name to save the DUT test data. Once everything is ready, the |curvetrace| program starts the pre-heat process by setting |U1| to the PSU1-``VIDLE`` value (7.5 v) and adjust |U2| until |I1| attains the PSU1-``IIDLE`` value of 0.02 A (20 mA). After 20 seconds of pre-heat is stopped (``PREHEATSECS``), and the curve tracing starts. |U2| is set to 0.0 V, and |U1| is stepped from 0-15 V in 1 V steps. This sequence is repeated for |U2| = -0.5 V, -1.0 V, ... , and -3.5 V. At each step, |U1|, |I1|, |U2|, and |I2| are measured and saved to the data file. The ``curvetrace`` program shows a live plot of the curve data during the measurement.
 
 .. image:: curvetrace_J112.png
   :width: 658
