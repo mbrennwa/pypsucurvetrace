@@ -76,9 +76,10 @@ The test parameters for the J112 are defined by creating a ``J112_config.txt`` f
    IDLESECS    = 0
    PREHEATSECS = 20
 
-To start the curve tracing, execute the following command:
+Execute the following command to start the curve tracing:
 
 .. code-block:: console
+
    curvetrace -c J112_config.txt
    
 The |curvetrace| program will connect the PSUs, configure the test parameters, and ask you for a file name to save the DUT test data. Once everything is ready, the |curvetrace| program will start the pre-heat process by setting |U1| to the PSU1-``VIDLE`` value and adjust |U2| until |I1| attains the PSU1-``IIDLE`` value. After 20 seconds of pre-heat is stopped, and the curve tracing starts. |U2| is set to 0.0 V, and |U1| is stepped from 0-15 V in 1 V steps. This is repeated for |U2| = -0.5 V, -1.0 V, ... , and -3.5 V. At each step, |U1|, |I1|, |U2|, and |I2| are measured and saved to the data file. The ``curvetrace`` program shows a live plot of the curve data during the measurement.
