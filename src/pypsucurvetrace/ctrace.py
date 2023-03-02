@@ -95,22 +95,22 @@ def ctrace():
 
     # check for batch mode:
     batch_mode = False
-    if args.b:
+    if args.batch:
 	    logger.info('Running in batch mode (loop of repeated test tuns)...')
 	    batch_mode = True
 
     # check for quick mode:
     quick_mode = False
-    if args.q:
+    if args.quick:
 	    logger.info('Running in quick mode (pre-heating only, no curve tracing)...')
 	    quick_mode = True
 
     # read DUT test config file (if any):
     configDUT = []
-    if args.c:
-	    logger.info('Reading DUT configuration in file ' + args.c + '...')
+    if args.config:
+	    logger.info('Reading DUT configuration in file ' + args.config + '...')
 	    configDUT = configparser.ConfigParser()
-	    configDUT.read(args.c)
+	    configDUT.read(args.config)
 	    
     # connect to PSUs:
     try:
