@@ -8,21 +8,32 @@ Examples
 .. autosummary::
    :toctree: generated
 
-This chapter presents a number of step-by-step examples to introduce new users to the |pypsucurvetrace| tools. A working installation of the |pypsucurvetrace| software is assumed (see :ref:`installation`).
+Consider this chapter as a modular tutorial built around various examples of how to use the |pypsucurvetrace| tools. It is assumed that you have the |pypsucurvetrace| software installed on your computer (see :ref:`installation` for details).
 
 
-
-STRUCTURE: SECTIONS |curvetrace| (incl. PSU config, DUT config, connections setups for pos/negative parts, FETs, BJTs, tubes), |curveplot|, |curveprocess|, |curvematch|, Heaterblock
-
-    * Setup examples (PSUs, heaterblock)
-    * Application examples (different DUT types, curve plotting, parameter extraction, matching,...)
-    
-    
-    
 .. _examples_curvetrace:
 
 |curvetrace|
 --------------
+
+Configuring the PSUs
+^^^^^^^^^^^^^^^^^^^^
+The first step in using the |curvetrace| program is to configure the PSUs (see :ref:`curvetrace_PSUconfig` for details). It is assumed that PSU1 unit is a Riden 6012P running in it's low-current / high-resolution mode, while PSU2 is a Riden 6006P (see :ref:`supported_PSUs` for details on these PSUs). These PSUs will be useful for testing a wide range of differen DUT types.
+
+The simplest method to determine the ``COMPORT`` for PSU1 on Linux is to disconnect all serial interfaces except PSU1, and then list the virtual file representing the PSU1 serial port in the ``/dev/serial/by-path/`` directory. Repeat for PSU2.
+
+Create the ``pypsucurvetrace_config.txt`` file in your home directory and then enter the following parameters (your ``COMPORT`` settings will be different):::
+
+   [PSU1]
+   TYPE    = RIDEN_6A
+   COMPORT = /dev/serial/by-path/pci-0000:00:14.0-usb-0:2.4.3:1.0-port0
+
+   [PSU2]
+   TYPE    = RIDEN
+   COMPORT = /dev/serial/by-path/pci-0000:00:14.0-usb-0:2.4.2:1.0-port0
+
+This minimal PSU configuration file allow the |curvetrace| program to establish the communication with PSU1 and PSU2.
+
 
 Curve tracing an N-channel FET
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
