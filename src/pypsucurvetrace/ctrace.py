@@ -163,8 +163,8 @@ def ctrace():
     # set up repeats:
     if 'EXTRA' in configDUT:
         try:
-    	    N_rep = int(configDUT['EXTRA']['NREP'])
-    	except:
+            N_rep = int(configDUT['EXTRA']['NREP'])
+        except:
             N_rep = 1
     else:
 	    try:
