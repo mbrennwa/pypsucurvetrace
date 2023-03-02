@@ -47,100 +47,75 @@ Connect the PSU terminals to the J112 pins following the schematic in :ref:`curv
    * PSU2-red to PSU1-black
    * PSU2-black to a grid-stopper resistor at the Gate pin (approximately 1 k|Ohm|)
    
-The test parameters for the 2SK2013 are defined by creating a ``2SK2013_config.txt`` file containing the following parameters (see also :ref:`curvetrace_DUTconfig`):::
+The test parameters for the J112 are defined by creating a ``J112_config.txt`` file containing the following parameters (see also :ref:`curvetrace_DUTconfig`):::
 
    [PSU1]
    POLARITY = 1
    VSTART = 0
-   VEND   = 20
-   VSTEP  = 0.5
-   IMAX   = 1.0
-   PMAX   = 25
-   VIDLE  = 15
-   IIDLE  = 0.3
-   
+   VEND   = 15
+   VSTEP  = 1
+   IMAX   = 0.05
+   PMAX   = 0.25
+   VIDLE  = 7.5
+   IIDLE  = 0.02
+
    [PSU2]
-   POLARITY  = 1
-   VSTART    = 1.75
-   VEND      = 4.0
-   VSTEP     = 0.25
-   IMAX      = 1
-   PMAX      = 5
-   VIDLE     = 3.0
-   VIDLE_MIN = 0.5
-   VIDLE_MAX = 4.0
-   IDLE_GM   = 1
+   POLARITY = -1
+   VSTART = 0.0
+   VEND   = 3.5
+   VSTEP  = 0.5
+   IMAX   = 1
+   PMAX   = 1
+   VIDLE     = 5.0
+   VIDLE_MIN = 0.0
+   VIDLE_MAX = 5.0
+   IDLE_GM   = -0.01
    IIDLE     = 1
-   
+
    [EXTRA]
    IDLESECS    = 0
-   PREHEATSECS = 60
+   PREHEATSECS = 20
 
+To start the curve tracing, execute the following command:
 
-
-Curve tracing an N-channel FET
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-This first example uses the PSU configuration from above to demonstrate the curve tracing of a 2SK2013 N-channel FET.
-
-Mount the 2SK2013 on a chunk of metal or a heatsink using a thermal pad for electrical insulation between the FET and the metal. The metal will provide some thermal inertia to prevent large changes of the 2SK2013 temperature during the test.
-
-The PSU terminals are connected to the 2SK2013 pins following the schematic in :ref:`curvetrace`:
-
-   * PSU1-red to the Drain pin
-   * PSU1-black to the Source pin and to PSU2-red
-   * PSU2-red to a grid-stopper resistor at the Gate pin (approximately 1 k|Ohm|)
-   * PSU2-black to PSU1-black
+.. code-block:: console
+   curvetrace -c J112_config.txt
    
-The test parameters for the 2SK2013 are defined by creating a ``2SK2013_config.txt`` file containing the following parameters (see also :ref:`curvetrace_DUTconfig`):::
+The |curvetrace| program will connect the PSUs, configure the test parameters, and ask you for a file name to save the DUT test data. Once everything is ready, the |curvetrace| program will start the pre-heat process by setting |U1| to the PSU1-``VIDLE`` value and adjust |U2| until |I1| attains the PSU1-``IIDLE`` value. After 20 seconds of pre-heat is stopped, and the curve tracing starts. |U2| is set to 0.0 V, and |U1| is stepped from 0-15 V in 1 V steps. This is repeated for |U2| = -0.5 V, -1.0 V, ... , and -3.5 V. At each step, |U1|, |I1|, |U2|, and |I2| are measured and saved to the data file. The ``curvetrace`` program shows a live plot of the curve data during the measurement.
 
-   [PSU1]
-   POLARITY = 1
-   VSTART = 0
-   VEND   = 20
-   VSTEP  = 0.5
-   IMAX   = 1.0
-   PMAX   = 25
-   VIDLE  = 15
-   IIDLE  = 0.3
-   
-   [PSU2]
-   POLARITY  = 1
-   VSTART    = 1.75
-   VEND      = 4.0
-   VSTEP     = 0.25
-   IMAX      = 1
-   PMAX      = 5
-   VIDLE     = 3.0
-   VIDLE_MIN = 0.5
-   VIDLE_MAX = 4.0
-   IDLE_GM   = 1
-   IIDLE     = 1
-   
-   [EXTRA]
-   IDLESECS    = 0
-   PREHEATSECS = 60
+.. image:: curvetrace_J112.png
+  :width: 658
+  :alt: ``curvetrace`` example with a J112 jFET
+
+
+Curve tracing a low-power NPN BJT
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+EXAMPLE WITH BC550, SHOWING HOW TO USE R2 TO CONTROL THE BASE CURRENT
 
 
 
+Curve tracing a power FET
+^^^^^^^^^^^^^^^^^^^^^^^^^
 
-XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+EXAMPLE WITH IRF150 OR SIMILAR ON A HEATSINK, WITH/WITHOUT TEMPERATURE CONTROL
 
 
+Curve tracing a vacuum tube
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+EXAMPLE WITH VACUUM TUBE (TRIODE, OR PENTODE IN TRIODE CONNECTION), USING HIGH-VOLTAGE PSU (SHOW THE PSU CONFIG), AND AN EXTERNAL HEATER SUPPLY, MAYBE ALSO 
 
 
-If PSU1 is a BK 9185B and PSU2 is a RIDEN 6006P, a minimal ``pypsucurvetrace_config.txt`` file might look like this::
+Batch mode
+^^^^^^^^^^
 
-   [PSU1]
-   TYPE    = BK
-   COMPORT = /dev/serial/by-id/usb-Silicon_Labs_CP2102_USB_to_UART_Bridge_Controller_508D19126-if00-port0
+EXAMPLE TO ILLUSTRATE BATCH MODE (FOR LATER USE IN MATCHING EXAMPLE)
 
-   [PSU2]
-   TYPE    = RIDEN
-   COMPORT = /dev/serial/by-id/usb-1a86_USB_Serial-if00-port0
+
    
    
-.. _examples_curvetrace:
-
+.. _examples_curveplot:
 
 |curveplot|
 --------------
@@ -148,11 +123,15 @@ If PSU1 is a BK 9185B and PSU2 is a RIDEN 6006P, a minimal ``pypsucurvetrace_con
 UNDER CONSTRUCTION
 
 
+.. _examples_curveprocess:
+
 |curveprocess|
 --------------
 
 UNDER CONSTRUCTION
 
+
+.. _examples_curvematch:
 
 |curvematch|
 --------------
