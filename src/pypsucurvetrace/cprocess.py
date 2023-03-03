@@ -80,14 +80,14 @@ def cprocess():
     label_I1 = 'I1 (A)' # operating point current
     label_X2 = 'Ug (V)' # gate / grid current
     label_dI1_dU1 = 'go (A/V)' # output impedance
-    label_dI1_dX2 = 'gm (A/V)' # gain
-    label_dU1_dX2 = 'μ (V/V)' # gain
+    label_dI1_dX2 = 'gm (A/V)' # transconductance
+    label_dU1_dX2 = 'μ (V/V)'  # voltage gain
     if BJT_VBE is not None:
         # voltage controlled DUT
         label_X2 = 'Ib (A)' # base current
-        label_dI1_dX2 = 'hfe (A/A)' # gain
-        label_dU1_dX2 = 'sxdfg (V/A)' # gain
-    print( 'Filename' + sep + 'Sample' + sep + label_U1 + sep + label_I1 + sep + label_X2 + sep + label_dI1_dX2 + sep + label_dI1_dU1 + sep + label_dI1_dX2 + sep + 'T (°C)')
+        label_dI1_dX2 = 'hfe (A/A)' # current gain
+        label_dU1_dX2 = 'rbe (V/A)' # 
+    print( 'Filename' + sep + 'Sample' + sep + label_U1 + sep + label_I1 + sep + label_X2 + sep + label_dI1_dX2 + sep + label_dI1_dU1 + sep + label_dU1_dX2 + sep + 'T (°C)')
     
     # process all datafiles:
     for i in range(len(datafiles)):
@@ -112,13 +112,10 @@ def cprocess():
 
 	    for j in range(len(U1I1[0])):
             # determine DUT parameters at U1/I1 point(s):
-	        XX2, dI1_dX2, dI1_dU1 = proc_curves(d, U1I1[0][j], U1I1[1][j], R2_val, BJT_VBE)
+	        XX2, dI1_dX2, dU1_dX2, dI1_dU1 = proc_curves(d, U1I1[0][j], U1I1[1][j], R2_val, BJT_VBE)
 	        if not use_preheat:
 	            X2 = XX2
 	            
-	        logger.warning('dU1/dX2 not yet implemented.')
-	        dU1_dX2 = None
-	        
 	        # print parameters:
 	        Nd = 4
 	        if T is None:
@@ -145,7 +142,8 @@ def proc_curves(cdata, U1, I1, R2_val=None, BJT_VBE=None):
     #
     # OUTPUT:
     # X2: U2 or I2 corresponding to specified (U1/I1) poins
-    # dI1_dX2: dI1/dU2 or dI1/dI2 derivative(s) at point (U1/I1), aka. gm (transconductance) of hfe (current gain)
+    # dI1_dX2: dI1/dU2 or dI1/dI2 derivative(s) at point (U1/I1), aka. gm (transconductance) or hfe (current gain)
+    # dU1_dX2: dU1/dU2 or dU1/dI2 derivative(s) at point (U1/I1), aka. μ (gain)
     # dI1_dU1: dI1/dU1 derivative(s) at point (U1/I1), aka. go (output impedance)
     
     # get curve data:
@@ -205,8 +203,10 @@ def proc_curves(cdata, U1, I1, R2_val=None, BJT_VBE=None):
     except:
         dI1_dX2 = np.nan
         dI1_dU1 = np.nan
+        
+    dU1_dX2 = dI1_dX2 / dI1_dU1
 
     ### determine X2 value:
     X2 = griddata((cU1, cI1), cX2, (U1, I1), method='linear') # linear interpolation (cubic spline tends to screw up somehow...)
     
-    return X2, dI1_dX2, dI1_dU1
+    return X2, dI1_dX2, dU1_dX2, dI1_dU1
