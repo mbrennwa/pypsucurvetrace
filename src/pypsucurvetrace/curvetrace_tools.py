@@ -451,10 +451,10 @@ def do_idle(PSU1, PSU2, HEATER, seconds, file=None, wait_for_TEMP=False):
 
 			# output string / line			
 			t = "Idling ({:.1f}".format(time.time()-t0-heater_delays) + ' of ' + "{:.1f}".format(seconds) + ' s): ' + \
-			    "U0 = " + format_PSU_reading(FIX.TEST_POLARITY*Uf, FIX.VRESREAD) + " V" + '  ' + \
-			    "I0 = " + format_PSU_reading(FIX.TEST_POLARITY*If, FIX.IRESREAD) + " A" + '  ' + \
-			    "Uc = " + format_PSU_reading(REG.TEST_POLARITY*Ur, REG.VRESREAD) + " V" + '  ' + \
-			    "Ic = " + format_PSU_reading(REG.TEST_POLARITY*Ir, REG.IRESREAD) + " A" + '  ' + \
+			    "U1 = " + format_PSU_reading(FIX.TEST_POLARITY*Uf, FIX.VRESREAD) + " V" + '  ' + \
+			    "I1 = " + format_PSU_reading(FIX.TEST_POLARITY*If, FIX.IRESREAD) + " A" + '  ' + \
+			    "U2 = " + format_PSU_reading(REG.TEST_POLARITY*Ur, REG.VRESREAD) + " V" + '  ' + \
+			    "I2 = " + format_PSU_reading(REG.TEST_POLARITY*Ir, REG.IRESREAD) + " A" + '  ' + \
 			    "T = " + T_HB + " °C"
 			print (t, end="\r")
 
@@ -483,10 +483,10 @@ def do_idle(PSU1, PSU2, HEATER, seconds, file=None, wait_for_TEMP=False):
 		# write idle / preheat conditions to file:
 		if file is not None:
 			t = '* OPERATING POINT AT END OF PREHEAT / IDLE: ' + \
-			    "U0 = " + format_PSU_reading(FIX.TEST_POLARITY*Uf, FIX.VRESREAD) + " V" + '  ' + \
-			    "I0 = " + format_PSU_reading(FIX.TEST_POLARITY*If, FIX.IRESREAD) + " A" + '  ' + \
-			    "Uc = " + format_PSU_reading(REG.TEST_POLARITY*Ur, REG.VRESREAD) + " V" + '  ' + \
-			    "Ic = " + format_PSU_reading(REG.TEST_POLARITY*Ir, REG.IRESREAD) + " A" + '  ' + \
+			    "U1 = " + format_PSU_reading(FIX.TEST_POLARITY*Uf, FIX.VRESREAD) + " V" + '  ' + \
+			    "I1 = " + format_PSU_reading(FIX.TEST_POLARITY*If, FIX.IRESREAD) + " A" + '  ' + \
+			    "U2 = " + format_PSU_reading(REG.TEST_POLARITY*Ur, REG.VRESREAD) + " V" + '  ' + \
+			    "I2 = " + format_PSU_reading(REG.TEST_POLARITY*Ir, REG.IRESREAD) + " A" + '  ' + \
 			    "T = " + T_HB + " °C"
 			printit(t, file , '%')
 
