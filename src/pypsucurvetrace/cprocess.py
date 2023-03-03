@@ -87,7 +87,7 @@ def cprocess():
         label_X2 = 'Ib (A)' # base current
         label_dI1_dX2 = 'hfe (A/A)' # gain
         label_dU1_dX2 = 'sxdfg (V/A)' # gain
-    print( 'Filename' + sep + 'Sample' + sep + label_U1 + sep + label_I1 + sep + label_X2 + sep + label_dI1_dX2 + sep + label_dI1_dU1 + sep + 'T (°C)')
+    print( 'Filename' + sep + 'Sample' + sep + label_U1 + sep + label_I1 + sep + label_X2 + sep + label_dI1_dX2 + sep + label_dI1_dU1 + sep + label_dI1_dX2 + sep + 'T (°C)')
     
     # process all datafiles:
     for i in range(len(datafiles)):
