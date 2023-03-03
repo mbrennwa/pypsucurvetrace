@@ -22,7 +22,7 @@ To use the |curvetrace| program, you need to setup the PSU configuration file (s
 
 The simplest method to determine the ``COMPORT`` for PSU1 on Linux is to disconnect all serial interfaces except PSU1, and then list the virtual file representing the PSU1 serial port in the ``/dev/serial/by-path/`` directory. Repeat for PSU2.
 
-Create the ``pypsucurvetrace_config.txt`` file in your home directory and then enter the following parameters (your ``COMPORT`` settings will be different):::
+Create the ``curvetrace_config.txt`` file in your home directory and then enter the following parameters (your ``COMPORT`` settings will be different):::
 
    [PSU1]
    TYPE    = RIDEN_6A
