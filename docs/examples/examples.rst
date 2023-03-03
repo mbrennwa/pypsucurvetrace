@@ -8,7 +8,7 @@ Examples
 .. autosummary::
    :toctree: generated
 
-This chapter is a modular tutorial built around various examples of how to use the |pypsucurvetrace| tools. It is assumed that you have the |pypsucurvetrace| software installed on your computer (see :ref:`installation` for details).
+This chapter is a modular tutorial built around various examples illustrating the use of the |pypsucurvetrace| tools. It is assumed that you have the |pypsucurvetrace| software installed on your computer (see :ref:`installation` for details).
 
 
 .. _examples_curvetrace:

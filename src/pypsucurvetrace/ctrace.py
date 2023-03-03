@@ -86,7 +86,7 @@ def ctrace():
     say_hello('curvetrace', 'I-V curve tracing of electronic parts using programmable power supplies')
 
     # read PSU config file:
-    cfgfile = 'pypsucurvetrace_config.txt'
+    cfgfile = 'curvetrace_config.txt'
     cfgfile = Path.home() / cfgfile
     if not cfgfile.is_file():
         error_and_exit(logger, 'Could not find config file ' + str(cfgfile) + '.')
