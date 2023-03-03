@@ -101,8 +101,8 @@ def cprocess():
 	    
 	    if use_preheat:
 	        try:
-	            U1I1 = [ [float(p.U0),], [float(p.I0),] ]
-	            X2 = float(p.Uc)
+	            U1I1 = [ [float(p.U1),], [float(p.I1),] ]
+	            X2 = float(p.U2)
 	            if BJT_VBE is not None:
 	                X2 = convert_to_bjt(X2, BJT_VBE, R2_val)
 	        except Exception as e:

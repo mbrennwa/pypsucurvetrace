@@ -319,7 +319,7 @@ def cplot():
 				    if args.maxdeltaUc is None:
 					    do_add = True
 				    else:
-					    if abs(preheat[i].Uc-preheat[j].Uc) <= maxdeltaUc:
+					    if abs(preheat[i].U2-preheat[j].U2) <= maxdeltaUc:
 						    do_add = True
 				    if do_add:
 					    datapairs += ( ( data[i], data[j], ), )
