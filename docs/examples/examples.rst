@@ -13,8 +13,8 @@ This chapter is a modular tutorial built around various examples illustrating th
 
 .. _examples_curvetrace:
 
-|curvetrace|
-------------
+Working with the |curvetrace| program
+-------------------------------------
 
 Configuring the PSUs
 ^^^^^^^^^^^^^^^^^^^^
@@ -114,27 +114,33 @@ Batch mode
 EXAMPLE TO ILLUSTRATE BATCH MODE (FOR LATER USE IN MATCHING EXAMPLE)
 
 
+Controlling DUT temperature with a heater block
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+DESCRIBE THE HEATERBLOCK: CONSTRUCTION, CONFIGURATION, PRACTICAL ASPECTS, USAGE EXAMPLE (IRF150 CURVES AT DIFFERENT TEMPERATURES, MAYBE?)
+
+
    
    
 .. _examples_curveplot:
 
-|curveplot|
---------------
+Working with the |curveplot| program
+------------------------------------
 
 UNDER CONSTRUCTION
 
 
 .. _examples_curveprocess:
 
-|curveprocess|
---------------
+Working with the |curveprocess| program
+---------------------------------------
 
 UNDER CONSTRUCTION
 
 
 .. _examples_curvematch:
 
-|curvematch|
---------------
+Working with the |curvematch| program
+-------------------------------------
 
 UNDER CONSTRUCTION
