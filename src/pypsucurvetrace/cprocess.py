@@ -79,12 +79,14 @@ def cprocess():
     label_U1 = 'U1 (V)' # operating point voltage
     label_I1 = 'I1 (A)' # operating point current
     label_X2 = 'Ug (V)' # gate / grid current
-    label_dI1_dX2 = 'gm (A/V)' # gain
     label_dI1_dU1 = 'go (A/V)' # output impedance
+    label_dI1_dX2 = 'gm (A/V)' # gain
+    label_dU1_dX2 = 'μ (V/V)' # gain
     if BJT_VBE is not None:
         # voltage controlled DUT
         label_X2 = 'Ib (A)' # base current
         label_dI1_dX2 = 'hfe (A/A)' # gain
+        label_dU1_dX2 = 'sxdfg (V/A)' # gain
     print( 'Filename' + sep + 'Sample' + sep + label_U1 + sep + label_I1 + sep + label_X2 + sep + label_dI1_dX2 + sep + label_dI1_dU1 + sep + 'T (°C)')
     
     # process all datafiles:
@@ -113,6 +115,9 @@ def cprocess():
 	        XX2, dI1_dX2, dI1_dU1 = proc_curves(d, U1I1[0][j], U1I1[1][j], R2_val, BJT_VBE)
 	        if not use_preheat:
 	            X2 = XX2
+	            
+	        logger.warning('dU1/dX2 not yet implemented.')
+	        dU1_dX2 = None
 	        
 	        # print parameters:
 	        Nd = 4
@@ -126,6 +131,7 @@ def cprocess():
 	               "{:.{}g}".format( X2, Nd ) + sep +
 	               "{:.{}g}".format( dI1_dX2, Nd ) + sep +
 	               "{:.{}g}".format( dI1_dU1, Nd ) + sep +
+	               "{:.{}g}".format( dU1_dX2, Nd ) + sep +
 	               TT )
 	    
 	    
