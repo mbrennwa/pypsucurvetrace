@@ -183,6 +183,11 @@ def proc_curves(cdata, U1, I1, R2_val=None, BJT_VBE=None):
     i1 = np.arange(I1-NG*delta_i1, I1+NG*delta_i1+delta_i1/2, delta_i1)
     x2 = np.arange(cX2.min(), cX2.max()+delta_x2/2, delta_x2)
 
+
+    ##########################################
+    # determine dI1_dX2, dI1_dU1 and dU1_dX2 #
+    ##########################################
+
     # determine smooth function II1 = f(u1,x2):
     UU1, XX2 = np.meshgrid(u1,x2)
     II1 = griddata((cU1, cX2), cI1, (UU1, XX2), method='cubic')  # cubic spline interpolation
@@ -191,8 +196,6 @@ def proc_curves(cdata, U1, I1, R2_val=None, BJT_VBE=None):
     g = np.gradient(II1, delta_x2, delta_u1)
     # dI1_dX2 <--> g[0] is the gradient in horizontal direction
     # dI1_dU1 <--> g[1] is the gradient in vertical direction
-    
-    ### determine gradient values:
     
     # find gradient values of the specifed (U1,I1) position:
     try:
@@ -203,10 +206,14 @@ def proc_curves(cdata, U1, I1, R2_val=None, BJT_VBE=None):
     except:
         dI1_dX2 = np.nan
         dI1_dU1 = np.nan
-        
+
     dU1_dX2 = dI1_dX2 / dI1_dU1
 
-    ### determine X2 value:
-    X2 = griddata((cU1, cI1), cX2, (U1, I1), method='linear') # linear interpolation (cubic spline tends to screw up somehow...)
+
+    ######################
+    # determine X2 value #
+    ######################
     
+    X2 = griddata((cU1, cI1), cX2, (U1, I1), method='linear') # linear interpolation (cubic spline tends to screw up somehow...)
+
     return X2, dI1_dX2, dU1_dX2, dI1_dU1
