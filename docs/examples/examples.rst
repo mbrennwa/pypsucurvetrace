@@ -156,7 +156,7 @@ Power transistors can produce a lot more heat than the low-power devices conside
 
 A more efficient method to control the DUT temperature is to clamp it to a large block of metal with a regulated heater element. The thermal inertia of the metal block greatly reduces short-term fluctuations of the DUT temperature. The heater allows controlling the temperature of the metal block and the DUT to a predefined value.
 
-The |curvetrace| program has a built-in PID controller for the heater block. The controller works by sensing the heater block with a DS18B20 temperature sensor, and by adjusting the output of the programmable PSU that powers the heater element. See :ref:`_examples_curvetrace_heaterblock` for an example of such a heater block.
+The |curvetrace| program has a built-in PID controller for the heater block. The controller works by sensing the heater block temperature with a DS18B20 sensor, and by adjusting the output of the programmable PSU that powers the heater element. See :ref:`_examples_curvetrace_heaterblock` for an example of such a heater block.
 
 To use the temperature control of the heater block, add the following paramters to the ``[EXTRA]`` section of your DUT test config file:::
 
