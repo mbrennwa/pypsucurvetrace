@@ -83,7 +83,7 @@ def cprocess():
     label_dI1_dX2 = 'gm (A/V)' # transconductance
     label_dU1_dX2 = 'μ (V/V)'  # voltage gain
     if BJT_VBE is not None:
-        # voltage controlled DUT
+        # current controlled DUT (BJT), see also https://de.wikipedia.org/wiki/Mathematische_Beschreibung_des_Bipolartransistors#Kleinsignalparameter
         label_X2 = 'Ib (A)' # base current
         label_dI1_dX2 = 'hfe (A/A)' # current gain
         label_dU1_dX2 = 'rbe (V/A)' # 
