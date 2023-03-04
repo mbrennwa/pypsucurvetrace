@@ -19,7 +19,7 @@ import numpy as np
 from scipy.interpolate import griddata
 
 from pypsucurvetrace.read_datafile import read_datafile
-from pypsucurvetrace.curvetrace_tools import say_hello, get_logger, convert_to_bjt, error_and_exit, argpair
+from pypsucurvetrace.curvetrace_tools import say_hello, get_logger, convert_to_bjt, error_and_exit, valuepairs
 
 
 # set up logger:
@@ -39,10 +39,10 @@ def cmatch():
     parser.add_argument('datafiles', nargs='+', help='Names (and paths) of pypsucurvetrace data files, can use wildcards.')
 
     # U1 range:
-    parser.add_argument('--U1range', type=argpair, help='U1 range to consider (value pair with min. and max value, e.g. --U1range [5,20]')
+    parser.add_argument('--U1range', type=valuepairs, help='U1 range to consider (value pair with min. and max value, e.g. --U1range [5,20]')
 
     # I1 range:
-    parser.add_argument('--I1range', type=argpair, help='I1 range to consider (value pair with min. and max value, e.g. --I1range [5,20]')
+    parser.add_argument('--I1range', type=valuepairs, help='I1 range to consider (value pair with min. and max value, e.g. --I1range [5,20]')
 
     # BJT option:
     parser.add_argument('--bjtvbe', help='BJT VBE-on voltage for conversion of PSU U2 voltage to base current using R2CONTROL from the data file: Ibase = (U2-BJTVBE)/R2CONTROL')
@@ -89,19 +89,21 @@ def cmatch():
             label_X2_delta_RMS + sep + label_X2_delta_RMS_mean_removed )
 
     try:
-        U1range  = [ min(U1range), max(U1range) ]
+        U1range  = [ min(min(U1range)), max(max(U1range)) ]
         if U1range[0] == U1range[1]:
             logger.warning('Width of U1 range is zero, ignoring U1 range.')
             U1range = None
     except:
+        logger.warning('Could not parse U1 range, ignoring U1 range.')
         U1range = None
         
     try:
-        I1range  = [ min(I1range), max(I1range) ]
+        I1range  = [ min(min(I1range)), max(max(I1range)) ]
         if I1range[0] == I1range[1]:
             logger.warning('Width of I1 range is zero, ignoring I1 range.')
             I1range = None
     except:
+        logger.warning('Could not parse I1 range, ignoring U1 range.')
         I1range = None
     
     datafiles.sort()

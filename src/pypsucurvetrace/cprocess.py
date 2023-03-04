@@ -19,7 +19,7 @@ import numpy as np
 from scipy.interpolate import griddata
 
 from pypsucurvetrace.read_datafile import read_datafile
-from pypsucurvetrace.curvetrace_tools import say_hello, get_logger, convert_to_bjt, error_and_exit, argpair
+from pypsucurvetrace.curvetrace_tools import say_hello, get_logger, convert_to_bjt, error_and_exit, valuepairs
 
 
 # set up logger:
@@ -39,7 +39,7 @@ def cprocess():
     parser.add_argument('datafiles', nargs='+', help='Names (and paths) of pypsucurvetrace data files, can use wildcards.')
 
     # U1/I1 value(s) for parameter calculation:
-    parser.add_argument('--U1I1', type=argpair, help='U1/I1 point(s) where the DUT parameters are determined. A single U1/I1 value pair is specified as [U1,I1] (for example: --U1I1 [20,0.5]). Multiple pairs can be specified as a list of pairs (for example: --U1I1 [15,0.5] [15,1] [20,0.7]), or as [U1_start:U1_end,I1_start:I1_end,N,scale] (for example: --U1I1 [0:30,0.1:1,10] for 10 points spaced linearly from U1=0...30V and I1=0.1...1A; or --U1I1 [0:30,0.1:1,10,log] for log spacing)')
+    parser.add_argument('--U1I1', type=valuepairs, help='U1/I1 point(s) where the DUT parameters are determined. A single U1/I1 value pair is specified as [U1,I1] (for example: --U1I1 [20,0.5]). Multiple pairs can be specified as a list of pairs (for example: --U1I1 [15,0.5] [15,1] [20,0.7]), or as [U1_start:U1_end,I1_start:I1_end,N,scale] (for example: --U1I1 [0:30,0.1:1,10] for 10 points spaced linearly from U1=0...30V and I1=0.1...1A; or --U1I1 [0:30,0.1:1,10,log] for log spacing)')
 
     # use preheat values as target point for the parameter extraction:
     parser.add_argument('--preheat', action='store_true', help='Determine the parameters at the preheat values of U1 and I1; use the measured U2 preheat value instead of interpolating U2 from the curve data.')

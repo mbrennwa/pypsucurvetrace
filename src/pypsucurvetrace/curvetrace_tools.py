@@ -524,8 +524,8 @@ def convert_to_bjt(Uc, BJT_Vbe, R2):
     return Ib
 
 
-def argpair(arg):
-    # argparse: deal with value pairs as input arguments in the form [x,y] or [x1:x2,y1:y2,N,lin/log]
+def valuepairs(arg):
+    # method for argparse: deal with value pairs as input arguments in the form [x,y] or [x1:x2,y1:y2,N,lin/log]
     try:
         # try if arg is formatted as [x,y]:
         p = eval(arg)
