@@ -12,6 +12,7 @@
 .. |deltaU2| replace:: :math:`\Delta U_2`
 .. |R2| replace:: :math:`R_2`
 .. |Ohm| unicode:: U+02126
+.. |kOhm| k unicode:: U+02126
 .. |VBEon| replace:: :math:`V_{\rm BE,on}`
 .. |IB| replace:: :math:`I_{\rm B}`
 .. |VG| replace:: :math:`V_{\rm G}`
