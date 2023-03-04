@@ -158,6 +158,15 @@ A more efficient method to control the DUT temperature is to clamp it to a large
 
 The |curvetrace| program has a built-in PID controller for the heater block. The controller works by sensing the heater block with a DS18B20 temperature sensor, and by adjusting the output of the programmable PSU that powers the heater element. See :ref:`_examples_curvetrace_heaterblock` for an example of such a heater block.
 
+To use the temperature control of the heater block, add the following paramters to the ``[EXTRA]`` section of your DUT test config file:::
+
+   [EXTRA]
+   ...
+   T_TARGET = 50
+   T_TOL    = 0.5
+
+The below figure shows the curves from an IRFP150 power FET, which was clamped on a heater block. The curves were measured at 30°C, 50°C and 70°C. The curves do not show any thermal runaway, because the temperature was always stable to within 0.5°C of the nominal value.
+
 .. image:: curvetrace_IRFP150_T_control.png
   :width: 658
   :alt: IRFP curves measured on heater block at different temperatures
