@@ -40,7 +40,7 @@ Curve tracing a low-power N-channel FET
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 This first example uses the PSU configuration from above to demonstrate the curve tracing of a J112 N-channel jFET.
 
-Connect the PSU terminals to the J112 pins following the schematic in :ref:`curvetrace` (with PSU1 at normal polarity, and PSU2 reversed):
+The J112 needs a positive Drain-Source voltage (|U1|) and a negative Gate-Source voltage (|U2|). Therefore, connect PSU1 with positive polarity and PSU2 with negative polarity to the J112 pins following the schematic in :ref:`curvetrace`:
 
    * PSU1-red to the Drain pin
    * PSU1-black to the Source pin and to PSU2-red
