@@ -94,6 +94,65 @@ Curve tracing a low-power NPN BJT
 
 EXAMPLE WITH BC550, SHOWING HOW TO USE R2 TO CONTROL THE BASE CURRENT
 
+This example demonstrates how to test a bipolar transistor (BJT). In contrast to the previous FET example, the BJT is controlled the the base *current*. Since the base current is typically much smaller than the current measurement resolution of most PSUs, the ``curvetrace`` program uses the |R2| resistor to convert the |U2| voltage to the base current value (see ref:`curvetrace` for details). The conversion relies on the exact |R2| value, which is determined by the max. |U2| output voltage of the PSU2 and the max. |Ib| current required for the test. The max. output voltage of PSU2 (Riden 6006P) is 60 V, and the targeted base current should range up to about 50 μA. With |Ib| = (|U2| - |Vbe|) / |R2|, a suitable value for the test is |R2| = 100 k|Ohm|.
+
+The BC550 needs a positive Collector-Emitter voltage (|U1|) and a positive Base-Emitter voltage (|U2|), so you need to connect the pins as follows:
+
+# - PSU1-RED --> COLLECTOR
+# - PSU1-BLK --> EMITTER + PSU2-BLK
+# - PUS2-RED --> BASE (VIA 100k RESISTOR)
+# - PSU2-BLK --> PSU1-BLK
+
+
+   * PSU1-red to the Collector pin
+   * PSU1-black to the Emitter pin and to PSU2-black
+   * PSU2-red to the Base pin via the 100 k|Ohm| |R2| resistor
+   * PSU2-black to PSU2-black
+   
+The test parameters for the BC550 are defined by creating a ``BC550_config.txt`` file containing the following parameters (see also :ref:`curvetrace_DUTconfig`):::
+
+   [PSU1]
+   POLARITY = 1
+   VSTART = 0
+   VEND   = 20
+   VSTEP  = 1
+   IMAX   = 0.1
+   PMAX   = 0.5
+   VIDLE  = 5
+   IIDLE  = 0.02
+   
+   [PSU2]
+   POLARITY = 1
+   VSTART = 0.65
+   VEND   = 6.65
+   VSTEP  = 0.5
+   IMAX   = 0.1
+   PMAX   = 1
+   VIDLE     = 0.8
+   VIDLE_MIN = 0.0
+   VIDLE_MAX = 20
+   IDLE_GM   = 0.01
+   IIDLE     = 1
+   
+   [EXTRA]
+   R2CONTROL = 100000
+   IDLESECS    = 2
+   PREHEATSECS = 60
+   NREP        = 1
+
+Run |curvetrace|:
+
+.. code-block:: console
+
+   curvetrace -c J112_config.txt
+
+The curve tracing works in the same way as in the previous example, with two exceptions. First, the |U2| steps start at 0.65 V, which is the (assumed) |Vbe|-on value of the BC550. Second, there is a 2 second idle time between each reading for re-equilibration of the BC550 temperature before each reading, which reduces the distortion of the curves at higher power levels due to self-heating of the transistor. The following plot shows the BC550 curves measured with and without the 2 s idle time between readings:
+
+.. image:: curvetrace_BC550_selfheating.png
+  :width: 658
+  :alt: BC550 curves with/without self-heating control
+
+The conversion from |U2| to the base-current is done later during curve plotting and data processing (see also :ref:`examples_curveplot`, :ref:`examples_curveprocess` and :ref:`examples_curvematch`).
 
 
 Curve tracing a power FET
