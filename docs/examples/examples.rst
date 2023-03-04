@@ -94,7 +94,7 @@ Curve tracing of a low-power NPN BJT
 
 EXAMPLE WITH BC550, SHOWING HOW TO USE R2 TO CONTROL THE BASE CURRENT
 
-This example demonstrates how to test a bipolar transistor (BJT). In contrast to the previous FET example, the BJT is controlled the the base *current*. Since the base current is typically much smaller than the current measurement resolution of most PSUs, the ``curvetrace`` program uses the |R2| resistor to convert the |U2| voltage to the base current value (see ref:`curvetrace` for details). The conversion relies on the exact |R2| value, which is determined by the max. |U2| output voltage of the PSU2 and the max. |IB| current required for the test. The max. output voltage of PSU2 (Riden 6006P) is 60 V, and the targeted base current should range up to about 50 μA. With |IB| = (|U2| - |VBEon|) / |R2|, a suitable value for the test is |R2| = 100 k\ |khm|.
+This example demonstrates how to test a bipolar transistor (BJT). In contrast to the previous FET example, the BJT is controlled the the base *current*. Since the base current is typically much smaller than the current measurement resolution of most PSUs, the ``curvetrace`` program uses the |R2| resistor to convert the |U2| voltage to the base current value (see ref:`curvetrace` for details). The conversion relies on the exact |R2| value, which is determined by the max. |U2| output voltage of the PSU2 and the max. |IB| current required for the test. The max. output voltage of PSU2 (Riden 6006P) is 60 V, and the targeted base current should range up to about 50 μA. With |IB| = (|U2| - |VBEon|) / |R2|, a suitable value for the test is |R2| = 100 k\ |Ohm|.
 
 The BC550 needs a positive Collector-Emitter voltage (|U1|) and a positive Base-Emitter voltage (|U2|), so you need to connect the pins as follows:
 
@@ -140,7 +140,7 @@ Run |curvetrace|:
 
    curvetrace -c BC550_config.txt
 
-The curve tracing works in the same way as in the previous example, with two notable exceptions:
+The curve tracing works in the same way as in the previous example, with two notable differences:
    * The |U2| steps start at 0.65 V, which is the (assumed) |VBEon| value of the BC550. The conversion from |U2| to the base-current will done later during curve plotting and data processing (see also :ref:`examples_curveplot`, :ref:`examples_curveprocess` and :ref:`examples_curvematch`).
    * There is a 2 second idle time between each reading for thermal re-equilibration of the BC550 before each reading. This reduces the thermal runaway at higher power levels due to self-heating of the transistor. The following plot compares the BC550 curves measured with and without the idle time between readings:
 
@@ -154,7 +154,15 @@ The curve tracing works in the same way as in the previous example, with two not
 Curve tracing of a power transistor using temperature control
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-EXAMPLE WITH IRF150 OR SIMILAR WITH/WITHOUT TEMPERATURE CONTROL BY HEATERBLOCK, DESCRIBE HEATERBLOCK
+Power transistors typically produce a lot more heat than the low-power devices in the previous examples. To avoid thermal runaway and distortion of the curves at high power levels, the DUT temperature must remain stable during curve tracing. This could be achieved in the same way as in the BC550 example by inserting idle periods where the DUT is operated at fixed power level to attains thermal equilibrium before the next reading. However, at higher power levels, the required idle periods can become excessively long, and self-heating during a single measurement may become significant.
+
+A more efficient method to control the DUT temperature is to clamp it to a large block of metal with a regulated heater element. The thermal inertia of the metal block greatly reduces short-term fluctuations of the DUT temperature. The heater allows controlling the temperature of the metal block and the DUT to a predefined value.
+
+The |curvetrace| program has a built-in PID controller for the heater block. The controller works by sensing the heater block with a DS18B20 temperature sensor, and by adjusting the output of the programmable PSU that powers the heater element. See :ref:`curvetrace_heaterblock` for an example of such a heater block.
+
+.. image:: curvetrace_powertransistor_T_control.png
+  :width: 658
+  :alt: IRFP curves measured on heater block at different temperatures
 
 
 Curve tracing of a vacuum tube
@@ -169,10 +177,12 @@ Batch mode
 EXAMPLE TO ILLUSTRATE BATCH MODE (FOR LATER USE IN MATCHING EXAMPLE). USE 2SJ28 OR 2SK82 BATCH, WHICH WILL SERVE AS A NICE DATASET TO RE-USE IN THE CURVEMATCH EXAMPLE(S).
 
 
+.. _examples_curvetrace_heaterblock
+
 Construction of a heater block for DUT temperature control
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-DESCRIBE THE HEATERBLOCK: CONSTRUCTION, CONFIGURATION, PRACTICAL ASPECTS, USAGE EXAMPLE (IRF150 CURVES AT DIFFERENT TEMPERATURES, MAYBE?)
+DESCRIBE THE HEATERBLOCK: CONSTRUCTION, CONFIGURATION, PRACTICAL ASPECTS
 
 
    
