@@ -98,12 +98,6 @@ This example demonstrates how to test a bipolar transistor (BJT). In contrast to
 
 The BC550 needs a positive Collector-Emitter voltage (|U1|) and a positive Base-Emitter voltage (|U2|), so you need to connect the pins as follows:
 
-# - PSU1-RED --> COLLECTOR
-# - PSU1-BLK --> EMITTER + PSU2-BLK
-# - PUS2-RED --> BASE (VIA 100k RESISTOR)
-# - PSU2-BLK --> PSU1-BLK
-
-
    * PSU1-red to the Collector pin
    * PSU1-black to the Emitter pin and to PSU2-black
    * PSU2-red to the Base pin via the 100 k|Ohm| |R2| resistor
