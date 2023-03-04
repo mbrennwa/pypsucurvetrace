@@ -13,8 +13,8 @@
 .. |R2| replace:: :math:`R_2`
 .. |Ohm| unicode:: U+02126
 .. |VBEon| replace:: :math:`V_{\rm BE,on}`
-.. |Ib| replace:: :math:`I_{\rm b}`
-.. |Vg| replace:: :math:`V_{\rm g}`
+.. |IB| replace:: :math:`I_{\rm B}`
+.. |VG| replace:: :math:`V_{\rm G}`
 .. |hfe| replace:: :math:`h_{\rm fe}`
 .. |gm| replace:: :math:`g_{\rm m}`
 .. |go| replace:: :math:`g_{\rm o}`
