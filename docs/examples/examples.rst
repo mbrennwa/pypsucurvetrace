@@ -154,7 +154,7 @@ The curve tracing works in the same way as in the previous example, with two not
 Curve tracing of a power transistor using temperature control
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Power transistors typically produce a lot more heat than the low-power devices in the previous examples. To avoid thermal runaway and distortion of the curves at high power levels, the DUT temperature must remain stable during curve tracing. This could be achieved in the same way as in the BC550 example by inserting idle periods where the DUT is operated at fixed power level to attains thermal equilibrium before the next reading. However, at higher power levels, the required idle periods can become excessively long, and self-heating during a single measurement may become significant.
+Power transistors can produce a lot more heat than the low-power devices considered in the previous examples. To avoid thermal runaway and distortion of the curves at high power levels, the DUT temperature must remain stable during curve tracing. In principle, this could be achieved in the same way as in the BC550 example, where the DUT was operated at a fixed power level to attain thermal equilibrium during idle periods before each measurement. However, at higher power levels, the required idle periods can become excessively long, and self-heating during a single measurement may become significant. The «idle period» method therefore does not work well for testing transistors at high power levels.
 
 A more efficient method to control the DUT temperature is to clamp it to a large block of metal with a regulated heater element. The thermal inertia of the metal block greatly reduces short-term fluctuations of the DUT temperature. The heater allows controlling the temperature of the metal block and the DUT to a predefined value.
 
@@ -168,7 +168,7 @@ The |curvetrace| program has a built-in PID controller for the heater block. The
 Curve tracing of a vacuum tube
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-EXAMPLE WITH VACUUM TUBE (TRIODE, OR PENTODE IN TRIODE CONNECTION), USING HIGH-VOLTAGE PSU (SHOW THE PSU CONFIG), AND AN EXTERNAL HEATER SUPPLY, MAYBE ALSO 
+EXAMPLE WITH VACUUM TUBE, USING HIGH-VOLTAGE PSU (SHOW THE PSU CONFIG), AND AN EXTERNAL HEATER SUPPLY, MAYBE ALSO 
 
 
 Batch mode
