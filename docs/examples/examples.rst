@@ -45,7 +45,7 @@ The J112 needs a positive Drain-Source voltage (|U1|) and a negative Gate-Source
    * PSU1-red to the Drain pin
    * PSU1-black to the Source pin and to PSU2-red
    * PSU2-red to PSU1-black
-   * PSU2-black to a grid-stopper resistor at the Gate pin (approximately 1 |kOhm|)
+   * PSU2-black to a grid-stopper resistor at the Gate pin (approximately 1 k\ |Ohm|)
    
 The test parameters for the J112 are defined by creating a ``J112_config.txt`` file containing the following parameters (see also :ref:`curvetrace_DUTconfig`):::
 
@@ -94,13 +94,13 @@ Curve tracing of a low-power NPN BJT
 
 EXAMPLE WITH BC550, SHOWING HOW TO USE R2 TO CONTROL THE BASE CURRENT
 
-This example demonstrates how to test a bipolar transistor (BJT). In contrast to the previous FET example, the BJT is controlled the the base *current*. Since the base current is typically much smaller than the current measurement resolution of most PSUs, the ``curvetrace`` program uses the |R2| resistor to convert the |U2| voltage to the base current value (see ref:`curvetrace` for details). The conversion relies on the exact |R2| value, which is determined by the max. |U2| output voltage of the PSU2 and the max. |IB| current required for the test. The max. output voltage of PSU2 (Riden 6006P) is 60 V, and the targeted base current should range up to about 50 μA. With |IB| = (|U2| - |VBEon|) / |R2|, a suitable value for the test is |R2| = 100 |kOhm|.
+This example demonstrates how to test a bipolar transistor (BJT). In contrast to the previous FET example, the BJT is controlled the the base *current*. Since the base current is typically much smaller than the current measurement resolution of most PSUs, the ``curvetrace`` program uses the |R2| resistor to convert the |U2| voltage to the base current value (see ref:`curvetrace` for details). The conversion relies on the exact |R2| value, which is determined by the max. |U2| output voltage of the PSU2 and the max. |IB| current required for the test. The max. output voltage of PSU2 (Riden 6006P) is 60 V, and the targeted base current should range up to about 50 μA. With |IB| = (|U2| - |VBEon|) / |R2|, a suitable value for the test is |R2| = 100 k\ |khm|.
 
 The BC550 needs a positive Collector-Emitter voltage (|U1|) and a positive Base-Emitter voltage (|U2|), so you need to connect the pins as follows:
 
    * PSU1-red to the Collector pin
    * PSU1-black to the Emitter pin and to PSU2-black
-   * PSU2-red to the Base pin via the 100 |kOhm| |R2| resistor
+   * PSU2-red to the Base pin via the 100 k\ |Ohm| |R2| resistor
    * PSU2-black to PSU2-black
    
 The test parameters for the BC550 are defined in the same way as in the previous example by creating a file ``BC550_config.txt`` with the following parameters:::
