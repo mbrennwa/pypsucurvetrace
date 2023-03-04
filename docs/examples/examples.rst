@@ -142,7 +142,7 @@ Run |curvetrace|:
 
 The curve tracing works in the same way as in the previous example, with two notable exceptions:
    * The |U2| steps start at 0.65 V, which is the (assumed) |VBEon|-on value of the BC550. The conversion from |U2| to the base-current will done later during curve plotting and data processing (see also :ref:`examples_curveplot`, :ref:`examples_curveprocess` and :ref:`examples_curvematch`).
-   * There is a 2 second idle time between each reading for thermal re-equilibration of the BC550 before each reading. This reduces the thermal runaway at higher power levels due to self-heating of the transistor. The following plot compares the BC550 curves measured with and without the 2 s idle time between readings:
+   * There is a 2 second idle time between each reading for thermal re-equilibration of the BC550 before each reading. This reduces the thermal runaway at higher power levels due to self-heating of the transistor. The following plot compares the BC550 curves measured with and without the idle time between readings:
 
 .. image:: curvetrace_BC550_selfheating.png
   :width: 658
