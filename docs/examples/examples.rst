@@ -92,8 +92,6 @@ The |curvetrace| program starts communication with the PSUs, configures the test
 Curve tracing of a low-power NPN BJT
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-EXAMPLE WITH BC550, SHOWING HOW TO USE R2 TO CONTROL THE BASE CURRENT
-
 This example demonstrates how to test a bipolar transistor (BJT). In contrast to the previous FET example, the BJT is controlled the the base *current*. Since the base current is typically much smaller than the current measurement resolution of most PSUs, the ``curvetrace`` program uses the |R2| resistor to convert the |U2| voltage to the base current value (see ref:`curvetrace` for details). The conversion relies on the exact |R2| value, which is determined by the max. |U2| output voltage of the PSU2 and the max. |IB| current required for the test. The max. output voltage of PSU2 (Riden 6006P) is 60 V, and the targeted base current should range up to about 50 μA. With |IB| = (|U2| - |VBEon|) / |R2|, a suitable value for the test is |R2| = 100 k\ |Ohm|.
 
 The BC550 needs a positive Collector-Emitter voltage (|U1|) and a positive Base-Emitter voltage (|U2|), so you need to connect the pins as follows:
@@ -160,7 +158,7 @@ A more efficient method to control the DUT temperature is to clamp it to a large
 
 The |curvetrace| program has a built-in PID controller for the heater block. The controller works by sensing the heater block with a DS18B20 temperature sensor, and by adjusting the output of the programmable PSU that powers the heater element. See :ref:`curvetrace_heaterblock` for an example of such a heater block.
 
-.. image:: curvetrace_powertransistor_T_control.png
+.. image:: curvetrace_IRFP150_T_control.png
   :width: 658
   :alt: IRFP curves measured on heater block at different temperatures
 
