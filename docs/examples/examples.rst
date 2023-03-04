@@ -36,8 +36,8 @@ This minimal PSU configuration file contains all information for the |curvetrace
 
 
 
-Curve tracing a low-power N-channel FET
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Curve tracing of a low-power N-channel FET
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 This first example uses the PSU configuration from above to demonstrate the curve tracing of a J112 N-channel jFET.
 
 The J112 needs a positive Drain-Source voltage (|U1|) and a negative Gate-Source voltage (|U2|). Therefore, connect PSU1 with positive polarity and PSU2 with negative polarity to the J112 pins following the schematic in :ref:`curvetrace`:
@@ -89,8 +89,8 @@ The |curvetrace| program starts communication with the PSUs, configures the test
   :alt: ``curvetrace`` example with a J112 jFET
 
 
-Curve tracing a low-power NPN BJT
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Curve tracing of a low-power NPN BJT
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 EXAMPLE WITH BC550, SHOWING HOW TO USE R2 TO CONTROL THE BASE CURRENT
 
@@ -103,7 +103,7 @@ The BC550 needs a positive Collector-Emitter voltage (|U1|) and a positive Base-
    * PSU2-red to the Base pin via the 100 k|Ohm| |R2| resistor
    * PSU2-black to PSU2-black
    
-The test parameters for the BC550 are defined by creating a ``BC550_config.txt`` file containing the following parameters (see also :ref:`curvetrace_DUTconfig`):::
+The test parameters for the BC550 are defined in the same way as in the previous example by creating a file ``BC550_config.txt`` with the following parameters:::
 
    [PSU1]
    POLARITY = 1
@@ -138,9 +138,11 @@ Run |curvetrace|:
 
 .. code-block:: console
 
-   curvetrace -c J112_config.txt
+   curvetrace -c BC550_config.txt
 
-The curve tracing works in the same way as in the previous example, with two exceptions. First, the |U2| steps start at 0.65 V, which is the (assumed) |VBEon|-on value of the BC550. Second, there is a 2 second idle time between each reading for re-equilibration of the BC550 temperature before each reading, which reduces the distortion of the curves at higher power levels due to self-heating of the transistor. The following plot shows the BC550 curves measured with and without the 2 s idle time between readings:
+The curve tracing works in the same way as in the previous example, with two exceptions:
+   * The |U2| steps start at 0.65 V, which is the (assumed) |VBEon|-on value of the BC550.
+   * There is a 2 second idle time between each reading for thermal re-equilibration of the BC550 before each reading. This reduces the thermal runaway at higher power levels due to self-heating of the transistor. The following plot compares the BC550 curves measured with and without the 2 s idle time between readings:
 
 .. image:: curvetrace_BC550_selfheating.png
   :width: 658
@@ -149,14 +151,14 @@ The curve tracing works in the same way as in the previous example, with two exc
 The conversion from |U2| to the base-current is done later during curve plotting and data processing (see also :ref:`examples_curveplot`, :ref:`examples_curveprocess` and :ref:`examples_curvematch`).
 
 
-Curve tracing a power FET
-^^^^^^^^^^^^^^^^^^^^^^^^^
+Curve tracing of a power transistor using temperature control
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-EXAMPLE WITH IRF150 OR SIMILAR ON A HEATSINK, WITH/WITHOUT TEMPERATURE CONTROL
+EXAMPLE WITH IRF150 OR SIMILAR WITH/WITHOUT TEMPERATURE CONTROL BY HEATERBLOCK, DESCRIBE HEATERBLOCK
 
 
-Curve tracing a vacuum tube
-^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Curve tracing of a vacuum tube
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 EXAMPLE WITH VACUUM TUBE (TRIODE, OR PENTODE IN TRIODE CONNECTION), USING HIGH-VOLTAGE PSU (SHOW THE PSU CONFIG), AND AN EXTERNAL HEATER SUPPLY, MAYBE ALSO 
 
@@ -164,11 +166,11 @@ EXAMPLE WITH VACUUM TUBE (TRIODE, OR PENTODE IN TRIODE CONNECTION), USING HIGH-V
 Batch mode
 ^^^^^^^^^^
 
-EXAMPLE TO ILLUSTRATE BATCH MODE (FOR LATER USE IN MATCHING EXAMPLE)
+EXAMPLE TO ILLUSTRATE BATCH MODE (FOR LATER USE IN MATCHING EXAMPLE). USE 2SJ28 OR 2SK82 BATCH, WHICH WILL SERVE AS A NICE DATASET TO RE-USE IN THE CURVEMATCH EXAMPLE(S).
 
 
-Controlling DUT temperature with a heater block
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Construction of a heater block for DUT temperature control
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 DESCRIBE THE HEATERBLOCK: CONSTRUCTION, CONFIGURATION, PRACTICAL ASPECTS, USAGE EXAMPLE (IRF150 CURVES AT DIFFERENT TEMPERATURES, MAYBE?)
 
