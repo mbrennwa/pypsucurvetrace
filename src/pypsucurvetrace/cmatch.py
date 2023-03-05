@@ -103,7 +103,7 @@ def cmatch():
             logger.warning('Width of I1 range is zero, ignoring I1 range.')
             I1range = None
     except:
-        logger.warning('Could not parse I1 range, ignoring U1 range.')
+        logger.warning('Could not parse I1 range, ignoring I1 range.')
         I1range = None
     
     datafiles.sort()

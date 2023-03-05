@@ -16,7 +16,6 @@ logger = get_logger('powersupply_BK')
 BK_SPECS = {
 		"9185B_HIGH":	( 0.0, 610.0,  0.35, 210,  0.02,    0.00001, 0.3,    0.00001, 0.02, 0.0001, 2.0 ),  # 9185B in "HIGH" setting, confirmed working
 		"9185B_LOW":	( 0.0, 400.0,  0.5 , 210,  0.02,    0.00001, 0.3,    0.00001, 0.02, 0.0001, 2.0 ),  # 9185B in "LOW" setting, confirmed working
-		# "9120A":	    ( 0.0, 32.0,   3.0 , 96,   0.0005,  0.0001,  0.0001, 0.00001, 2.0 )   # 9120A, currently testing / under construction
 		"9120A":	    ( 0.0, 32.0,   3.0 , 96,   0.0005,  0.0001,  0.0001, 0.00001, 0.012, 0.0002, 3.0 )   # 9120A, currently testing / under construction
 }
 
@@ -49,7 +48,7 @@ class BK(object):
 	Class for B&K power supply.
 	"""
 
-	def __init__(self, port, debug=False,voltagemode='HIGH'):
+	def __init__(self, port, debug=False, voltagemode='HIGH'):
 		'''
 		PSU(port)
 		port : serial port (string, example: port = '/dev/serial/by-id/XYZ_123_abc')
