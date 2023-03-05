@@ -241,7 +241,7 @@ The test parameters for the 807 tube are defined in a ``807_triode_config.txt`` 
    IDLESECS    = 0
    PREHEATSECS = 300
 
-Note the somewhat long ``PREHEATSECS`` parameter, which makes sure the tube has warmed up and stabilized before the curve tracing starts. Also, make sure to not skip the grid stopper resistors at Grid-1 and Grid-2 to prevent oscillation. With this test setup, the curves recorded with the |curvetrace| program will look like in the figure below.
+Note the somewhat long pre-heat time (``PREHEATSECS=300``), which makes sure the tube has warmed up and stabilized before the curve tracing starts. Also, make sure to not skip the grid stopper resistors at Grid-1 and Grid-2 to prevent oscillation. With this test setup, the curves recorded with the |curvetrace| program will look like in the figure below.
 
 .. image:: curvetrace_807_triode.png
   :width: 658
