@@ -19,13 +19,13 @@ Working with the |curvetrace| program
 
 .. _examples_curvetrace_PSUconfig:
 
-Configuring the PSUs
-^^^^^^^^^^^^^^^^^^^^
+Configure the PSUs
+^^^^^^^^^^^^^^^^^^
 To use the |curvetrace| program, you need to setup the PSU configuration file (see :ref:`curvetrace_PSUconfig`). It is assumed that PSU1 unit is a Riden 6012P operating in it's 6 A / high-resolution mode, while PSU2 is a Riden 6006P (see :ref:`supported_PSUs`). These PSUs will be useful for testing a wide range of differen DUT types.
 
 The simplest method to determine the ``COMPORT`` for PSU1 on Linux is to disconnect all serial interfaces except PSU1, and then list the virtual file representing the PSU1 serial port in the ``/dev/serial/by-path/`` directory. Repeat for PSU2.
 
-Create the ``curvetrace_config.txt`` file in your home directory and then enter the following parameters (your ``COMPORT`` settings will be different):::
+To set up a minimal PSU configuration file that contains all information for the |curvetrace| program to establish the communication with PSU1 and PSU2, create a ``curvetrace_config.txt`` file in your home directory and enter the following parameters (your ``COMPORT`` settings will be different):::
 
    [PSU1]
    TYPE    = RIDEN_6A
@@ -35,9 +35,7 @@ Create the ``curvetrace_config.txt`` file in your home directory and then enter 
    TYPE    = RIDEN
    COMPORT = /dev/serial/by-path/pci-0000:00:14.0-usb-0:2.4.2:1.0-port0
 
-This minimal PSU configuration file contains all information for the |curvetrace| program to establish the communication with PSU1 and PSU2.
-
-If you have different PSUs for different curve-tracing needs, it may be convenient to keep the configurations of all PSU devices in the ``curvetrace_config.txt`` file. Just make sure the active PSU1 and PSU2 devices are labelled ``[PSU1]`` and ``[PSU2]``, while the unused PSUs are labelled differently so they will be ignored by the |curvetrace| program. For example, if you would like to keep around the configurations for the Riden 6012P at 12 A / low-resolution mode and a BK Precision PSU, you could add them as ``not active PSU1`` to the ``curvetrace_config.txt`` file:::
+If you have different PSUs for different curve-tracing needs, it may be convenient to keep the configurations of all PSU devices in the ``curvetrace_config.txt`` file. Just make sure the active PSU1 and PSU2 devices are labelled ``[PSU1]`` and ``[PSU2]``, while the unused PSUs are labelled differently so they will be ignored by the |curvetrace| program. For example, if you would like to keep around the configurations for the Riden 6012P at 12 A / low-resolution mode and a BK Precision PSU, you could add them as ``not active PSU1`` to the ``curvetrace_config.txt`` file::
 
    [not active PSU1]
    # Riden 6012P at 12A/high-res mode
@@ -60,8 +58,8 @@ If you have different PSUs for different curve-tracing needs, it may be convenie
 
 
 
-Curve tracing of a low-power N-channel FET
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Testing a low-power N-channel FET
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 This first example uses the PSU configuration from above to demonstrate the curve tracing of a J112 N-channel jFET.
 
 The J112 needs a positive Drain-Source voltage (|U1|) and a negative Gate-Source voltage (|U2|). Therefore, connect PSU1 with positive polarity and PSU2 with negative polarity to the J112 pins following the schematic in :ref:`curvetrace`:
@@ -71,7 +69,7 @@ The J112 needs a positive Drain-Source voltage (|U1|) and a negative Gate-Source
    * PSU2-red to PSU1-black
    * PSU2-black to a grid-stopper resistor at the Gate pin (approximately 1 k\ |Ohm|)
    
-The test parameters for the J112 are defined by creating a ``J112_config.txt`` file containing the following parameters (see also :ref:`curvetrace_DUTconfig`):::
+The test parameters for the J112 are defined by creating a ``J112_config.txt`` file containing the following parameters (see also :ref:`curvetrace_DUTconfig`)::
 
    [PSU1]
    POLARITY = 1
@@ -113,8 +111,8 @@ The |curvetrace| program starts communication with the PSUs, configures the test
   :alt: ``curvetrace`` example with a J112 jFET
 
 
-Curve tracing of a low-power NPN BJT
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Testing a low-power NPN BJT
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 This example demonstrates how to test a bipolar transistor (BJT). In contrast to the previous example with the voltage-controlled FET, the BJT is controlled the base *current*. Since the base current is typically much smaller than the current measurement resolution of most PSUs, the ``curvetrace`` program uses the |R2| resistor to convert the |U2| voltage to the base current value (see ref:`curvetrace` for details). The conversion relies on the |R2| value, which must be determined considering the max. |U2| output voltage of the PSU2 and the max. |IB| current required for the test. The max. output voltage of PSU2 (Riden 6006P) is 60 V, and the targeted base current should range up to about 50 μA. With |IB| = (|U2| - |VBEon|) / |R2|, a suitable value for the test setup is |R2| = 100 k\ |Ohm|.
 
@@ -125,7 +123,7 @@ The BC550 needs a positive Collector-Emitter voltage (|U1|) and a positive Base-
    * PSU2-red to the Base pin via the 100 k\ |Ohm| |R2| resistor
    * PSU2-black to PSU2-black
    
-The test parameters for the BC550 are defined in the same way as in the previous example by creating a file ``BC550_config.txt`` with the following parameters:::
+The test parameters for the BC550 are defined in the same way as in the previous example by creating a file ``BC550_config.txt`` with the following parameters::
 
    [PSU1]
    POLARITY = 1
@@ -170,11 +168,8 @@ The curve tracing works in the same way as in the previous example, with two not
   :width: 658
   :alt: BC550 curves with/without self-heating control
 
-
-
-
-Curve tracing of a power transistor using temperature control
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Using a heater block to test a power transistor at controlled temperature
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Power transistors can produce a lot more heat than the low-power devices considered in the previous examples. To avoid thermal runaway and distortion of the curves at high power levels, the DUT temperature must remain stable during curve tracing. In principle, this could be achieved in the same way as in the BC550 example, where the DUT was operated at a fixed power level to attain thermal equilibrium during idle periods before each measurement. However, at higher power levels, the required idle periods can become excessively long, and self-heating during a single measurement may become significant. The «idle period» method therefore does not work well for testing transistors at high power levels.
 
@@ -182,7 +177,7 @@ A more efficient method to control the DUT temperature is to clamp it to a large
 
 The |curvetrace| program has a built-in PID controller for the heater block. The controller works by sensing the heater block temperature with a DS18B20 sensor, and by adjusting the output of the programmable PSU that powers the heater element. See :ref:`examples_curvetrace_heaterblock` for an example of such a heater block.
 
-To use the temperature control of the heater block, add the following paramters to the ``[EXTRA]`` section of your DUT test config file:::
+To use the temperature control of the heater block, add the following paramters to the ``[EXTRA]`` section of your DUT test config file::
 
    [EXTRA]
    ...
@@ -196,8 +191,8 @@ The below figure shows the curves from an IRFP150 power FET, which was clamped o
   :alt: IRFP150 curves measured on heater block at different temperatures
 
 
-Curve tracing of a vacuum tube
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Testing a vacuum tube
+^^^^^^^^^^^^^^^^^^^^^
 
 Analysing a vacuum tube works in the same way as with semiconductors. The obvious differences are (i) that vacuum tubes require an additional power supply with a fixed output for the heater filament(s) and (ii) that tubes tend to work at higher voltages.
 
@@ -212,7 +207,7 @@ The tube needs a positive Anode-Cathode voltage (|U1|) and a negative Grid-Cathd
    * PSU2-red to PSU2-black
    * PSU2-black to the Grid-1 pin (via a grid stopper resistor)   
    
-The test parameters for the 807 tube are defined in a ``807_triode_config.txt`` file, which might look like this:::
+The test parameters for the 807 tube are defined in a ``807_triode_config.txt`` file, which might look like this::
 
    [PSU1]
    POLARITY = 1
