@@ -16,9 +16,12 @@ This chapter is a modular tutorial built around various examples illustrating th
 Working with the |curvetrace| program
 -------------------------------------
 
+
+.. _examples_curvetrace_PSUconfig:
+
 Configuring the PSUs
 ^^^^^^^^^^^^^^^^^^^^
-To use the |curvetrace| program, you need to setup the PSU configuration file (see :ref:`curvetrace_PSUconfig`). It is assumed that PSU1 unit is a Riden 6012P operating in it's low-current / high-resolution mode, while PSU2 is a Riden 6006P (see :ref:`supported_PSUs`). These PSUs will be useful for testing a wide range of differen DUT types.
+To use the |curvetrace| program, you need to setup the PSU configuration file (see :ref:`curvetrace_PSUconfig`). It is assumed that PSU1 unit is a Riden 6012P operating in it's 6 A / high-resolution mode, while PSU2 is a Riden 6006P (see :ref:`supported_PSUs`). These PSUs will be useful for testing a wide range of differen DUT types.
 
 The simplest method to determine the ``COMPORT`` for PSU1 on Linux is to disconnect all serial interfaces except PSU1, and then list the virtual file representing the PSU1 serial port in the ``/dev/serial/by-path/`` directory. Repeat for PSU2.
 
@@ -33,6 +36,27 @@ Create the ``curvetrace_config.txt`` file in your home directory and then enter 
    COMPORT = /dev/serial/by-path/pci-0000:00:14.0-usb-0:2.4.2:1.0-port0
 
 This minimal PSU configuration file contains all information for the |curvetrace| program to establish the communication with PSU1 and PSU2.
+
+If you have different PSUs for different curve-tracing needs, it may be convenient to keep the configurations of all PSU devices in the ``curvetrace_config.txt`` file. Just make sure the active PSU1 and PSU2 devices are labelled ``[PSU1]`` and ``[PSU2]``, while the unused PSUs are labelled differently so they will be ignored by the |curvetrace| program. For example, if you would like to keep around the configurations for the Riden 6012P at 12 A / low-resolution mode and a BK Precision PSU, you could add them as ``not active PSU1`` to the ``curvetrace_config.txt`` file:::
+
+   [not active PSU1]
+   # Riden 6012P at 12A/high-res mode
+   TYPE    = RIDEN_6A
+   COMPORT = /dev/serial/by-path/pci-0000:00:14.0-usb-0:2.4.3:1.0-port0
+
+   [not active PSU1]
+   # BK Precision
+   TYPE    = BK
+   COMPORT = /dev/serial/by-id/usb-Silicon_Labs_CP2102_USB_to_UART_Bridge_Controller_508D19126-if00-port0
+
+   [PSU1]
+   # Riden 6012P at 6A/high-res mode
+   TYPE    = RIDEN_6A
+   COMPORT = /dev/serial/by-path/pci-0000:00:14.0-usb-0:2.4.3:1.0-port0
+
+   [PSU2]
+   TYPE    = RIDEN
+   COMPORT = /dev/serial/by-path/pci-0000:00:14.0-usb-0:2.4.2:1.0-port0
 
 
 
@@ -130,7 +154,7 @@ The test parameters for the BC550 are defined in the same way as in the previous
    R2CONTROL = 100000
    IDLESECS    = 2
    PREHEATSECS = 60
-   NREP        = 1
+
 
 Run |curvetrace|:
 
@@ -156,7 +180,7 @@ Power transistors can produce a lot more heat than the low-power devices conside
 
 A more efficient method to control the DUT temperature is to clamp it to a large block of metal with a regulated heater element. The thermal inertia of the metal block greatly reduces short-term fluctuations of the DUT temperature. The heater allows controlling the temperature of the metal block and the DUT to a predefined value.
 
-The |curvetrace| program has a built-in PID controller for the heater block. The controller works by sensing the heater block temperature with a DS18B20 sensor, and by adjusting the output of the programmable PSU that powers the heater element. See :ref:`_examples_curvetrace_heaterblock` for an example of such a heater block.
+The |curvetrace| program has a built-in PID controller for the heater block. The controller works by sensing the heater block temperature with a DS18B20 sensor, and by adjusting the output of the programmable PSU that powers the heater element. See :ref:`examples_curvetrace_heaterblock` for an example of such a heater block.
 
 To use the temperature control of the heater block, add the following paramters to the ``[EXTRA]`` section of your DUT test config file:::
 
@@ -169,13 +193,59 @@ The below figure shows the curves from an IRFP150 power FET, which was clamped o
 
 .. image:: curvetrace_IRFP150_T_control.png
   :width: 658
-  :alt: IRFP curves measured on heater block at different temperatures
+  :alt: IRFP150 curves measured on heater block at different temperatures
 
 
 Curve tracing of a vacuum tube
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-EXAMPLE WITH VACUUM TUBE, USING HIGH-VOLTAGE PSU (SHOW THE PSU CONFIG), AND AN EXTERNAL HEATER SUPPLY, MAYBE ALSO 
+Analysing a vacuum tube works in the same way as with semiconductors. The obvious differences are (i) that vacuum tubes require an additional power supply with a fixed output for the heater filament(s) and (ii) that tubes tend to work at higher voltages.
+
+This example assumes a 807 beam power tube configured for triode operation. Connect the filament pins to a 6.3 V / 0.9 A power supply, and Grid-2 to the Anode via a grid stopper resistor (for triode operation).
+
+The anode voltage is controlled by a BK Precision 8158B as PSU1, while the Grid-1 voltage is controlled by the same Riden 6006P as in the previous examples (see :ref:`examples_curvetrace_PSUconfig` for a convenient method to switch between PSU units for different applications).
+
+The tube needs a positive Anode-Cathode voltage (|U1|) and a negative Grid-Cathde voltage (|U2|), so you need to connect the pins as follows:
+
+   * PSU1-red to the Anode pin
+   * PSU1-black to the Cathode pin and to PSU2-red
+   * PSU2-red to PSU2-black
+   * PSU2-black to the Grid-1 pin (via a grid stopper resistor)   
+   
+The test parameters for the 807 tube are defined in a ``807_triode_config.txt`` file, which might look like this:::
+
+   [PSU1]
+   POLARITY = 1
+   VSTART = 0
+   VEND   = 400
+   VSTEP  = 5
+   IMAX   = 0.125
+   PMAX   = 50
+   VIDLE  = 300
+   IIDLE  = 0.075
+   
+   [PSU2]
+   POLARITY = -1
+   VSTART = 0.0
+   VEND   = 60
+   VSTEP  = 5
+   IMAX   = 1
+   PMAX   = 5
+   VIDLE     = 25.0
+   VIDLE_MIN = 0.0
+   VIDLE_MAX = 60.0
+   IDLE_GM   = -0.007
+   IIDLE     = 1
+   
+   [EXTRA]
+   IDLESECS    = 0
+   PREHEATSECS = 300
+
+Note the somewhat long ``PREHEATSECS`` parameter, which makes sure the tube has warmed up and stabilized before the curve tracing starts. Also, make sure to not skip the grid stopper resistors at Grid-1 and Grid-2 to prevent oscillation. With this test setup, the curves recorded with the |curvetrace| program will look like in the figure below.
+
+.. image:: curvetrace_807_triode.png
+  :width: 658
+  :alt: Curves of a 807 tube in triode configuration
 
 
 Batch mode
