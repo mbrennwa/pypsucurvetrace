@@ -28,7 +28,7 @@ classifiers = [
 # as defined in src/pypsucurvetrace/__init__.py
 curvetrace   = "pypsucurvetrace:curvetrace"
 curveplot    = "pypsucurvetrace:curveplot"
-curveprocess = "pypsucurvetrace:cprocess"
+curveprocess = "pypsucurvetrace:curveprocess"
 curvematch   = "pypsucurvetrace:curvematch"
 
 [project.urls]
