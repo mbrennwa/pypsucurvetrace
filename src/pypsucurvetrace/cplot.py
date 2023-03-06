@@ -99,7 +99,7 @@ def cplot():
 
     # matching tools:
     parser.add_argument('--pairs', action='store_true', help='Plot overlays of all dataset pairs in datafiles list (useful for parts matching). The plot title is determined from the datafile names.')
-    parser.add_argument('--maxdeltaUc', type=float, help='Skip --pairs plotting if the Uc values from the prehead/idle are different by more than the specified value (ignored if used without --pairs)')
+    parser.add_argument('--maxdeltaU2', type=float, help='Skip --pairs plotting if the Uc values from the prehead/idle are different by more than the specified value (ignored if used without --pairs)')
 
     # program flow:
     parser.add_argument('--savepdf', action='store_true', help='Save plot to PDF file. The filename is determined from the --title (if set) or from the datafile name(s). WARNING: existing files with the same name will be overwritten!')
@@ -122,14 +122,14 @@ def cplot():
 
     # matching:
     pairs = False
-    maxdeltaUc = None
+    maxdeltaU2 = None
     if args.pairs:
 	    if len(datafiles) == 1:
 		    logger.warning('Specified --pairs option with a single datafile, ignoring --pairs.')
 	    else:
 		    pairs = True
-	    if args.maxdeltaUc:
-		    maxdeltaUc = args.maxdeltaUc
+	    if args.maxdeltaU2:
+		    maxdeltaU2 = args.maxdeltaU2
 		    
     # program flow:
     savefig = False
@@ -321,10 +321,10 @@ def cplot():
 		    for i in range(0,len(data)-1):
 			    for j in range(i+1,len(data)):
 				    do_add = False
-				    if args.maxdeltaUc is None:
+				    if args.maxdeltaU2 is None:
 					    do_add = True
 				    else:
-					    if abs(preheat[i].U2-preheat[j].U2) <= maxdeltaUc:
+					    if abs(preheat[i].U2-preheat[j].U2) <= maxdeltaU2:
 						    do_add = True
 				    if do_add:
 					    datapairs += ( ( data[i], data[j], ), )

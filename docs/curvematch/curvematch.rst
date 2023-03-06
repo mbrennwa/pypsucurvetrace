@@ -14,7 +14,7 @@ The |curvematch| program
    :toctree: generated
 
 
-The |curvematch| program calculates the «difference between two curve sets». This is useful to find parts with similar curves (part matching). The difference between the curve sets of two DUTs is calculated and expressed as follows:
+The |curvematch| program calculates the «difference between two curve sets». This is useful to find parts with similar curves (part matching). The difference between the curve sets of two DUTs is calculated and reported as follows:
 
    #. The values of the gate/grid voltage (|VG|) or base current (|IB|) of both DUTs are interpolated from the raw data to a rectangular grid of |U1| and |I1| values.
    #. The differences |Dij| of the |VG| or |IB| values are calculated at each grid point :math:`(i,j)`.
