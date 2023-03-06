@@ -12,11 +12,20 @@ description = "A software toolbox for I/V curve tracing of electronic devices us
 readme = "README.md"
 requires-python = ">=3.7"
 dependencies = [
+    "numpy",
+    "matplotlib",
+    "serial",
     "minimalmodbus",
+    "scipy",
     "simple_pid",
     "pydigitemp",
-    "matplotlib",
-    "scipy"
+    "argparse",
+    "pathlib",
+    "logging",
+    "configparser",
+    "datetime",
+    "multiprocessing"
+    "threading",
 ]
 classifiers = [
     "Programming Language :: Python :: 3",

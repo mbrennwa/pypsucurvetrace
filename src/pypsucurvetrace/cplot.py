@@ -19,8 +19,7 @@ import argparse
 import numpy as np
 import matplotlib.pyplot as plt
 from pathlib import Path
-import tempfile
-import logging
+### import tempfile
 
 from pypsucurvetrace.read_datafile import read_datafile
 from pypsucurvetrace.plot_curves import plot_curves

@@ -5,7 +5,7 @@ Function to plot pypsucurvetrace data
 # imports:
 import numpy as np
 import matplotlib.pyplot as plt
-import logging
+### import logging
 from queue import Empty
 
 from pypsucurvetrace.read_datafile import measurement_data

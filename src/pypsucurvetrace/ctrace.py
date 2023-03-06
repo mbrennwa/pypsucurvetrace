@@ -18,7 +18,7 @@ import configparser
 import datetime
 import numpy as np
 import time
-import logging
+### import logging
 import matplotlib.pyplot as plt
 import multiprocessing
 from pathlib import Path
