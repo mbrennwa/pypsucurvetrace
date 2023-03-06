@@ -23,9 +23,9 @@ dependencies = [
     "pathlib",
     ### "logging",
     "configparser",
-    "datetime",
-    "multiprocessing",
-    "threading"
+    "datetime" #,
+    ### "multiprocessing",
+    ### "threading"
 ]
 classifiers = [
     "Programming Language :: Python :: 3",
