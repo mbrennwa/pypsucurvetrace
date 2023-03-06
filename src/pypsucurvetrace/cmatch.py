@@ -112,6 +112,7 @@ def cmatch():
         I1range = None
     
     datafiles.sort()
+    not_proc = []
     for i in range(N-1):
         for j in range(N):
             if j > i:
@@ -120,8 +121,12 @@ def cmatch():
                 d2, l2, p2, R2_val2 = read_datafile(datafiles[j])
                 
                 # determine RMS delta:
-                dx2_0RMS, dx2_cRMS = curves_RMSdelta(d1, d2, U1range, I1range, R2_val1, R2_val2, BJT_VBE, BJT_VBE)
-                
+                try:
+                    dx2_0RMS, dx2_cRMS = curves_RMSdelta(d1, d2, U1range, I1range, R2_val1, R2_val2, BJT_VBE, BJT_VBE)
+                except Exception as e:
+                    not_proc.append([d1, d2, e])
+                    break
+                    
 	            # print results:
                 Nd = 4
                 try: U1_low = "{:.{}g}".format( U1range[0], Nd )
@@ -146,6 +151,9 @@ def cmatch():
 	                   dx2_0RMS + sep +
 	                   dx2_cRMS
 	                  )
+
+    for x in not_proc:
+        logger.warning('Could not match data from files ' + Path(x[0].datafile).stem + ' and '  + Path(x[1].datafile).stem)
 
 
 def curves_RMSdelta(cdata1, cdata2, U1range, I1range, R2_val1=None, R2_val2=None, BJT_VBE1=None, BJT_VBE2=None):
