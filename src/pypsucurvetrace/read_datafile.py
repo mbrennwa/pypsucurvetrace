@@ -144,18 +144,19 @@ def read_datafile(datafile):
 			u = line.replace("Uc = U0=", "U0=") # workaround for buggy output from curvetrace
 			
 			# replace old-style U0/I0 by U1/I1 and Uc/Ic by U2/I2:
-			u = line.replace("U0", "U1")
-			u = line.replace("I0", "I1")
-			u = line.replace("Uc", "U2")
-			u = line.replace("Ic", "I2")
-			
+			u = u.replace("U0", "U1")
+			u = u.replace("I0", "I1")
+			u = u.replace("Uc", "U2")
+			u = u.replace("Ic", "I2")
 			
 			u = u.split(': ')[1]
 			u = u.split('=')
+			
 			ph.U1 = float(u[1].split('V')[0])
 			ph.I1 = float(u[2].split('A')[0])
 			ph.U2 = float(u[3].split('V')[0])
 			ph.I2 = float(u[4].split('A')[0])
+
 			try:
 				ph.T = float(u[5].split('°C')[0])
 			except:

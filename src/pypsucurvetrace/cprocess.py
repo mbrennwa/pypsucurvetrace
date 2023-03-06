@@ -94,6 +94,7 @@ def cprocess():
     print( 'Filename' + sep + 'Sample' + sep + label_U1 + sep + label_I1 + sep + label_X2 + sep + label_dI1_dX2 + sep + label_dI1_dU1 + sep + label_dU1_dX2 + sep + 'T (°C)')
     
     # process all datafiles:
+    not_proc = []
     for i in range(len(datafiles)):
     
         # read data file:
@@ -115,8 +116,13 @@ def cprocess():
 	            error_and_exit(logger, 'Could not determine U1, I1 and U2 from preheat data', e)
 
 	    for j in range(len(U1I1[0])):
-            # determine DUT parameters at U1/I1 point(s):
-	        XX2, dI1_dX2, dU1_dX2, dI1_dU1 = proc_curves(d, U1I1[0][j], U1I1[1][j], R2_val, BJT_VBE)
+	        # determine DUT parameters at U1/I1 point(s):
+	        try:
+	            XX2, dI1_dX2, dU1_dX2, dI1_dU1 = proc_curves(d, U1I1[0][j], U1I1[1][j], R2_val, BJT_VBE)
+	        except Exception as e:
+	            not_proc.append([d,e])
+	            break
+    	        
 	        if not use_preheat:
 	            X2 = XX2
 	            
@@ -134,6 +140,9 @@ def cprocess():
 	               "{:.{}g}".format( dI1_dU1, Nd ) + sep +
 	               "{:.{}g}".format( dU1_dX2, Nd ) + sep +
 	               TT )
+	               
+    for x in not_proc:
+        logger.warning('Could not process file ' + Path(x[0].datafile).stem)
 	    
 	    
 def proc_curves(cdata, U1, I1, R2_val=None, BJT_VBE=None):
@@ -175,11 +184,11 @@ def proc_curves(cdata, U1, I1, R2_val=None, BJT_VBE=None):
         except:
             pass
     if delta_u1 == 0 or np.isnan(delta_u1):
-        error_and_exit(logger, 'U1 range must be greater than zero!')
+        raise ValueError('U1 range must be greater than zero!')
     if delta_i1 == 0 or np.isnan(delta_i1):
-        error_and_exit(logger, 'I1 range must be greater than zero!')
+        raise ValueError('I1 range must be greater than zero!')
     if delta_x2 == 0 or np.isnan(delta_x2):
-        error_and_exit(logger, 'U2 range must be greater than zero!')
+        raise ValueError('U2 range must be greater than zero!')
     
     # interpolation coordinates for U1, I1 and X2 (only use the range that is relevant for analysis around the (U1/I1) point)
     NG = 3 # number of grid points near U1 and I1 (don't need much)
