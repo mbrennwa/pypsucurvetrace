@@ -21,11 +21,8 @@ dependencies = [
     "pydigitemp",
     "argparse",
     "pathlib",
-    ### "logging",
     "configparser",
-    "datetime" #,
-    ### "multiprocessing",
-    ### "threading"
+    "datetime"
 ]
 classifiers = [
     "Programming Language :: Python :: 3",
