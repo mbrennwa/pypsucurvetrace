@@ -24,8 +24,8 @@ dependencies = [
     "logging",
     "configparser",
     "datetime",
-    "multiprocessing"
-    "threading",
+    "multiprocessing",
+    "threading"
 ]
 classifiers = [
     "Programming Language :: Python :: 3",
