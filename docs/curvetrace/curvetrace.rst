@@ -8,6 +8,7 @@ The |curvetrace| program
 .. autosummary::
    :toctree: generated
 
+.. _curvetrace_hardwaresetup:
 
 .. image:: test_setup.png
   :width: 658

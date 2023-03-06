@@ -5,6 +5,47 @@
 
 |pypsucurvetrace| is a software toolbox for «curve tracing» of electronic devices like transistors or vacuum tubes. It uses standard off-the-shelf programmable power supplies (PSUs) to apply predefined voltages to the device under test (DUT) and to determine the corresponding currents flowing through the DUT.
 
+
+.. grid::
+
+    .. grid-item-card:: Installation
+        :link: installation/installation
+        :link-type: doc
+
+        How to install the |pypsucurvetrace| software
+
+
+    .. grid-item-card:: Software User Guide
+        :link: overview/userguide
+        :link-type: doc
+
+        User guide for the |pypsucurvetrace| tools
+
+
+    .. grid-item-card:: Hardware Setup
+        :link: :ref:`curvetrace_hardwaresetup`
+        :link-type: doc
+
+        Hardware setup for curve tracing
+
+
+.. grid::
+
+    .. grid-item-card:: Tutorial and Examples
+        :link: examples/examples
+        :link-type: doc
+
+        Tutorial with worked examples
+        
+
+    .. grid-item-card:: Contribute
+        :link: overview/contribute
+        :link-type: doc
+
+        How to contribute to |pypsucurvetrace| or report bugs
+
+
+
 |pypsucurvetrace| provides the following command-line tools:
 
 * |curvetrace| controls the PSUs and records the «curve data» of the DUT and saves them to a data file. The |curvetrace| program can also control the DUT temperature during curve tracing using an optional heater block.
