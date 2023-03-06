@@ -80,10 +80,16 @@ def ctrace():
     parser.add_argument('-c', '--config', help='path to configuration file with DUT test parameters')
     parser.add_argument('-b', '--batch', action='store_true', help='batch mode (loop of repeated test tuns)')
     parser.add_argument('-q', '--quick', action='store_true', help='quick mode (pre-heating only, no curve tracing)')
+
+    # do not show a "hello" message
+    parser.add_argument('--nohello', action='store_true', help='Do not print the hello / about message (useful when the output needs further processing).')
+
+    # parse args:
     args = parser.parse_args()
 
     # Say Hello:
-    say_hello('curvetrace', 'I-V curve tracing of electronic parts using programmable power supplies')
+    if not args.nohello:
+        say_hello('curvetrace', 'I-V curve tracing of electronic parts using programmable power supplies')
 
     # read PSU config file:
     cfgfile = 'curvetrace_config.txt'

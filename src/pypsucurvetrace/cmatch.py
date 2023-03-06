@@ -46,11 +46,16 @@ def cmatch():
 
     # BJT option:
     parser.add_argument('--bjtvbe', help='BJT VBE-on voltage for conversion of PSU U2 voltage to base current using R2CONTROL from the data file: Ibase = (U2-BJTVBE)/R2CONTROL')
+    
+    # do not show a "hello" message
+    parser.add_argument('--nohello', action='store_true', help='Do not print the hello / about message (useful when the output needs further processing).')
+
+    # parse args:
+    args = parser.parse_args()
 
     # Say Hello:
-    say_hello('curveprocess', 'Extract and calculate parameters from pypsucurvetrace data')
-
-    args = parser.parse_args()
+    if not args.nohello:
+        say_hello('curveprocess', 'Extract and calculate parameters from pypsucurvetrace data')
 
     # determine unique list of data file(s):
     datafiles = (list(set(args.datafiles)))

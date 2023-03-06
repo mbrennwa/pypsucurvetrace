@@ -107,10 +107,15 @@ def cplot():
     parser.add_argument('--savepng', action='store_true', help='Save plot to PNG file (see also --savepdf)')
     parser.add_argument('--nodisplay', action='store_true', help='Do not show the figure(s) on screen, only save to file (this requires at lease one of the --saveXYZ options to be set)')
 
-    # Say Hello:
-    say_hello('curveplot', 'Plotting of pypsucurvetrace data')
+    # do not show a "hello" message
+    parser.add_argument('--nohello', action='store_true', help='Do not print the hello / about message (useful when the output needs further processing).')
 
+    # parse args:
     args = parser.parse_args()
+
+    # Say Hello:
+    if not args.nohello:
+         say_hello('curveplot', 'Plotting of pypsucurvetrace data')
 
     # determine data file(s):
     datafiles = args.datafiles

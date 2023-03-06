@@ -19,7 +19,7 @@ def say_hello(progname, purpose):
 	print('\n')
 	print('***** ' + progname + ' (pypsucurvetrace)')
 	print('***** ' + purpose)
-	print('***** Disclaimer: NO WARRANTIES OF ANY KIND! Users are advised to study the code in order to understand how this program works.')
+	print('***** Disclaimer: NO WARRANTIES OF ANY KIND! Users are advised to read the documentation at http://pypsucurvetrace.readthedocs.io and to study the source code in order to understand how this program works.')
 	print('\n')
 
 
