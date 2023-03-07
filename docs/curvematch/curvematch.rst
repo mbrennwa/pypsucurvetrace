@@ -14,22 +14,23 @@ The |curvematch| program
    :toctree: generated
 
 
-The |curvematch| program quantifies the «similarity of two curve sets». Consider the following figure where the |U1|, |I1|, and |U2| data from two different DUTs are represented by the red and blue surfaces:
+The |curvematch| program quantifies the «similarity» of two curve sets. Consider the following figure with the |U1|, |I1|, and |U2| data from two different VFET power transistors. The data from the two DUTs are represented by the red and blue surfaces in a 3-dimensional plot instead of the conventional curves plot:
 
 .. image:: curvematch_surfaces.png
   :width: 658
   :alt: 3-dimensional representation of the (|U1|,\ |I1|,\ |U2|) curve data from two different VFET power transistors.
 
-The «similarity between the two curve sets» is defined as the RMS value of the vertical difference between the two surfaces (i.e., the difference along the |U2| axis).
+The «similarity» between the two curve sets is defined as the RMS value of the vertical difference between the two surfaces (i.e., the difference along the |U2| axis).
 
 The procedure implemented in the |curvematch| program to calculate and report the similarity between the curve sets is as follows:
 
-   #. The values of the gate/grid voltage (|VG|) or base current (|IB|) of both DUTs are interpolated from the raw data to a rectangular grid of |U1| and |I1| values.
-   #. The differences |Dij| of the |VG| or |IB| values are calculated at each grid point :math:`(i,j)`.
-   #. The RMS value of the |Dij| values is reported. A low RMS value indicates a good overall match between the two DUTs (i.e., the surfaces in the 3-dimensional plot are almost identical).
-   #. The mean |D0| of all |Dij| values is calculated, and the RMS value of |Ddelta| is reported. A low value indicates that the curves of the two DUTs tend to be parallel to each other, but may exhibit a constant |VG| or |IB| offset (i.e., the surfaces in the 3-dimensional plot are almost parallel, but may be offset vertically).
+   #. For current-controlled DUTs (BJTs), the |U2| value is converted to the base current |IB|. For voltage controlled DUTs (FETs, tubes), the |U2| voltage the gate/grid voltage |VG|.
+   #. The |IB| or |VG| data of both DUTs are interpolated to a rectangular grid of |U1| and |I1| values.
+   #. At each grid point :math:`(i,j)` the differences |Dij| of the |VG| or |IB| values are calculated.
+   #. The RMS value of the |Dij| values is reported. A low RMS value indicates that the two curve data sets are similar to each other (i.e., the surfaces in the 3-dimensional plot are almost identical).
+   #. The mean |D0| of all |Dij| values is calculated, and the RMS value of |Ddelta| is reported. A low RMS value indicates that the curves of the two DUTs tend to be parallel to each other, but may exhibit a constant |VG| or |IB| offset (i.e., the surfaces in the 3-dimensional plot are parallel, but may be offset along the |U2| axis).
 
-The calculation of these RMS values can be restricted with the |curvematch| program to data points that lie within a certain range of |U1| and |I1| values only.
+Optionally, the calculation of these RMS values can be restricted with the |curvematch| program to data points that lie within a certain range of interest of the |U1| and |I1| data.
 
 The |curvematch| documentation can be accessed from the |curvematch| program directly:
 
