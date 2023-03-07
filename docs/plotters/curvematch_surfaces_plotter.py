@@ -70,7 +70,7 @@ ax.set_xlabel('U1 (V)')
 ax.set_ylabel('I1 (A)')
 ax.set_zlabel('U2 (V)')
 
-fig.savefig('curvematch_surfaces.png', dpi=200)
+fig.savefig('curvematch_surfaces.png', dpi=200, bbox_inches="tight", pad_inches=0.3)
 
 plt.show()
 
