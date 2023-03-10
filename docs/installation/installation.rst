@@ -10,7 +10,7 @@ Installation
    pypsucurvetrace
 
 
-If you already know how to install a Python package, all you may want to know is this command to install ``pypsucurvetrace``:
+If you already know how to install a Python package, the following command may be everything you need to know to install ``pypsucurvetrace``:
 
 .. code-block:: console
 
