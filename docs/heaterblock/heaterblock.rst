@@ -16,6 +16,6 @@ In the meantime, here's a diagram and a photo of a temperature controlled heater
   :alt: Heater block diagram
 
 
-.. image:: heaterblock_photo.png
+.. image:: heaterblock_photo.jpg
   :width: 658
   :alt: Heater block photo
