@@ -12,7 +12,7 @@
 
 |pypsucurvetrace| provides the following command-line tools:
 
-* |curvetrace| controls the PSUs and records the «curve data» of the DUT and saves them to a data file. The |curvetrace| program can also control the DUT temperature during curve tracing using an optional heater block.
+* |curvetrace| controls the PSUs, records the «curve data» of the DUT, and saves them to a data file. The |curvetrace| program can also control the DUT temperature during curve tracing using an optional heater block.
 * |curveplot| produces high-quality plots of the curve data.
 * |curveprocess| determines characteristic DUT parameters from the curve data (operating points, gain, output conductance).
 * |curvematch| calculates the «difference between two curve sets» to help finding parts with similar curves (part matching).
