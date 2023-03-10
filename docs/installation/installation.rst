@@ -10,6 +10,15 @@ Installation
    pypsucurvetrace
 
 
+If you already know how to install a Python package, all you may want to know is this command to install ``pypsucurvetrace``:
+
+.. code-block:: console
+
+   pipx install git+https://github.com/mbrennwa/pypsucurvetrace
+
+Otherwise, read on!
+
+
 Prerequisites
 -------------
 
