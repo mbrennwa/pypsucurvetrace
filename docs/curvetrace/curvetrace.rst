@@ -14,7 +14,7 @@ The |curvetrace| program
   :width: 658
   :alt: Schematic of test circuit
 
-The figure shows the circuit used to analyse a device under test (DUT). The |curvetrace| program controls the voltages |U1| and |U2| at the terminals of the programmable power supplies PSU1 and PSU2, and records the currents |I1| and |I2| using the built-in meters of PSU1 and PSU2. Both |U1| and |U2| are shwon as positive voltages in the figure. Negative voltages are achieved simply by connecting the corresponding PSU(s) with inverted polarity.
+The figure shows the circuit used to analyse a device under test (DUT). The |curvetrace| program controls the voltages |U1| and |U2| at the terminals of the programmable power supplies PSU1 and PSU2, and records the currents |I1| and |I2| using the built-in meters of PSU1 and PSU2. Both |U1| and |U2| are shwon as positive voltages in the figure. Negative voltages are achieved simply by connecting the terminals of the corresponding PSU(s) with inverted polarity.
 
 The resistor |R2| serves multiple purposes:
 
