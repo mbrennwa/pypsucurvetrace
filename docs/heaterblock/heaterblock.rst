@@ -1,8 +1,6 @@
-.. _heaterblock:
-
 .. include:: ../symbols.rst
 
-
+.. _heaterblock:
 ************
 Heater Block
 ************
