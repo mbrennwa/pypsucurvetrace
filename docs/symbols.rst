@@ -1,4 +1,5 @@
 .. |pypsucurvetrace| replace:: ``pypsucurvetrace``
+.. |PSU_configfile| replace:: ``curvetrace_config.txt``
 .. |curvetrace| replace:: ``curvetrace``
 .. |curveplot| replace:: ``curveplot``
 .. |curveprocess| replace:: ``curveprocess``
