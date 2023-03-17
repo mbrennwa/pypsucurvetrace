@@ -26,27 +26,26 @@ The configuration of the heaterblock for the |curvetrace| program is specified i
 
    PSU_COMPORT       = ...
    PSU_TYPE          = ...
-
    TEMPSENS_COMPORT  = ...
    TEMPSENS_TYPE     = ...
-
-   TBUFFER_NUM       = 5
-   TBUFFER_INTERVAL  = 1
-   NUMSTABLEREAD     = 5
-
+   TBUFFER_NUM       = ...
+   TBUFFER_INTERVAL  = ...
+   NUMSTABLEREAD     = ...
    HEATER_RESISTANCE = ...
    MAX_POWER         = ...
-
    KP                = ...
    KI                = ...
    KD                = ...
 
-
-UNDER CONSTRUCTION / TO DO:
-* EXPLAIN CONFIG PARAMETERS (SEE OLD TEMPLATE FILE)
-* GET NICER PHOTO AND USE THIS IN THE CONSTRUCTION EXAMPLE (NOT HERE)
-
-
+* ``PSU_COMPORT`` and ``PSU_TYPE``: COM port and type of the PSU used for the heaters (see also :ref:`curvetrace_PSUconfig` and :ref:`supported_PSUs` for details).
+* ``TEMPSENS_COMPORT``: COM port of the temperature sensor
+* ``TEMPSENS_TYPE``: type of temperature sensor. Currently, only ``TEMPSENS_TYPE = DS1820`` is supported.
+* ``TBUFFER_NUM``: number of temperature readings to store in memory
+* ``TBUFFER_INTERVAL``: time between temperature readings (in seconds)
+* ``NUMSTABLEREAD``: number of temperature readings that must be consistent with the target temperature in order to assume temperature conditions (must not be higher than ``TBUFFER_NUM``)
+* ``HEATER_RESISTANCE``: resistance of the combined heater resistors (in Ohm)
+* ``MAX_POWER``: maximum heating power
+* ``KP``, ``KI``, ``KD``: coefficients of the `PID controller <https://en.wikipedia.org/wiki/PID_controller>`_
 
 .. image:: heaterblock_photo.jpg
   :width: 658
