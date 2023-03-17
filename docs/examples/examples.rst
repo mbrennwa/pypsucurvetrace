@@ -25,7 +25,7 @@ To use the |curvetrace| program, you need to setup the PSU configuration file (s
 
 The simplest method to determine the ``COMPORT`` for PSU1 on Linux is to disconnect all serial interfaces except PSU1, and then list the virtual file representing the PSU1 serial port in the ``/dev/serial/by-path/`` directory. Repeat for PSU2.
 
-To set up a minimal PSU configuration file that contains all information for the |curvetrace| program to establish the communication with PSU1 and PSU2, create a ``curvetrace_config.txt`` file in your home directory and enter the following parameters (your ``COMPORT`` settings will be different):::
+To set up a minimal PSU configuration file that contains all information for the |curvetrace| program to establish the communication with PSU1 and PSU2, create a |PSU_configfile| file in your home directory and enter the following parameters (your ``COMPORT`` settings will be different):::
 
    [PSU1]
    TYPE    = RIDEN_6A
@@ -35,7 +35,7 @@ To set up a minimal PSU configuration file that contains all information for the
    TYPE    = RIDEN
    COMPORT = /dev/serial/by-path/pci-0000:00:14.0-usb-0:2.4.2:1.0-port0
 
-If you have different PSUs for different curve-tracing needs, it may be convenient to keep the configurations of all PSU devices in the ``curvetrace_config.txt`` file. Just make sure the active PSU1 and PSU2 devices are labelled ``[PSU1]`` and ``[PSU2]``, while the unused PSUs are labelled differently so they will be ignored by the |curvetrace| program. For example, if you would like to keep around the configurations for the Riden 6012P at 12 A / low-resolution mode and a BK Precision PSU, you could add them as ``disabled PSU1`` to the ``curvetrace_config.txt`` file::
+If you have different PSUs for different curve-tracing needs, it may be convenient to keep the configurations of all PSU devices in the |PSU_configfile| file. Just make sure the active PSU1 and PSU2 devices are labelled ``[PSU1]`` and ``[PSU2]``, while the unused PSUs are labelled differently so they will be ignored by the |curvetrace| program. For example, if you would like to keep around the configurations for the Riden 6012P at 12 A / low-resolution mode and a BK Precision PSU, you could add them as ``disabled PSU1`` to the |PSU_configfile| file::
 
    [disabled PSU1]
    # Riden 6012P at 12A/high-res mode

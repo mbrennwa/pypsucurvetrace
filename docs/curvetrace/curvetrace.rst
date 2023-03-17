@@ -33,7 +33,7 @@ Test procedure
 
 The procedure implemented in the |curvetrace| program is as follows:
 
-   1. Read the ``curvetrace_config.txt`` configuration file with the PSU details, and connect to the PSUs (see below).
+   1. Read the |PSU_configfile| configuration file with the PSU details, and connect to the PSUs (see below).
    
    2. Interactively ask the user for a name or label of the test data, and then open an ASCII data file with that name (an existing file with the same name gets overwritten!).
    
@@ -65,7 +65,7 @@ The procedure implemented in the |curvetrace| program is as follows:
 
 Power supply configuration
 --------------------------
-The basic configuration required for |curvetrace| to work is to specify the PSU models used, and their communication port is connected to the computer. To specify these configurations, create a file ``curvetrace_config.txt`` and enter the PSU configurations as follows:::
+The basic configuration required for |curvetrace| to work is to specify the PSU models used, and their communication port is connected to the computer. To specify these configurations, create a file |PSU_configfile| and enter the PSU configurations as follows:::
 
    [PSU1]
    TYPE    = ...
@@ -78,7 +78,7 @@ The basic configuration required for |curvetrace| to work is to specify the PSU 
 * ``TYPE``: the type or model of the PSU. See :ref:`supported_PSUs` for details.
 * ``COMPORT``: path of the virtual file corresponding to the serial port of the PSU
 
-See :ref:`examples_curvetrace` for examples of ``curvetrace_config.txt`` files.
+See :ref:`examples_curvetrace` for examples of |PSU_configfile| files.
 
 Note that it is possible to connect multiple PSU units in series to each other to accomplish a higher voltage range. Such a series combination of multiple PSU units can be configured as a single PSU object by specifying their `TYPE` and `COMPORT` fields as follows:
 
@@ -93,7 +93,7 @@ There are further configuration options to improve the the quality of the the PS
 
 Heater block configuration
 --------------------------
-The configuration of the heater block is only required if a heater block is used. The heater block configuration is also specified in the ``curvetrace_config.txt`` file. See :ref:`heaterblock` for details.
+The configuration of the heater block is only required if a heater block is used. The heater block configuration is also specified in the |PSU_configfile| file. See :ref:`heaterblock` for details.
 
 
 .. _curvetrace_DUTconfig:

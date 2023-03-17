@@ -12,7 +12,7 @@ Choosing suitable PSU models for your curve-tracing setup will mainly depend on 
    * Testing small-signal transistors requires a high-resolution PSU that can set and read voltages and currents at small increments of about 10-100 μV and 10-100 μA, while the power will be 1 W or less.
    * Testing vacuum tubes also benefits from good low-current resolution, but typically requires high-voltage PSUs (or multiple PSUs connected in series).
 
-The list below describes the PSU models that are supported by |pypsucurvetrace|, and how to configure them in the ``curvetrace_config.txt`` file.
+The list below describes the PSU models that are supported by |pypsucurvetrace|, and how to configure them in the |PSU_configfile| file.
 
 Korad / RND
 -----------
@@ -23,7 +23,7 @@ Korad make cost-effective power supplies which make for a flexible all-purpose t
    * Tested / confirmed: KA3005P, KWR103
    * Untested / unconfirmed: KA3003P, KD3005P, KA3010P, KA6002P, KA6003P, KA6005P, KD6005P
    
-Configuration in ``curvetrace_config.txt``::
+Configuration in |PSU_configfile|::
 
    TYPE = KORAD
 
@@ -37,7 +37,7 @@ Riden / Ruiden offer power supply modules and accessories that allow building ve
    * Tested / confirmed: RD6006P, RD6012P
    * Untested / unconfirmed: RD6006, RD6012   
    
-Configuration in ``curvetrace_config.txt``::
+Configuration in |PSU_configfile|::
 
    TYPE = RIDEN
    
@@ -56,11 +56,11 @@ BK Precision
 ------------
 |pypsucurvetrace| supports the BK Precision 9120A and 9185B models, which both provide 0.01 mA current readback resolution. The 9120A is very suitable for testing small-signal transistors, because it provides 0.1 mV voltage readback resolution with a max voltage of 32 V. The 9185B is suitable for high-voltage devices like electron tubes, because it provides a maximum output voltage of 610 V (with 0.3 V voltage readback resolution).
 
-Configuration of the 9120A in ``curvetrace_config.txt``::
+Configuration of the 9120A in |PSU_configfile|::
 
    TYPE = BK
    
-Configuration of the 9185B in ``curvetrace_config.txt``:
+Configuration of the 9185B in |PSU_configfile|:
 
    * For high voltage range (up to 610 V, max. current 350 mA)::
    
@@ -82,7 +82,7 @@ The Voltcraft PPS models have been around for a long time and have served as cos
    * Tested / confirmed: PPS11360, PPS16005, PPS11810
    * Untested / unconfirmed: PPS11603, PPS13610, PPS11815
 
-Configuration in ``curvetrace_config.txt``::
+Configuration in |PSU_configfile|::
 
    TYPE = VOLTCRAFT
 
