@@ -249,7 +249,7 @@ Batch mode
 EXAMPLE TO ILLUSTRATE BATCH MODE (FOR LATER USE IN MATCHING EXAMPLE). USE 2SJ28 OR 2SK82 BATCH, WHICH WILL SERVE AS A NICE DATASET TO RE-USE IN THE CURVEMATCH EXAMPLE(S).
 
 
-.. _examples_curvetrace_heaterblock
+.. _examples_curvetrace_heaterblock:
 
 Construction of a heater block for DUT temperature control
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
