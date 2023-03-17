@@ -20,7 +20,7 @@ The |curvetrace| program allows controlling the temperature of the DUT during cu
 
 See :ref:`examples_curvetrace_heaterblock` for an example of such a heater block.
 
-The configuration of the heaterblock for the |curvetrace| program is specified in the |PSU_configfile| by adding a ``[HEATERBLOCK]`` section as follows:::
+The configuration of the heaterblock for the |curvetrace| program is specified in the |PSU_configfile| file by adding a ``[HEATERBLOCK]`` section as follows:::
 
    [HEATERBLOCK]
 
@@ -46,7 +46,3 @@ The configuration of the heaterblock for the |curvetrace| program is specified i
 * ``HEATER_RESISTANCE``: resistance of the combined heater resistors (in Ohm)
 * ``MAX_POWER``: maximum heating power
 * ``KP``, ``KI``, ``KD``: coefficients of the `PID controller <https://en.wikipedia.org/wiki/PID_controller>`_
-
-.. image:: heaterblock_photo.jpg
-  :width: 658
-  :alt: Heater block photo

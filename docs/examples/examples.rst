@@ -173,11 +173,9 @@ Using a heater block to test a power transistor at controlled temperature
 
 Power transistors can produce a lot more heat than the low-power devices considered in the previous examples. To avoid thermal runaway and distortion of the curves at high power levels, the DUT temperature must remain stable during curve tracing. In principle, this could be achieved in the same way as in the BC550 example, where the DUT was operated at a fixed power level to attain thermal equilibrium during idle periods before each measurement. However, at higher power levels, the required idle periods can become excessively long, and self-heating during a single measurement may become significant. The «idle period» method therefore does not work well for testing transistors at high power levels.
 
-A more efficient method to control the DUT temperature is to clamp it to a large block of metal with a regulated heater element. The thermal inertia of the metal block greatly reduces short-term fluctuations of the DUT temperature. The heater allows controlling the temperature of the metal block and the DUT to a predefined value.
+A more efficient method to control the DUT temperature is to clamp it to a large block of metal with a regulated heater element. The thermal inertia of the metal block greatly reduces short-term fluctuations of the DUT temperature. The heater allows controlling the temperature of the metal block and the DUT to a predefined value. See :ref:`heaterblock` and :ref:`examples_curvetrace_heaterblock` for more details.
 
-The |curvetrace| program has a built-in PID controller for the heater block. The controller works by sensing the heater block temperature with a DS18B20 sensor, and by adjusting the output of the programmable PSU that powers the heater element. See :ref:`examples_curvetrace_heaterblock` for an example of such a heater block.
-
-To use the temperature control of the heater block, add the following paramters to the ``[EXTRA]`` section of your DUT test config file::
+To use the temperature control of the heater block, add the following parameters to the ``[EXTRA]`` section of your DUT test config file::
 
    [EXTRA]
    ...
@@ -253,10 +251,41 @@ EXAMPLE TO ILLUSTRATE BATCH MODE (FOR LATER USE IN MATCHING EXAMPLE). USE 2SJ28 
 
 Construction of a heater block for DUT temperature control
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+This example illustrates the design and construction of a heater block for temperature control of the DUT during curve tracing (see also :ref:`heaterblock`).
 
-UNDER CONSTRUCTION -- DESCRIBE THE HEATERBLOCK: CONSTRUCTION, CONFIGURATION, PRACTICAL ASPECTS
+Here's a photo of the heater block:
 
+.. image:: heaterblock_photo.jpg
+  :width: 658
+  :alt: Heater block photo
 
+The heater block in this example is powered by a Voltcraft PPS-16005 PSU (36 V / 12 A max. output).
+
+The following parts were used to build the heater block:
+   * A copper block with a weight of approximately 2.8 kg (13 cm × 6 cm × 4 cm). Copper has a specific heat of 0.385 kJ/kg/K, so the heat capacity of the copper block is approximately H = 1 kJ/K.
+   * Five 100 W power resistors (Arcol FPA100). The resistors were bolted to the sides of the copper block. To fully exploit the power provided by the PSU (up to 36 V / 12 A / 430 W), the resistance of the resistor array should be 36 V / 12 A = 3 Ω. With the resistors connected in parallel, the resistance of the single resistors is 5 × 3 Ω = 15 Ω.
+   * A DS18B20 temperature sensor with a metal sleeve housing was inserted and glued into a bore to measure the temperature of the copper block just underneath the DUT. An FTDI TTL-232R-RPI cable was used to interface the 1-Wire bus of the DS18B20 sensor chip to the USB port of the computer (COM port = ``/dev/serial/by-id/usb-FTDI_TTL232R-3V3_FTBZLSUL-if00-port0``).
+   * An adjustable toggle lever clamp was mounted on the top of the copper block to allow easy clamping of the DUT to the copper block.
+   * The copper block was bolted to a large heatsink to allow efficient dissipation of any excess heat. The heatsink improves the cooling the heater block and therefore helps with the regulation of the heater block temperature.
+
+The time required to heat the copper block to a predefined temperature depends on the heating power P (430 W), the heat capacity H of the copper block (1 kJ/K), and the temperature change ΔT. For example, heating the block from 20°C to 50°C (ΔT = 30 K) will take at least H×ΔT/P = 70 seconds. In practice the heating time will be longer, because the PID controller needs to reduce the power before reaching the target temperature to avoid overshoot of the temperature. The coefficients of the PID controller were estimated as described `here <https://en.wikipedia.org/wiki/PID_controller#Manual_tuning>`_ by manually controlling the heating power at the PSU and monitoring the response of the heater block temperature.
+
+The ``[HEATERBLOCK]`` section in the |PSU_configfile| file is as follows:::
+
+   [HEATERBLOCK]
+
+   PSU_COMPORT       = /dev/serial/by-id/usb-Silicon_Labs_CP2102_USB_to_UART_Bridge_Controller_0010-if00-port0
+   PSU_TYPE          = VOLTCRAFT
+   TEMPSENS_COMPORT  = /dev/serial/by-id/usb-FTDI_TTL232R-3V3_FTBZLSUL-if00-port0
+   TEMPSENS_TYPE     = DS1820
+   TBUFFER_NUM       = 5
+   TBUFFER_INTERVAL  = 1
+   NUMSTABLEREAD     = 5
+   HEATER_RESISTANCE = 3
+   MAX_POWER         = 430
+   KP                = 100
+   KI                = 1.3
+   KD                = 100
    
    
 .. _examples_curveplot:
