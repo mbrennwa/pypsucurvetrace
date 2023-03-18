@@ -5,13 +5,13 @@
 Heater Block
 ************
 
-The |curvetrace| program allows controlling the temperature of the DUT during curve tracing. To this end, the DUT is clamped onto a large metal block equipped with heater elements and a temperature sensor. The heater block temperature is controlled by a `PID controller <https://en.wikipedia.org/wiki/PID_controller>`_ in the |curvetrace| software, which reads the temperature sensor and adjusts the power of the heater element accordingly, as illustrated in the following diagram:
+The |curvetrace| program allows controlling the temperature of the DUT during curve tracing. To this end, the DUT is clamped onto a large metal block equipped with heater elements and a temperature sensor. The heater block temperature is controlled by a `PID controller <https://en.wikipedia.org/wiki/PID_controller>`_ in the |curvetrace| software, which reads the temperature sensor and adjusts the power of the heater element as needed. This is illustrated in the following diagram:
 
 .. image:: heaterblock_diagram.png
   :width: 658
   :alt: Heater block diagram
 
-See :ref:`examples_curvetrace_heaterblock` for an example of such a heater block.
+See :ref:`examples_curvetrace_heaterblock` for an example of the design and construction of a |curvetrace| heater block.
 
 * To allow tight control of the DUT temperature by the heater block, its thermal inertia should be much larger than that of the DUT. A large block of copper is recommended, which exhibits a large specific heat capacity and thermal conductance.
 * Power resistors are used as heater elements. The resistor array is powered by a programmable PSU which is controlled by the |curvetrace| program (see :ref:`supported_PSUs` for supported PSUs). The heating power from the resistors and PSU should be adapted to the heat capacity of the heater block.
