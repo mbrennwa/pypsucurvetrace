@@ -19,7 +19,7 @@ logger = get_logger('powersupply_VOLTCRAFT')
 # It just doesn't really make sense...
 # Please confirm the modelnumbers.
 
-PPS_MODELS = { 	       (36.2,  7.0) : "PPS11360", # confirmed
+PPS_MODELS = { (36.2,  7.0) : "PPS11360", # confirmed
 		       (60.0,  2.5) : "PPS11603", # not confirmed yet
 		       (18.0, 20.0) : "PPS13610", # not confirmed yet
 		       (36.2, 12.0) : "PPS16005", # confirmed
