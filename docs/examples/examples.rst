@@ -268,9 +268,9 @@ The following parts were used to build the heater block:
    * An adjustable toggle lever clamp was mounted on the top of the copper block to allow easy clamping of the DUT to the copper block.
    * The copper block was bolted to a large heatsink to allow efficient dissipation of any excess heat. The heatsink improves the cooling the heater block and therefore helps with the regulation of the heater block temperature.
 
-The time required to heat the copper block to a predefined temperature depends on the heating power P (430 W), the heat capacity H of the copper block (1 kJ/K), and the temperature change ΔT. For example, heating the block from 20°C to 50°C (ΔT = 30 K) will take at least H×ΔT/P = 70 seconds. In practice the heating time will be longer, because the PID controller needs to reduce the power before reaching the target temperature to avoid overshoot of the temperature. The coefficients of the PID controller were estimated as described `here <https://en.wikipedia.org/wiki/PID_controller#Manual_tuning>`_ by manually controlling the heating power at the PSU and monitoring the response of the heater block temperature.
+The time required to heat the copper block to a predefined temperature depends on the heating power P (430 W), the heat capacity H of the copper block (1 kJ/K), and the temperature change ΔT. For example, heating the block from 20°C to 50°C (ΔT = 30 K) will take at least H×ΔT/P = 70 seconds. In practice the heating time will be longer, because the PID controller needs to reduce the power before reaching the target temperature to avoid overshoot of the temperature. The coefficients of the PID controller were estimated as described `here <https://en.wikipedia.org/wiki/PID_controller#Manual_tuning>`_ by repeated trial-and-error runs of the |curvetrace| program with different PID coefficient values in the |PSU_configfile| file.
 
-The corresponding ``[HEATERBLOCK]`` section in the |PSU_configfile| file looks like this::
+The ``[HEATERBLOCK]`` section in the |PSU_configfile| file looks like this::
 
    [HEATERBLOCK]
 
