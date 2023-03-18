@@ -5,4 +5,5 @@ pip install <packages>
 deactivate
 
 Run curvetrace program (analogous for the other programs):
-./ctrace <args>
+source testenv/bin/activate
+./run_curveplot
