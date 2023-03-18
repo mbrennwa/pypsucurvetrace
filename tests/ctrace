@@ -1,4 +1,0 @@
-#!/usr/bin/env bash
-
-source testenv/bin/activate
-python3 _run_curvetrace
