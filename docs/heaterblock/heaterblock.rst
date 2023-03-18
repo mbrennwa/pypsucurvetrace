@@ -16,6 +16,7 @@ See :ref:`examples_curvetrace_heaterblock` for an example of such a heater block
 * To allow tight control of the DUT temperature by the heater block, its thermal inertia should be much larger than that of the DUT. A large block of copper is recommended, which exhibits a large specific heat capacity and thermal conductance.
 * Power resistors are used as heater elements. The resistor array is powered by a programmable PSU which is controlled by the |curvetrace| program (see :ref:`supported_PSUs` for supported PSUs). The heating power from the resistors and PSU should be adapted to the heat capacity of the heater block.
 * A Maxim DS18B20 digital temperature sensor is used to read the heater block temperature. The 1-Wire bus of the DS18B20 is connected to the computer using a USB-TTL adapter cable (for example FTDI TTL-232R-RPI) as follows:
+
    * DS18B20 data pin ⟷ TXD and RXD joined together on the USB adapter cable
    * DS18B20 GND and supply pins joined together ⟷ GND pin on the USB adapter cable
 
