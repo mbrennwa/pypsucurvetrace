@@ -294,8 +294,8 @@ def ctrace():
 				    logger.info('  ' + p.LABEL + ': Adjusting max.-idle voltage to ' + str(p.TEST_VIDLE) + ' V).')
 				    p.TEST_VIDLE_MAX = p.TEST_VIDLE
 			    if p.TEST_IIDLE > p.IMAX:
-				    logger.info('  ' + p.LABEL + ': Adjusting idle current to max. value possible with the power supply (' + str(p.IMAX) + ' V).')
-				    p.TEST_IIDLE = p.IMIN
+				    logger.info('  ' + p.LABEL + ': Adjusting idle current to max. value possible with the power supply (' + str(p.IMAX) + ' A).')
+				    p.TEST_IIDLE = p.IMAX
 			    if p.TEST_VIDLE * p.TEST_IIDLE > p.PMAX:
 				    p.TEST_IIDLE = p.PMAX / p.TEST_VIDLE
 				    logger.info('  ' + p.LABEL + ': Idle current limit is higher than PSU power limit (' + str(p.PMAX) + ' W). Adjusting idle current limit to ' + str(p.TEST_IIDLE) + ' A.' )

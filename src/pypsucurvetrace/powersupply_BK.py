@@ -59,7 +59,7 @@ class BK(object):
 		self.MODEL = '?'
 
 		# open and configure serial port:
-		baud_rates = ( 57600, 38400, 19200, 14400, 9600, 4800 )
+		baud_rates = ( 9600, 57600, 38400, 19200, 14400, 4800 )
 		
 		from pkg_resources import parse_version
 		typestring = None

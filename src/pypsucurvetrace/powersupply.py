@@ -12,6 +12,7 @@ import pypsucurvetrace.powersupply_VOLTCRAFT as powersupply_VOLTCRAFT
 import pypsucurvetrace.powersupply_KORAD as powersupply_KORAD
 import pypsucurvetrace.powersupply_BK as powersupply_BK
 import pypsucurvetrace.powersupply_RIDEN as powersupply_RIDEN
+import pypsucurvetrace.powersupply_SALUKI as powersupply_SALUKI
 
 # set up logger:
 logger = get_logger('powersupply')
@@ -64,7 +65,7 @@ class PSU:
 			Voltcraft PPS / Mason: commandset = 'Voltcraft'
 			Korad / RND: commandset = 'Korad'
 			Riden / Ruiden: commandset = 'Riden'
-			SCPI interface: commandset = 'SCPI'
+			Saluki / Maynuo: commandset = 'SALUKI'
 		label: label or name to be used to describe / identify the PSU unit (string)
 		'''
 
@@ -163,7 +164,11 @@ class PSU:
 				elif C == "RIDEN_6012P_12A":
 				    PSU = powersupply_RIDEN.RIDEN(P, currentmode='HIGH', debug=False)
 				    C = 'RIDEN'
-
+				    
+				elif C == 'SALUKI':
+				    PSU = powersupply_SALUKI.SALUKI(P, debug=False)
+				    C = 'SALUKI'
+				
 				else:
 					raise RuntimeError ('Unknown commandset ' + C + '! Cannot continue...')
 
@@ -255,7 +260,7 @@ class PSU:
 			V.append(value)
 
 		for k in range(len(self._PSU)):
-			if self._PSU[k].COMMANDSET in [ 'KORAD' , 'VOLTCRAFT' , 'BK' , 'RIDEN' ]:
+			if self._PSU[k].COMMANDSET in [ 'KORAD' , 'VOLTCRAFT' , 'BK' , 'RIDEN' , 'SALUKI' ]:
 				
 				# determine corrected voltage setpoint:
 				VV = polyval(V[k], self.V_SET_CALPOLY)
@@ -332,7 +337,7 @@ class PSU:
 		value = round(value/self.VRESSET) * self.VRESSET
 
 		for k in range(len(self._PSU)):
-			if self._PSU[k].COMMANDSET in [ 'KORAD' , 'VOLTCRAFT' , 'BK' , 'RIDEN' ]:
+			if self._PSU[k].COMMANDSET in [ 'KORAD' , 'VOLTCRAFT' , 'BK' , 'RIDEN' , 'SALUKI' ]:
 							
 				# determine corrected current setpoint:
 				VV = polyval(value, self.I_SET_CALPOLY)
@@ -388,7 +393,7 @@ class PSU:
 		"""
 
 		for k in range(len(self._PSU)):
-			if self._PSU[k].COMMANDSET in [ 'KORAD' , 'VOLTCRAFT' , 'BK' , 'RIDEN' ]:
+			if self._PSU[k].COMMANDSET in [ 'KORAD' , 'VOLTCRAFT' , 'BK' , 'RIDEN' , 'SALUKI' ]:
 				self._PSU[k].output(False)
 				self._PSU[k].voltage(self.VMIN)
 				self._PSU[k].current(0.0)
@@ -417,7 +422,7 @@ class PSU:
 		"""
 
 		for k in range(len(self._PSU)):
-			if self._PSU[k].COMMANDSET in [ 'KORAD' , 'VOLTCRAFT' , 'BK' , 'RIDEN' ]:
+			if self._PSU[k].COMMANDSET in [ 'KORAD' , 'VOLTCRAFT' , 'BK' , 'RIDEN' , 'SALUKI' ]:
 				self._PSU[k].output(True)
 
 			else:
@@ -462,7 +467,7 @@ class PSU:
 			
 			for k in range(len(self._PSU)):
 			
-				if self._PSU[k].COMMANDSET in [ 'KORAD' , 'VOLTCRAFT' , 'BK' , 'RIDEN' ]:
+				if self._PSU[k].COMMANDSET in [ 'KORAD' , 'VOLTCRAFT' , 'BK' , 'RIDEN' , 'SALUKI' ]:
 				    vv,ii,ll = self._PSU[k].reading()
 				    
 				    # add values to the list:
@@ -544,4 +549,3 @@ class PSU:
 
 	def get_last_power(self):
 	    return self._last_power
-
