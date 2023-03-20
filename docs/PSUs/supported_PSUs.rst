@@ -1,3 +1,5 @@
+.. include:: ../symbols.rst
+
 .. _supported_PSUs:
 
 ************************
@@ -13,6 +15,26 @@ Choosing suitable PSU models for your curve-tracing setup will mainly depend on 
    * Testing vacuum tubes also benefits from good low-current resolution, but typically requires high-voltage PSUs (or multiple PSUs connected in series).
 
 The list below describes the PSU models that are supported by |pypsucurvetrace|, and how to configure them in the |PSU_configfile| file.
+
+
+BK Precision
+------------
+|pypsucurvetrace| supports the BK Precision 9120A and 9185B models, which both provide 0.01 mA current readback resolution. The 9120A is very suitable for testing small-signal transistors, because it provides 0.1 mV voltage readback resolution with a max voltage of 32 V. The 9185B is suitable for high-voltage devices like electron tubes, because it provides a maximum output voltage of 610 V (with 0.3 V voltage readback resolution).
+
+Configuration of the 9120A in |PSU_configfile|::
+
+   TYPE = BK
+   
+Configuration of the 9185B in |PSU_configfile|:
+
+   * For high voltage range (up to 610 V, max. current 350 mA)::
+   
+      TYPE = BK9185B_HIGH
+   
+   * For low voltage range (up to 400 V, max. current 500 mA)::
+   
+      TYPE = BK9185B_LOW
+
 
 Korad / RND
 -----------
@@ -64,27 +86,6 @@ The Saluki / Maynuo PSUs are designed for testing and lab work. They are more ex
 Configuration in |PSU_configfile|::
 
    TYPE = SALUKI
-
-
-BK Precision
-------------
-|pypsucurvetrace| supports the BK Precision 9120A and 9185B models, which both provide 0.01 mA current readback resolution. The 9120A is very suitable for testing small-signal transistors, because it provides 0.1 mV voltage readback resolution with a max voltage of 32 V. The 9185B is suitable for high-voltage devices like electron tubes, because it provides a maximum output voltage of 610 V (with 0.3 V voltage readback resolution).
-
-Configuration of the 9120A in |PSU_configfile|::
-
-   TYPE = BK
-   
-Configuration of the 9185B in |PSU_configfile|:
-
-   * For high voltage range (up to 610 V, max. current 350 mA)::
-   
-      TYPE = BK9185B_HIGH
-   
-   * For low voltage range (up to 400 V, max. current 500 mA)::
-   
-      TYPE = BK9185B_LOW
-
-
 
 
 Voltcraft PPS
