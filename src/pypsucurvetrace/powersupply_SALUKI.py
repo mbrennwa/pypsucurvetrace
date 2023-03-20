@@ -1,5 +1,5 @@
 """
-Python class to control SALUKI power supplies
+Python class to control SALUKI / MAYNUO power supplies
 """
 
 import serial
@@ -106,10 +106,26 @@ class SALUKI(object):
 			typestring = typestring.replace('MAYNUO', 'SALUKI')
 			typestring = typestring.split(',')
 			
+			# Maynuo types: http://www.maynuo.com/english/pro.asp?tid=31
+			
 			if not ( typestring[0] == 'SALUKI' ):
 				raise RuntimeError ('No SALUKI power supply connected to ' + port)
+			
 			if typestring[1] in ('M8831', 'SPS831'):
 				self.MODEL = 'SPS831'
+			
+			elif typestring[1] in ('M8811', 'SPS811'):
+				self.MODEL = 'SPS811'
+				logger.warning ( 'Operation of SALUKI ' + self.MODEL + ' with pypsucurvetrace is untested -- be careful!' )
+			
+			elif typestring[1] in ('M8812', 'SPS812'):
+				self.MODEL = 'SPS812'
+				logger.warning ( 'Operation of SALUKI ' + self.MODEL + ' with pypsucurvetrace is untested -- be careful!' )
+			
+			elif typestring[1] in ('M8813', 'SPS813'):
+				self.MODEL = 'SPS813'
+				logger.warning ( 'Operation of SALUKI ' + self.MODEL + ' with pypsucurvetrace is untested -- be careful!' )
+			
 			else:
 				logger.warning ( 'Unknown SALUKI model: ' + typestring[1] )
 				self.MODEL = '?????'

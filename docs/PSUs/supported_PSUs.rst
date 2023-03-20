@@ -52,6 +52,20 @@ The RD6012P unit needs special configuration to select the current range and res
       TYPE = RIDEN_12A
 
 
+Saluki / Maynuo
+---------------
+The Saluki / Maynuo PSUs are designed for testing and lab work. They are more expensive than some of the other products on this page, but some of their specs exceed those of the more cost-effective units. In particular, the Saluki SPS831 / Maynuo M8831 offers high readback resolution of 0.1 mV and 1 µA, which makes this PSU unit very suitable for testing of low-power duts.
+
+|pypsucurvetrace| has built-in support for the following models:
+
+   * Tested / confirmed: SPS831/M8831
+   * Untested / unconfirmed: SPS811/M8811, SPS812/M8812, SPS813/MM813
+   
+Configuration in |PSU_configfile|::
+
+   TYPE = SALUKI
+
+
 BK Precision
 ------------
 |pypsucurvetrace| supports the BK Precision 9120A and 9185B models, which both provide 0.01 mA current readback resolution. The 9120A is very suitable for testing small-signal transistors, because it provides 0.1 mV voltage readback resolution with a max voltage of 32 V. The 9185B is suitable for high-voltage devices like electron tubes, because it provides a maximum output voltage of 610 V (with 0.3 V voltage readback resolution).
