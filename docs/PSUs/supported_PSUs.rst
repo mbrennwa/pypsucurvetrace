@@ -90,7 +90,7 @@ Configuration in |PSU_configfile|::
 
 Voltcraft PPS
 -------------
-The Voltcraft PPS models have been around for a long time and have served as cost-effective general-purpose PSUs and many work benches. They were used in the first steps in the development of |pypsucurvetrace|.
+The Voltcraft PPS models have been around for a long time and have served as cost-effective general-purpose PSUs on many work benches. They were used in the first steps in the development of |pypsucurvetrace|.
 
 |pypsucurvetrace| has built-in support for the following models:
 
