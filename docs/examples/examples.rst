@@ -102,7 +102,7 @@ Execute the following command to start the curve tracing:
 
 .. code-block:: console
 
-   curvetrace -c J112_config.txt
+   curvetrace -config J112_config.txt
    
 The |curvetrace| program starts communication with the PSUs, configures the test parameters, and asks you for a file name to save the DUT test data. Once everything is ready, the |curvetrace| program runst the pre-heat process by setting |U1| to the PSU1-``VIDLE`` value (7.5 v) and adjust |U2| until |I1| attains the PSU1-``IIDLE`` value of 0.02 A (20 mA). After 20 seconds the pre-heat is stopped (``PREHEATSECS``), and the curve tracing starts. |U2| is set to 0.0 V, and |U1| is stepped from 0-15 V in 1 V steps. This sequence is repeated for |U2| = -0.5 V, -1.0 V, ... , and -3.5 V. At each step, |U1|, |I1|, |U2|, and |I2| are measured and saved to the data file. The ``curvetrace`` program shows a live plot of the curve data during the measurement as shown below.
 
@@ -158,7 +158,7 @@ Run |curvetrace|:
 
 .. code-block:: console
 
-   curvetrace -c BC550_config.txt
+   curvetrace -config BC550_config.txt
 
 The curve tracing works in the same way as in the previous example, with two notable differences:
    * The |U2| steps start at 0.65 V, which is the (assumed) |VBEon| value of the BC550. The conversion from |U2| to the base-current will done later during curve plotting and data processing (see also :ref:`examples_curveplot`, :ref:`examples_curveprocess` and :ref:`examples_curvematch`).
@@ -240,12 +240,18 @@ Note the somewhat long pre-heat time (``PREHEATSECS=300``), which makes sure the
   :width: 658
   :alt: Curves of a 807 tube in triode configuration
 
+.. _examples_curvetrace_batchmode:
 
 Batch mode
 ^^^^^^^^^^
 
-EXAMPLE TO ILLUSTRATE BATCH MODE (FOR LATER USE IN MATCHING EXAMPLE). USE 2SJ28 OR 2SK82 BATCH, WHICH WILL SERVE AS A NICE DATASET TO RE-USE IN THE CURVEMATCH EXAMPLE(S).
+When testing multiple DUTs of the same type, it may be useful to use the ``--batch`` mode of the |curvetrace| program. In this mode, the |curvetrace| program will automatically enumerate the file names and sample labels. Also, if a heater block is used, it will keept the temperature control active between test runs to avoid the down time related to temperature stabilization. To run a batch of 2SK82 VFETs, you would run |curvetrace| with the ``--batch`` flag as follows:
 
+.. code-block:: console
+
+   curvetrace --config 2SK82_config.txt --batch
+   
+The |curvetrace| program will ask for the base name to use for the file names and sample labels before running the test procedures for each DUT. Once it's done with testing the first DUT, it will tell you to install the second DUT before it continues with the testing.
 
 .. _examples_curvetrace_heaterblock:
 
