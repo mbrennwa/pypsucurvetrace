@@ -76,12 +76,12 @@ The RD6012P unit needs special configuration to select the current range and res
 
 Saluki / Maynuo
 ---------------
-The Saluki / Maynuo PSUs are designed for testing and lab work. They are more expensive than some of the other products on this page, but some of their specs exceed those of the more cost-effective units. In particular, the Saluki SPS831 / Maynuo M8831 offers high readback resolution of 0.1 mV and 1 µA, which makes this PSU unit very suitable for testing of low-power duts.
+The Saluki / Maynuo / Hopetech PSUs are designed for electronic testing and lab work. They are more expensive than some of the other units on this page, but some of their specs exceed those of the more cost-effective units. In particular, the Saluki SPS831 / Maynuo M8831 / Hopetech	HT6831 M8831 offers high readback resolution of 0.1 mV and 1 µA, which makes this PSU unit very suitable for testing of low-power duts.
 
-|pypsucurvetrace| has built-in support for the following models:
+|pypsucurvetrace| has built-in support for the following models (Saluki model numbers):
 
-   * Tested / confirmed: SPS831/M8831
-   * Untested / unconfirmed: SPS811/M8811, SPS812/M8812, SPS813/MM813
+   * Tested / confirmed: SPS831
+   * Untested / unconfirmed: SPS811, SPS812, SPS813
    
 Configuration in |PSU_configfile|::
 
