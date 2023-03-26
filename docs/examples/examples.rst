@@ -286,7 +286,6 @@ The ``[HEATERBLOCK]`` section in the |PSU_configfile| file looks like this::
    TEMPSENS_TYPE     = DS1820
    TBUFFER_NUM       = 5
    TBUFFER_INTERVAL  = 1
-   NUMSTABLEREAD     = 5
    HEATER_RESISTANCE = 3
    MAX_POWER         = 430
    KP                = 100
