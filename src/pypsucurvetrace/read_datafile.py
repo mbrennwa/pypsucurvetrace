@@ -24,7 +24,7 @@ class preheat:
 
 class measurement_data:
 
-	def __init__ (self,datafile=None):
+	def __init__ (self,datafile=None, R_wire_PSU1=0.0, R_wire_PSU2=0.0):
 		
 		self.datafile = datafile
 		
@@ -81,12 +81,15 @@ class measurement_data:
 
 	
 	def get_U1_meas (self,exclude_CC):
+	    # find wire resistance specs
+	    logger.warning('NOT YET IMPLEMENTED: correct U1 for voltage drop across wires beteween DUT and PSU')
 		return self.__get_column(2,exclude_CC)
-		
+
 	def get_I1_meas (self,exclude_CC):
 		return self.__get_column(3,exclude_CC)
 				
 	def get_U2_set (self,exclude_CC):
+	    logger.warning('NOT YET IMPLEMENTED: correct U2 for voltage drop across wires beteween DUT and PSU')
 		return self.__get_column(5,exclude_CC)
 				
 	def get_T (self,exclude_CC):
@@ -137,6 +140,11 @@ def read_datafile(datafile):
 			label = line.split(': ')[1]
 			break # break from the loop
 
+	# read reistance spec of wires between DUT and PSUs (if available):
+	logger.warning('NOT YET IMPLEMENTED: read resistance of wires beteween DUT and PSUs')
+	R_wire_PSU1 = None
+	R_wire_PSU2 = None
+
 	# find operating point after pre-heat/idle:
 	ph = preheat()
 	for i,line in enumerate(lines):
@@ -162,7 +170,8 @@ def read_datafile(datafile):
 			except:
 				ph.T = None
 			break # break from the loop
-
+	    logger.warning('NOT YET IMPLEMENTED: apply compensation of voltage drops across wires beteween DUT and PSUs to U1 and U2 of pre-heat.')
+	
 	r2 = None
 	for i,line in enumerate(lines):
 		if '* R2CONTROL' in line:
@@ -174,6 +183,6 @@ def read_datafile(datafile):
 		    break # break from the loop
 
 	# load measurement data from file:
-	data = measurement_data(datafile)
+	data = measurement_data(datafile, R_wire_PSU1, R_wire_PSU2)
 
 	return data, label, ph, r2
