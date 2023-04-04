@@ -11,7 +11,7 @@ The |curvetrace| program
 .. _curvetrace_hardwaresetup:
 
 .. image:: test_setup.png
-  :width: 658
+  :width: 861
   :alt: Schematic of test circuit
 
 The figure shows the circuit used to analyse a device under test (DUT). The |curvetrace| program controls the voltages |U1| and |U2| at the terminals of the programmable power supplies PSU1 and PSU2, and records the currents |I1| and |I2| using the built-in meters of PSU1 and PSU2. Both |U1| and |U2| are shwon as positive voltages in the figure. Negative voltages are achieved simply by connecting the terminals of the corresponding PSU(s) with inverted polarity.
@@ -20,6 +20,8 @@ The resistor |R2| serves multiple purposes:
 
    * For voltage-controlled DUTs like FETs or vacuum tubes, the resistor prevents high-frequency oscillation at the FET gate or tube grid. An |R2| value of approximately 10\ :sup:`3` |Ohm| is recommended, but the exact value is not critical and will not have an effect on the test results.
    * For current-controlled DUTs like BJTs, the resistor is used to convert the control voltage to the control current |IB|. The voltage drop across |R2| is equal to |U2| - |VBEon|, where |VBEon| is the base-emitter on voltage of the BJT. Therefore, the control current is given by Ohm's Law as |IB| = (|U2| - |VBEon|) / |R2|.
+   
+Note how the circuit schematic shows separate wires to connect the PSUs terminals to the DUT. High currents flowing through the wires will cause (small) voltage drops across the wires. To avoid interference of the voltage drop due to |I1| on the measurement of |U2| (and vice versa for |I1| and |U2|), separate wires are recommended for tests at high currents.
 
 The |curvetrace| program allows limiting the currents (|I1|, |I2|) and power (|U1| × |I1|, |I2| × |U2|) to prevent overloading the DUT during testing.
 
