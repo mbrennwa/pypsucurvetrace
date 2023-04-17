@@ -20,14 +20,14 @@ The resistor |R2| serves multiple purposes:
 
    * For voltage-controlled DUTs like FETs or vacuum tubes, the resistor prevents high-frequency oscillation at the FET gate or tube grid. An |R2| value of approximately 10\ :sup:`3` |Ohm| is recommended, but the exact value is not critical and will not have an effect on the test results.
    * For current-controlled DUTs like BJTs, the resistor is used to convert the control voltage to the control current |IB|. The voltage drop across |R2| is equal to |U2| - |VBEon|, where |VBEon| is the base-emitter on voltage of the BJT. Therefore, the control current is given by Ohm's Law as |IB| = (|U2| - |VBEon|) / |R2|.
-   
-Note how the circuit schematic shows separate wires to connect the PSUs terminals to the DUT. High currents flowing through the wires will cause (small) voltage drops across the wires. To avoid interference of the voltage drops due to |I1| on the measurement of |U2| (and vice versa for |I1| and |U2|), separate wires are recommended for tests at high currents. |pypsucurvetrace| will calculate the voltage drops across the wires between PSU1 and the DUT from |I1| and the resistance of the wires, and subtract the voltage drops from the |U1| value measured at PSU1 (and analogous for PSU2, |I2|, and |U2|).
 
 The |curvetrace| program allows limiting the currents (|I1|, |I2|) and power (|U1| × |I1|, |I2| × |U2|) to prevent overloading the DUT during testing.
 
 The |curvetrace| program supports a number of different PSU models. See :ref:`supported_PSUs` for details.
 
 The |curvetrace| program allows using a heater block to control the temperature of the DUT during curve tracing. See :ref:`heaterblock` for details.
+
+A future version of the |curvetrace| program will allow compensation of the (small) voltage drops across the wires to connect the terminals of the PSUs to the DUT. The voltage drops due to the resistance of the wires are usually negligible, but can be calculated from the measured |I1| and |I2| values using Ohm's Law, and subtracted from the measured |U1| and |U2|. To avoid interference of the voltage drops due to |I1| on the measurement of |U2| (and vice versa for |I1| and |U2|), separate wires are recommended for tests at high currents (as shown in the above circuit diagram).
 
 
 Test procedure
