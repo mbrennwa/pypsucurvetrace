@@ -81,7 +81,7 @@ The basic configuration required for |curvetrace| to work is to specify the PSU 
 
 * ``TYPE``: the type or model of the PSU. See :ref:`supported_PSUs` for details.
 * ``COMPORT``: path of the virtual file corresponding to the serial port of the PSU
-* ``WIRERESISTANCE``: resistance of each wire (in |Ohm|)
+* ``WIRERESISTANCE``: resistance of each wire used to connect the PSU terminal to the DUT (in |Ohm|)
 
 See :ref:`examples_curvetrace` for examples of |PSU_configfile| files.
 
