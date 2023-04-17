@@ -27,7 +27,7 @@ The |curvetrace| program supports a number of different PSU models. See :ref:`su
 
 The |curvetrace| program allows using a heater block to control the temperature of the DUT during curve tracing. See :ref:`heaterblock` for details.
 
-A future version of the |curvetrace| program will allow compensation of the (small) voltage drops across the wires to connect the terminals of the PSUs to the DUT. The voltage drops due to the resistance of the wires are usually negligible, but can be calculated from the measured |I1| and |I2| values using Ohm's Law, and subtracted from the measured |U1| and |U2|. To avoid interference of the voltage drops due to |I1| on the measurement of |U2| (and vice versa for |I1| and |U2|), separate wires are recommended for tests at high currents (as shown in the above circuit diagram).
+A future version of the |curvetrace| program will allow compensation of the (small) voltage drops across the wires to connect the terminals of the PSUs to the DUT. The voltage drops due to the resistance of the wires are usually negligible, but can be calculated from the measured |I1| and |I2| values using Ohm's Law, and subtracted from the measured |U1| and |U2|. To avoid interference of the voltage drops due to |I1| on the measurement of |U2| (and vice versa for |I1| and |U2|), separate wires are recommended as shown in the above circuit diagram, especially for tests at high currents.
 
 
 Test procedure
