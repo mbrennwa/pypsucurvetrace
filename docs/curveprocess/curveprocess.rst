@@ -13,7 +13,7 @@ The ``curveprocess`` program extracts and calculates DUT parameters from the cur
 
    * Gate/grid voltage |VG| or base current |IB| corresponding to a given operating point (|U1|, |I1|)
    * Transconductance |gm| or current gain |hfe| at a given operating point (|U1|, |I1|)
-   * Output conductance |gm| at a given operating point (|U1|, |I1|)
+   * Output conductance |go| at a given operating point (|U1|, |I1|)
 
 The ``curveprocess`` documentation can be accessed from the ``curveprocess`` program directly:
 
