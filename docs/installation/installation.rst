@@ -56,7 +56,7 @@ To download and install ``pypsucurvetrace`` in one single command:
 
    pipx install git+https://github.com/mbrennwa/pypsucurvetrace
 
-To upgrade ``pypsucurvetrace``:
+To upgrade an existing installation of ``pypsucurvetrace``:
 
 .. code-block:: console
 
