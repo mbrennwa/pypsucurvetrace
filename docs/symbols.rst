@@ -19,3 +19,4 @@
 .. |hfe| replace:: :math:`h_{\rm fe}`
 .. |gm| replace:: :math:`g_{\rm m}`
 .. |go| replace:: :math:`g_{\rm o}`
+.. |ro| replace:: :math:`r_{\rm o}`
