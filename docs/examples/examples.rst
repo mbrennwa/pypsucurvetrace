@@ -298,8 +298,36 @@ The ``[HEATERBLOCK]`` section in the |PSU_configfile| file looks like this::
 Working with the |curveplot| program
 ------------------------------------
 
-UNDER CONSTRUCTION
+The first example uses the curves measured in the above |curvetrace| example for the 807 tube. The |curveplot| program produces a simple plot of the 807 curves from the data file with the name ``807curves.dat``:
 
+.. code-block:: console
+
+   curveplot 807curves.dat
+   
+This will plot the curves on the screen as shown in the above figure, except that the title and axis labels may benefit from some tweaking. For example:
+
+.. code-block:: console
+
+   curveplot 807curves.dat --title "807 Tube (triode connected)" --xlabel "Anode-Cathod Voltage" --ylabel "Anode Current"
+
+Note how the units on the axes are automatically determined and added by the |curveplot| program.
+
+To save the figure to a PDF file:
+
+.. code-block:: console
+
+   curveplot 807curves.dat --title "807 Tube (triode connected)" --xlabel "Anode-Cathod Voltage" --ylabel "Anode Current" --savepdf
+
+
+The |curveplot| program produces a simple plot of the 807 curves from the data file with the name ``807curves.dat``:
+
+
+The second example uses the curves measured in the above |curvetrace| example for the BC550 BJT. The BJT data file (``BC550.dat``) contains the value of the |R2| resistor used to control the |IB| values. If the |VBEon| value is specified to the |curveplot| program, it will automatically convert the |U2| data to the |IB| values applied to the BJT base and use these values as labels for the BJT curves as shown in the above BJT example
+
+.. code-block:: console
+
+   curveplot BC550.dat --bjtvbe 0.65
+   
 
 .. _examples_curveprocess:
 
