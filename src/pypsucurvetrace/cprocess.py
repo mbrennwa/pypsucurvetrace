@@ -83,14 +83,14 @@ def cprocess():
     label_U1 = 'U1 (V)' # operating point voltage
     label_I1 = 'I1 (A)' # operating point current
     label_X2 = 'Ug (V)' # gate / grid current
-    label_dI1_dU1 = 'go (A/V)' # output impedance
+    label_dI1_dU1 = 'go (A/V)' # output conductance
     label_dI1_dX2 = 'gm (A/V)' # transconductance
     label_dU1_dX2 = 'μ (V/V)'  # voltage gain
     if BJT_VBE is not None:
         # current controlled DUT (BJT), see also https://de.wikipedia.org/wiki/Mathematische_Beschreibung_des_Bipolartransistors#Kleinsignalparameter
         label_X2 = 'Ib (A)' # base current
         label_dI1_dX2 = 'hfe (A/A)' # current gain
-        label_dU1_dX2 = 'rbe (V/A)' # 
+        label_dU1_dX2 = 'ro (V/A)' # Output transresistance, or mutual resistance
     print( 'Filename' + sep + 'Sample' + sep + label_U1 + sep + label_I1 + sep + label_X2 + sep + label_dI1_dX2 + sep + label_dI1_dU1 + sep + label_dU1_dX2 + sep + 'T (°C)')
     
     # process all datafiles:
