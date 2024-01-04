@@ -5,12 +5,7 @@
 .. |curveprocess| replace:: ``curveprocess``
 .. |curvematch| replace:: ``curvematch``
 
-
-\newcommand{\U1}{U_1}
-
-\newcommand{\ohm}{\ensuremath{\Omega}}
-
-.. |U1| replace:: :math:`\U1`
+.. |U1| replace:: :math:`U_1`
 .. |U2| replace:: :math:`U_2`
 .. |I1| replace:: :math:`I_1`
 .. |I2| replace:: :math:`I_2`
