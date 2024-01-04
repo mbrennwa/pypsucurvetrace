@@ -6,7 +6,9 @@
 .. |curvematch| replace:: ``curvematch``
 
 
-\newcommand{\U1}{\ensuremath{U_1}}
+\newcommand{\U1}{U_1}
+
+\newcommand{\ohm}{\ensuremath{\Omega}}
 
 .. |U1| replace:: :math:`\U1`
 .. |U2| replace:: :math:`U_2`
