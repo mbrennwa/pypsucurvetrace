@@ -5,7 +5,10 @@
 .. |curveprocess| replace:: ``curveprocess``
 .. |curvematch| replace:: ``curvematch``
 
-.. |U1| replace:: :math:`U_1`
+
+\newcommand{\U1}{\ensuremath{U_1}}
+
+.. |U1| replace:: :math:`\U1`
 .. |U2| replace:: :math:`U_2`
 .. |I1| replace:: :math:`I_1`
 .. |I2| replace:: :math:`I_2`
