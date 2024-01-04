@@ -15,7 +15,7 @@ The ``curveprocess`` program extracts and calculates DUT parameters from the cur
    * Transconductance |gm| or current gain |hfe| at a given operating point (|U1|, |I1|)
    * Output conductance |go| or output transresistance |ro| at a given operating point (|U1|, |I1|):
     .. math::
-    	|go| = |I1| | |U1|
+    	|go| = ∂f/∂x
 
 The ``curveprocess`` documentation can be accessed from the ``curveprocess`` program directly:
 
