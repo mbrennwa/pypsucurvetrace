@@ -90,7 +90,7 @@ def cprocess():
         # current controlled DUT (BJT), see also https://de.wikipedia.org/wiki/Mathematische_Beschreibung_des_Bipolartransistors#Kleinsignalparameter
         label_X2 = 'Ib (A)' # base current
         label_dI1_dX2 = 'hfe (A/A)' # current gain
-        label_dU1_dX2 = 'ro (V/A)' # Output transresistance, or mutual resistance
+        label_dU1_dX2 = 'ro (V/A)' # Output transresistance
     print( 'Filename' + sep + 'Sample' + sep + label_U1 + sep + label_I1 + sep + label_X2 + sep + label_dI1_dX2 + sep + label_dI1_dU1 + sep + label_dU1_dX2 + sep + 'T (°C)')
     
     # process all datafiles:
