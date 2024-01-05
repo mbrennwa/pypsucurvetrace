@@ -2,6 +2,18 @@
 
 .. include:: ../symbols.rst
 
+
+
+
+.. role:: custom-math(raw)
+   :format: latex html
+
+:custom-math:`\mycustomsymbol`
+
+
+
+
+
 The ``curveprocess`` program
 ============================
 
@@ -20,7 +32,7 @@ The ``curveprocess`` program extracts and calculates DUT parameters from the cur
     .. math::
     	g_{\rm o} = ∂I_1/∂U_1
 
-The ``curveprocess`` documentation can be accessed from the ``curveprocess`` program directly:
+The ``curveprocess`` documentation can be accessed from the ``curveprocess`` program directly :custom-math:`\mycustomsymbol`:
 
 .. code-block:: console
 

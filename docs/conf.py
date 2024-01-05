@@ -34,3 +34,15 @@ html_theme = 'sphinx_rtd_theme'
 
 # -- Options for EPUB output
 epub_show_urls = 'footnote'
+
+
+
+
+
+# conf.py
+
+latex_elements = {
+    'preamble': '''
+        \\newcommand{\\mycustomsymbol}{\\alpha + \\beta}
+    '''
+}
