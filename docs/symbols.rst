@@ -22,4 +22,4 @@
 .. |ro| replace:: :math:`r_{\rm o}`
 
 
-.. |customsymbol| math::`\alpha_{\text{custom}}`
+.. |customsymbol| replace:: :math:`\alpha_{\text{custom}}`
