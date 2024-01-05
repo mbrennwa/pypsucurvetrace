@@ -20,6 +20,3 @@
 .. |gm| replace:: :math:`g_{\rm m}`
 .. |go| replace:: :math:`g_{\rm o}`
 .. |ro| replace:: :math:`r_{\rm o}`
-
-.. |mathabu| replace:: `a_{\rm bu}`
-.. |abu| replace:: :math: |mathabu|
