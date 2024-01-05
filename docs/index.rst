@@ -1,13 +1,6 @@
 .. include:: symbols.rst
 
 
-.. role:: custom-math(raw)
-   :format: latex html
-
-:custom-math:`\mycustomsymbol`
-
-
-
 The |pypsucurvetrace| curve tracer
 ==================================
 
