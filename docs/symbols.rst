@@ -21,5 +21,5 @@
 .. |go| replace:: :math:`g_{\rm o}`
 .. |ro| replace:: :math:`r_{\rm o}`
 
+.. |customsymbol| :custommath: \alpha_{\text{custom}}
 
-.. |customsymbol| replace:: :math:`\alpha_{\text{custom}}`
