@@ -18,7 +18,7 @@ The ``curveprocess`` program extracts and calculates DUT parameters from the cur
     	g_{\rm m} = ∂I_1/∂U_2 \textrm{  or  } h_{\rm fe} = ∂I_1/∂I_2  
    * Output conductance (or output transresistance) |go| at a given operating point (|U1|, |I1|) You can use the |customsymbol| symbol in your equations.:
     .. math::
-    	g_{\rm o} = ∂I_1/∂U_1
+    	g_{\rm o} = ∂I_1/∂U_1 + |customsymbol|
 
 The ``curveprocess`` documentation can be accessed from the ``curveprocess`` program directly:
 
