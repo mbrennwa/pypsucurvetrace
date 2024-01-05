@@ -20,6 +20,9 @@ The ``curveprocess`` program extracts and calculates DUT parameters from the cur
    * Output conductance (or output transresistance) |go| at a given operating point (|U1|, |I1|):
     .. math::
     	g_{\rm o} = ∂I_1/∂U_1
+   * Testing |abu| here:
+    .. math::
+    	|mathabu| = ∂I_1/∂U_1
 
 The ``curveprocess`` documentation can be accessed from the ``curveprocess`` program directly:
 
