@@ -378,14 +378,13 @@ def curve_plotter(queue):
 	# plt.show()
 
 	while True:
-		
 		# init plot_update flag
-		plot_update = False
+		plot_update = False
 		
 		# init queue_empty flag
-		queue_empty = False
-
-        while not queue_empty:
+		queue_empty = False
+		
+		while not queue_empty:
 		    try:
 		        # get new data from queue (if any)
 			    y = queue.get(block=False)
@@ -399,7 +398,7 @@ def curve_plotter(queue):
 				    # move foreground to background, clear foreground:
 				    d2 = d1
 				    d1 = measurement_data(datafile=None) # init empty datafile objects
-				    plot_update = True
+				    plot_update = True
 			    
 			    else:
 				    # add new data:
@@ -410,7 +409,7 @@ def curve_plotter(queue):
 		        # queue is empty
 			    queue_empty = True
 
-		if plot_update
+		if plot_update:
 			# plot curves:			
 			plt.clf()
 			plot_curves((d1,d2), linecolor = ('r','gray',), linestyle = ('-', '-',) )
