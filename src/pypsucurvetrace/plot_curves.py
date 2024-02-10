@@ -47,6 +47,8 @@ def plot_curves( data,			# measurement_data object (or tuple of measurement_data
                  cscale=None,           # curve multiplier prefix (G, M, k, m, µ, n, p, f)
                  xoffset = 0.0,         # offset x-axis data by xoffset
                  yoffset = 0.0,         # offset y-axis data by yoffset
+                 xabs = False,          # use abs(x) for x-axis data
+                 yabs = False,          # use abs(y) for y-axis data
                  noclabels = False,     # flag to disable curve labels
                  nobranding=False       # do not add pypsucurvetrace "branding" to the plot
                 ):
@@ -229,11 +231,17 @@ def plot_curves( data,			# measurement_data object (or tuple of measurement_data
 			    y = y[u]
 			    
 			# remove y=0.0 if y-axis is log scale:
-			if xlog:
+			if ylog:
 			    u = np.where(y != 0)[0]
 			    x = x[u]
 			    y = y[u]
 			
+			# convert to absolute x or y values:
+			if xabs:
+				x = abs(x)
+			if yabs:
+				y = abs(y)
+            
 			# keep record of data xmin/xmax/ymin/ymax:
 			if x_min is None:
 			    x_min = min(x)
@@ -251,7 +259,7 @@ def plot_curves( data,			# measurement_data object (or tuple of measurement_data
 			    y_max = max(y)
 			else:
 			    y_max = max ([y_max, max(y)])
-            
+			    
 			plt.plot(x, y, color=linecolor[i], linestyle=linestyle[i], linewidth=lw_base, marker=dotmarker)
 			
 			# determine curve label things (only for first datafile):

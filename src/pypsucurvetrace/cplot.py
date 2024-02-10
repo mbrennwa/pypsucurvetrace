@@ -74,6 +74,10 @@ def cplot():
     parser.add_argument('--xoffset', type=float, help='x-axis data offset')
     parser.add_argument('--yoffset', type=float, help='y-axis data offset')
 
+    # plot absolute x/y values:
+    parser.add_argument('--xabs', action='store_true', help='absolute x-axis values')
+    parser.add_argument('--yabs', action='store_true', help='absolute y-axis values')
+    
     # title / labels:
     parser.add_argument('--title', help='Plot title (see also --saveXYZ and --pairs options)')
     parser.add_argument('--xlabel', help='x-axis label')
@@ -175,6 +179,8 @@ def cplot():
     yreverseneg = True
     xlog = False
     ylog = False
+    xabs = False
+    yabs = False
     if args.xlimit:
 	    xlimit = args.xlimit
     if args.ylimit:
@@ -195,6 +201,10 @@ def cplot():
 	    xlog = True
     if args.ylog:
 	    ylog = True
+    if args.xabs:
+	    xabs = True
+    if args.yabs:
+	    yabs = True
 
     # determine data x&y offsets:
     xoffset = 0.0 # default
@@ -381,6 +391,8 @@ def cplot():
 				         ylog      = ylog,
 				         xoffset   = xoffset,
 				         yoffset   = yoffset,
+				         xabs      = xabs,
+				         yabs      = yabs,
 				         fontsize  = fontsize,
 				         fontname  = fontname)
 		    except:
