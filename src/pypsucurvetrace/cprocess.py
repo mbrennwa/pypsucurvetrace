@@ -178,9 +178,9 @@ def proc_curves(cdata, U1, I1, R2_val=None, BJT_VBE=None):
     x2 = np.unique(cX2)
     if len(u1) > 1 and len(i1) > 1 and len(x2) > 1:
         try:
-            u = np.unique(cU1); delta_u1 = (u.max()-u.min())/(len(u)-1)/scale
-            u = np.unique(cI1); delta_i1 = (u.max()-u.min())/(len(u)-1)/scale
-            u = np.unique(cX2); delta_x2 = (u.max()-u.min())/(len(u)-1)/scale
+            delta_u1 = (u1.max()-u1.min())/(len(u1)-1)/scale
+            delta_i1 = (i1.max()-i1.min())/(len(i1)-1)/scale
+            delta_x2 = (x2.max()-x2.min())/(len(x2)-1)/scale
         except:
             pass
     if delta_u1 == 0 or np.isnan(delta_u1):
@@ -203,10 +203,10 @@ def proc_curves(cdata, U1, I1, R2_val=None, BJT_VBE=None):
 
     # determine smooth function II1 = f(u1,x2):
     UU1, XX2 = np.meshgrid(u1,x2)
-    II1 = griddata((cU1, cX2), cI1, (UU1, XX2), method='cubic')  # cubic spline interpolation
+    II1 = griddata((cU1, cX2), cI1, (UU1, XX2), method='linear')  # linear interpolation
     
     # determine vector gradient of II1(u1,x2) surface (vector elements are gradients along the u1 and x2 axes)
-    g = np.gradient(II1, delta_x2, delta_u1)
+    g = np.gradient(II1, delta_x2, delta_u1)    
     # dI1_dX2 <--> g[0] is the gradient in horizontal direction
     # dI1_dU1 <--> g[1] is the gradient in vertical direction
     
@@ -216,6 +216,7 @@ def proc_curves(cdata, U1, I1, R2_val=None, BJT_VBE=None):
         k = np.nanargmin(abs(II1[:,l]-I1)) # index to II1[:,l] value closest to I1
         dI1_dX2 = g[0][k,l]
         dI1_dU1 = g[1][k,l]
+        
     except:
         dI1_dX2 = np.nan
         dI1_dU1 = np.nan
