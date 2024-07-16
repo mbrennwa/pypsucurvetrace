@@ -8,14 +8,6 @@ from pypsucurvetrace.curvetrace_tools import get_logger
 
 # set up logger:
 logger = get_logger('read_datafile')
-global warn_compensation_read_resistance_not_implemented
-warn_compensation_read_resistance_not_implemented = True
-global warn_compensation_apply_not_implemented
-warn_compensation_apply_not_implemented = True
-global warn_compensationU1_not_implemented
-warn_compensationU1_not_implemented = True
-global warn_compensationU2_not_implemented
-warn_compensationU2_not_implemented = True
 
 ############################
 # data classes / strucures #
@@ -89,20 +81,12 @@ class measurement_data:
 	
 	def get_U1_meas (self,exclude_CC):
 		# find wire resistance specs
-		global warn_compensationU1_not_implemented
-		if warn_compensationU1_not_implemented:
-			logger.warning('NOT YET IMPLEMENTED: correct U1 for voltage drop across wires beteween DUT and PSU')
-			warn_compensationU1_not_implemented = False
 		return self.__get_column(2,exclude_CC)
 
 	def get_I1_meas (self,exclude_CC):
 		return self.__get_column(3,exclude_CC)
 				
 	def get_U2_set (self,exclude_CC):
-		global warn_compensationU2_not_implemented
-		if warn_compensationU2_not_implemented:
-			logger.warning('NOT YET IMPLEMENTED: correct U2 for voltage drop across wires beteween DUT and PSU')
-			warn_compensationU2_not_implemented = False
 		return self.__get_column(5,exclude_CC)
 				
 	def get_T (self,exclude_CC):
@@ -142,9 +126,6 @@ def read_datafile(datafile):
 	r2control: resistor value used to control U2 voltage and to convert PSU U2 voltage to BJT base current
 	'''
 
-	global warn_compensation_read_resistance_not_implemented
-	global warn_compensation_apply_not_implemented
-	
 	# read file to parse header
 	with open(datafile) as f:
 		lines = f.read().split("\n")
@@ -157,9 +138,6 @@ def read_datafile(datafile):
 			break # break from the loop
 
 	# read reistance spec of wires between DUT and PSUs (if available):
-	if warn_compensation_read_resistance_not_implemented:
-		logger.warning('NOT YET IMPLEMENTED: read resistance of wires beteween DUT and PSUs')
-		warn_compensation_read_resistance_not_implemented = False
 	R_wire_PSU1 = None
 	R_wire_PSU2 = None
 
@@ -188,11 +166,7 @@ def read_datafile(datafile):
 			except:
 				ph.T = None
 			break # break from the loop
-	
-	if warn_compensation_apply_not_implemented:
-		logger.warning('NOT YET IMPLEMENTED: apply compensation of voltage drops across wires beteween DUT and PSUs to U1 and U2 of pre-heat.')
-		warn_compensation_apply_not_implemented = False
-	
+		
 	r2 = None
 	for i,line in enumerate(lines):
 		if '* R2CONTROL' in line:
