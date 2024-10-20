@@ -178,7 +178,10 @@ def plot_curves( data,			# measurement_data object (or tuple of measurement_data
 		# loop over all curve lines:
 		for k in range(len(C0)):
 			
-			kk = np.where(CC == C0[k])[0]
+			try:
+				kk = np.where(CC == C0[k])[0]
+			except:
+				kk = []
 			
 			if len(kk) < 2:
 				if data[i].datafile is not None:
