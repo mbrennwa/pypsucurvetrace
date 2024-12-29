@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "pypsucurvetrace"
-version = "0.8.9"
+version = "0.9.0"
 authors = [
   { name="Matthias Brennwald", email="mbrennwa@gmail.com" },
 ]
@@ -19,6 +19,7 @@ dependencies = [
     "minimalmodbus",
     "simple_pid",
     "pydigitemp",
+    "pandas",
     "argparse",
     "pathlib",
     "configparser",
@@ -36,6 +37,7 @@ curvetrace   = "pypsucurvetrace:curvetrace"
 curveplot    = "pypsucurvetrace:curveplot"
 curveprocess = "pypsucurvetrace:curveprocess"
 curvematch   = "pypsucurvetrace:curvematch"
+cconvert     = "pypsucurvetrace:cconvert"
 
 [project.urls]
 "Homepage" = "https://github.com/mbrennwa/pypsucurvetrace"
