@@ -17,7 +17,7 @@ The |pypsucurvetrace| curve tracer
 * |curveplot| produces high-quality plots of the curve data.
 * |curveprocess| determines characteristic DUT parameters from the curve data (operating points, gain, output conductance).
 * |curvematch| calculates the «difference between two curve sets» to help finding parts with similar curves (part matching).
-* |cconvert| convert data files from other curve tracers to |pypsucurvetrace| format.
+* |curveconvert| convert data files from other curve tracers to |pypsucurvetrace| format.
 
 The |pypsucurvetrace| tools are written in Python 3 and will therefore work on all computers running a modern operating system.
 
