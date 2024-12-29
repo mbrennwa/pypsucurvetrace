@@ -37,7 +37,7 @@ curvetrace   = "pypsucurvetrace:curvetrace"
 curveplot    = "pypsucurvetrace:curveplot"
 curveprocess = "pypsucurvetrace:curveprocess"
 curvematch   = "pypsucurvetrace:curvematch"
-cconvert     = "pypsucurvetrace:cconvert"
+curveconvert     = "pypsucurvetrace:curveconvert"
 
 [project.urls]
 "Homepage" = "https://github.com/mbrennwa/pypsucurvetrace"

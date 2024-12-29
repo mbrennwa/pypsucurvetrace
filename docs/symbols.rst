@@ -4,6 +4,7 @@
 .. |curveplot| replace:: ``curveplot``
 .. |curveprocess| replace:: ``curveprocess``
 .. |curvematch| replace:: ``curvematch``
+.. |curveconvert| replace:: ``curveconvert``
 
 .. |U1| replace:: :math:`U_1`
 .. |U2| replace:: :math:`U_2`

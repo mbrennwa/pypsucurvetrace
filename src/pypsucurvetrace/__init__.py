@@ -13,3 +13,7 @@ def curveprocess():
 def curvematch():
     from pypsucurvetrace.cmatch  import cmatch
     cmatch()
+
+def curveconvert():
+    from pypsucurvetrace.cconvert  import cconvert
+    cconvert()
