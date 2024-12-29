@@ -32,7 +32,7 @@ Contents
    curveplot/curveplot
    curveprocess/curveprocess
    curvematch/curvematch
-   cconvert/cconvert
+   curveconvert/curveconvert
    PSUs/supported_PSUs
    heaterblock/heaterblock
    examples/examples

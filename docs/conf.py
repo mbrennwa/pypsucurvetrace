@@ -6,8 +6,8 @@ project = 'pypsucurvetrace'
 copyright = '2023, Matthias Brennwald'
 author = 'Matthias Brennwald'
 
-release = '0.1'
-version = '0.1.0'
+release = '0.9'
+version = '0.9.0'
 
 # -- General configuration
 
