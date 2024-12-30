@@ -350,4 +350,9 @@ UNDER CONSTRUCTION
 Working with the |curveconvert| program
 -------------------------------------
 
-UNDER CONSTRUCTION
+Convert an `Essues eTracer <https://www.essues.com/etracer>`_ CSV data file (``ECC81_et.csv``) to a |pypsucurvetrace| data file (``ECC81_pypsu.dat``):
+
+.. code-block:: console
+
+   curveconvert ECC81_et.csv --etracer > ECC81_pypsu.dat
+
