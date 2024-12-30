@@ -334,11 +334,17 @@ The second example uses the curves measured in the above |curvetrace| example fo
 Working with the |curveprocess| program
 ---------------------------------------
 
-To determine the characteristic parameters of a batch of 300B tubes at |U1| = 300 V and |I1| = 60 mA:
+To determine the characteristic parameters of a 300B tube at |U1| = 300 V and |I1| = 60 mA:
 
 .. code-block:: console
 
-   curveprocess --U1I1 [300,0.06] 300B_*.dat
+   curveprocess --U1I1 [300,0.06] 300B_1.dat
+
+To process a batch of data files from multiple 300B tubes, and saving the result in a data file:
+
+.. code-block:: console
+
+   curveprocess --nohello --U1I1 [300,0.06] 300B_*.dat > 300B_parameters.csv
 
 The program will output the results in comma-separated tabular form:
 
