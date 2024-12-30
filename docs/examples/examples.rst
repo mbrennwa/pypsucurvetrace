@@ -334,7 +334,25 @@ The second example uses the curves measured in the above |curvetrace| example fo
 Working with the |curveprocess| program
 ---------------------------------------
 
-UNDER CONSTRUCTION
+To determine the characteristic parameters from the curve data measured from a 300B tube at 300 V and 60 mA:
+
+.. code-block:: console
+
+   curveprocess --U1I1 [300,0.06] 300B_1.dat
+
+The program will output the results in comma-separated tabular form:
+
+.. code-block:: console
+
+   Filename, Sample, U1 (V), I1 (A), Ug (V), gm (A/V), go (A/V), μ (V/V), T (°C)
+   300B_1, 300B_TJMesh_1, 300, 0.06, -60.85, 0.004226, 0.000802, 5.269, NA
+   
+   
+To process a batch of data files from multiple DUTs and save the resuls in a comma-separated ASCII table:
+
+.. code-block:: console
+
+   curveprocess --U1I1 [300,0.06] --nohello 300B_*.dat > 300B_parameters.csv
 
 
 .. _examples_curvematch:
