@@ -334,11 +334,11 @@ The second example uses the curves measured in the above |curvetrace| example fo
 Working with the |curveprocess| program
 ---------------------------------------
 
-To determine the characteristic parameters from the curve data measured from a 300B tube at 300 V and 60 mA:
+To determine the characteristic parameters of a batch of 300B tubes at U1 = 300 V and I1 = 60 mA:
 
 .. code-block:: console
 
-   curveprocess --U1I1 [300,0.06] 300B_1.dat
+   curveprocess --U1I1 [300,0.06] 300B_*.dat
 
 The program will output the results in comma-separated tabular form:
 
@@ -346,21 +346,32 @@ The program will output the results in comma-separated tabular form:
 
    Filename, Sample, U1 (V), I1 (A), Ug (V), gm (A/V), go (A/V), μ (V/V), T (°C)
    300B_1, 300B_TJMesh_1, 300, 0.06, -60.85, 0.004226, 0.000802, 5.269, NA
-   
-   
-To process a batch of data files from multiple DUTs and save the resuls in a comma-separated ASCII table:
-
-.. code-block:: console
-
-   curveprocess --U1I1 [300,0.06] --nohello 300B_*.dat > 300B_parameters.csv
+   300B_2, 300B_TJMesh_2, 300, 0.06, -60.15, 0.00418, 0.001451, 2.881, NA
+   300B_3, 300B_TJMesh_3, 300, 0.06, -58.62, 0.00553, 0.001427, 3.875, NA
+   300B_4, 300B_TJMesh_4, 300, 0.06, -59.08, 0.005541, 0.001133, 4.889, NA
+   ...
 
 
 .. _examples_curvematch:
 
 Working with the |curvematch| program
--------------------------------------
+-------------------------------------   
+   
+To determine the «similarity» of all 300B from a batch of data files in the 50...400 V U1 range and 5...80 mA I1 range:
 
-UNDER CONSTRUCTION
+.. code-block:: console
+
+   curvematch --U1range [50,400] --I1range [0.005,0.08] --nohello 300B_*.dat
+
+The program will output the results for all DUT pairs in comma-separated tabular form:
+
+.. code-block:: console
+
+   Filename-1, Sample-1, Filename-2, Sample-2, U1_range_low (V), U1_range_high (V), I1_range_low (A), I1_range_high (A), delta-Vg (V-RMS), delta-Vg mean subtracted (V-RMS)
+   300B_1, 300B_TJMesh_1, 300B_2, 300B_TJMesh_2, 50, 400, 0, 0.08, 1.133, 0.8897
+   300B_1, 300B_TJMesh_1, 300B_3, 300B_TJMesh_3, 50, 400, 0, 0.08, 2.771, 2.332
+   300B_1, 300B_TJMesh_1, 300B_4, 300B_TJMesh_4, 50, 400, 0, 0.08, 3.991, 3.099
+   ...
 
 
 .. _examples_curveconvert:
