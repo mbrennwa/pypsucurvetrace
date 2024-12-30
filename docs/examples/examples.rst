@@ -357,7 +357,7 @@ The program will output the results in comma-separated tabular form:
    300B_4, 300B_TJMesh_4, 300, 0.06, -59.08, 0.005541, 0.001133, 4.889, NA
    ...
 
-To determine the parameters of ``300V_1.dat'' at |U1| = 100, 150,..., 400 V and |I1| = 60 mA:
+To determine the parameters at several operating points (|U1| = 100, 150,..., 400 V and |I1| = 60 mA):
 
 .. code-block:: console
 
@@ -368,7 +368,7 @@ To determine the parameters of ``300V_1.dat'' at |U1| = 100, 150,..., 400 V and
 
 Working with the |curvematch| program
 -------------------------------------   
-   
+
 To determine the «similarity» of all 300B from a batch of data files in the range |U1| = 50...400 V and |I1| = 5...80 mA:
 
 .. code-block:: console
