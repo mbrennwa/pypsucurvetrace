@@ -14,6 +14,7 @@ requires-python = ">=3.7"
 dependencies = [
     "numpy",
     "matplotlib",
+    "PyQt6",
     "scipy",
     "pyserial",
     "minimalmodbus",
