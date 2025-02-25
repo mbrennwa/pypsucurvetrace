@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "pypsucurvetrace"
-version = "1.0.1"
+version = "1.1.0"
 authors = [
   { name="Matthias Brennwald", email="mbrennwa@gmail.com" },
 ]
