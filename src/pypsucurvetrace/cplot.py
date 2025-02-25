@@ -94,8 +94,9 @@ def cplot():
     parser.add_argument('--nogrid', action='store_true', help='Turn off grid lines')
 
     # fonts:
+    parser.add_argument('--builtinfontname', help='Name of built-in font (RoutedGothic, NationalPark, FreeSans)')
+    parser.add_argument('--fontname', help='System font name (this may need clearing of the matplotlib font cache after installing new fonts to your system)')
     parser.add_argument('--fontsize', type=float, help='Font size')
-    parser.add_argument('--fontname', help='Font name (this may need clearing of the matplotlib font cache after installing new fonts to your system)')
 
     # logo / branding on/off:
     parser.add_argument('--nobranding', action='store_true', help='Hide pypsucurvetrace label')
@@ -318,12 +319,15 @@ def cplot():
 	    
     else:
 	    # determine font size and name:
+	    builtinfontname = None # built-in font name, default
+	    fontname = None # system font name, default
 	    fontsize = None # default
-	    fontname = None # default
-	    if args.fontsize:
-		    fontsize = args.fontsize
+	    if args.builtinfontname:
+		    builtinfontname = args.builtinfontname
 	    if args.fontname:
 		    fontname = args.fontname
+	    if args.fontsize:
+		    fontsize = args.fontsize
 
 	    if pairs:
 		    datapairs = tuple( )
@@ -394,7 +398,8 @@ def cplot():
 				         xabs      = xabs,
 				         yabs      = yabs,
 				         fontsize  = fontsize,
-				         fontname  = fontname)
+				         fontname  = fontname,
+				         builtinfontname = builtinfontname)
 		    except:
 			    # plot failed for some reason, skip this plot and try the next one
 			    continue

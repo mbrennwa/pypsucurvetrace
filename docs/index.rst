@@ -39,7 +39,7 @@ Contents
    
 .. note::
 
-   * |pypsucurvetrace| is free software and uses the GPL-3 license (see LICENSE.txt or http://www.gnu.org/licenses). The `Routed Gothic font <http://webonastick.com/fonts/routed-gothic>`_ included in the |pypsucurvetrace| package is licensed under the SIL Open Font License (OFL).
+   * |pypsucurvetrace| is free software and uses the GPL-3 license (see LICENSE.txt or http://www.gnu.org/licenses). The `Routed Gothic <http://webonastick.com/fonts/routed-gothic>`_ and `National Park <http://nationalparktypeface.com/>`_ fonts included in the |pypsucurvetrace| package are licensed under the SIL Open Font License (OFL).
 
    * Report issues and bugs `here <http://github.com/mbrennwa/pypsucurvetrace/issues>`_ 
 

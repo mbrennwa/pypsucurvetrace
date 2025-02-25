@@ -37,7 +37,8 @@ def plot_curves( data,			# measurement_data object (or tuple of measurement_data
                  grid_on = True,        # use grid lines
                  gridcolor = 'gray',    # color of the grid lines
                  dotmarker = None,      # dot marker symbol
-                 fontname = None,       # name of the font used in the plot (try to use Routed Gothic by default)
+                 builtinfontname = None,# name of built-in font name (RoutedGothic, NationalPark, FreeSans)
+                 fontname = None,       # name of the font used in the plot
                  fontsize = None,       # size of the font used in the plot (base value)
                  title=None,            # plot title
                  xlabel=None,           # x-axis label
@@ -146,13 +147,20 @@ def plot_curves( data,			# measurement_data object (or tuple of measurement_data
 		return
 
 	# prepare fonts:
-	fpath = None
+	
 	if fontname is None:
 		try:
-			# try specifying rounded-gothic.ttf:
-			font_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "fonts", "routed-gothic.ttf")
-			fm.fontManager.addfont(font_path) # add the font to matplotlib's font cache
-			fontname = fm.FontProperties(fname=font_path).get_name()
+		    if builtinfontname == "RoutedGothic":
+		        font_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "fonts", "routed-gothic.ttf")
+		        fontname = "Routed Gothic"
+		    elif builtinfontname == "NationalPark":
+		        font_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "fonts", "NationalPark-Medium.otf")
+		        fontname = "NationalPark"
+		    elif builtinfontname == "FreeSans":
+		        font_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "fonts", "FreeSans.otf")
+		        fontname = "FreeSans"
+            
+		    fm.fontManager.addfont(font_path) # add the font to matplotlib's font cache
 
 		except Exception as e:
 			fontname = 'Sans'	
