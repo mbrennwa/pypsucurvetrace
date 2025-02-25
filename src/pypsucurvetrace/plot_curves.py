@@ -151,13 +151,13 @@ def plot_curves( data,			# measurement_data object (or tuple of measurement_data
 	if fontname is None:
 		try:
 		    if builtinfontname == "RoutedGothic":
-		        font_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "fonts", "routed-gothic.ttf")
+		        font_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "routed-gothic.ttf")
 		        fontname = "Routed Gothic"
 		    elif builtinfontname == "NationalPark":
-		        font_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "fonts", "NationalPark-Medium.otf")
+		        font_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "NationalPark-Medium.otf")
 		        fontname = "NationalPark"
 		    elif builtinfontname == "FreeSans":
-		        font_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "fonts", "FreeSans.otf")
+		        font_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "FreeSans.otf")
 		        fontname = "FreeSans"
             
 		    fm.fontManager.addfont(font_path) # add the font to matplotlib's font cache
