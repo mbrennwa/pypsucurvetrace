@@ -1,0 +1,5 @@
+Testing PyPSUcurvetrace for development tasks
+
+When working on the code, it may be useful to test things by running the PyPSU programs using the development code. To this end, install the package using the "editable" flag from the local working repository:
+
+pipx install -e path/to/pypsucurvetrace.git
