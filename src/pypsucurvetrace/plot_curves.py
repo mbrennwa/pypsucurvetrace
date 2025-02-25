@@ -5,6 +5,9 @@ Function to plot pypsucurvetrace data
 # imports:
 import numpy as np
 import matplotlib.pyplot as plt
+import matplotlib.font_manager as fm
+import os
+
 ### import logging
 from queue import Empty
 
@@ -34,7 +37,7 @@ def plot_curves( data,			# measurement_data object (or tuple of measurement_data
                  grid_on = True,        # use grid lines
                  gridcolor = 'gray',    # color of the grid lines
                  dotmarker = None,      # dot marker symbol
-                 fontname = None,       # name of the font used in the plot
+                 fontname = None,       # name of the font used in the plot (try to use Routed Gothic by default)
                  fontsize = None,       # size of the font used in the plot (base value)
                  title=None,            # plot title
                  xlabel=None,           # x-axis label
@@ -143,13 +146,23 @@ def plot_curves( data,			# measurement_data object (or tuple of measurement_data
 		return
 
 	# prepare fonts:
+	fpath = None
 	if fontname is None:
-		fontname = 'Sans'
+		try:
+			# try specifying rounded-gothic.ttf:
+			font_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "fonts", "routed-gothic.ttf")
+			fm.fontManager.addfont(font_path) # add the font to matplotlib's font cache
+			fontname = fm.FontProperties(fname=font_path).get_name()
+
+		except Exception as e:
+			fontname = 'Sans'	
+	
 	if fontsize is None:
 		fs_base = 18
 	else:
 		fs_base = fontsize
 	fs_small = 0.7*fs_base
+
 	plt.rc('font', size=fs_base)
 	plt.rc('font', family=fontname)
 	
