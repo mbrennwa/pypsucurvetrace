@@ -11,7 +11,7 @@ authors = [
   { name="Matthias Brennwald", email="mbrennwa@gmail.com" },
 ]
 description = "A software toolbox for I/V curve tracing of electronic devices using programmable power supplies."
-readme = "README.md"
+readme = "README.rst"
 requires-python = ">=3.7"
 dependencies = [
     "numpy",
@@ -22,11 +22,7 @@ dependencies = [
     "minimalmodbus",
     "simple_pid",
     "pydigitemp",
-    "pandas",
-    "argparse",
-    "pathlib",
-    "configparser",
-    "datetime"
+    "pandas"
 ]
 classifiers = [
     "Programming Language :: Python :: 3",
@@ -46,6 +42,17 @@ curveconvert     = "pypsucurvetrace:curveconvert"
 "Homepage" = "https://github.com/mbrennwa/pypsucurvetrace"
 "Bug Tracker" = "https://github.com/mbrennwa/pypsucurvetrace/issues"
 
+[project.optional-dependencies]
+test = [
+    "pytest"
+]
+
 
 [tool.setuptools.package-data]
 mypkg = ["src/pypsucurvetrace/fonts/*"]
+
+[tool.pytest.ini_options]
+markers = [
+    "virtual_hw: hardware-free tests using virtual PSU drivers",
+    "hw: hardware-in-the-loop tests requiring physical instruments",
+]

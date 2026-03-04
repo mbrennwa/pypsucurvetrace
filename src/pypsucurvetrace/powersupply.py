@@ -13,6 +13,7 @@ import pypsucurvetrace.powersupply_KORAD as powersupply_KORAD
 import pypsucurvetrace.powersupply_BK as powersupply_BK
 import pypsucurvetrace.powersupply_RIDEN as powersupply_RIDEN
 import pypsucurvetrace.powersupply_SALUKI as powersupply_SALUKI
+import pypsucurvetrace.powersupply_VIRTUAL as powersupply_VIRTUAL
 
 # set up logger:
 logger = get_logger('powersupply')
@@ -168,11 +169,16 @@ class PSU:
 				elif C == 'SALUKI':
 				    PSU = powersupply_SALUKI.SALUKI(P, debug=False)
 				    C = 'SALUKI'
+
+				elif C == 'VIRTUAL':
+					PSU = powersupply_VIRTUAL.VIRTUAL(P, debug=False)
+					C = 'VIRTUAL'
 				
 				else:
 					raise RuntimeError ('Unknown commandset ' + C + '! Cannot continue...')
 
 				PSU.COMMANDSET = C
+				PSU._PARENT_PSU = self
 
 				self._PSU.append(PSU)
 
@@ -210,7 +216,7 @@ class PSU:
 				if self.MAXSETTLETIME < self._PSU[k].MAXSETTLETIME:
 					self.MAXSETTLETIME = self._PSU[k].MAXSETTLETIME
 				if self.READIDLETIME < self._PSU[k].READIDLETIME:
-					self.READIDETIME = self._PSU[k].READIDLETIME
+					self.READIDLETIME = self._PSU[k].READIDLETIME
 
 			if num_PSU > 1:
 				self.PMAX = min (self.PMAX,self.VMAX*self.IMAX)
@@ -260,7 +266,7 @@ class PSU:
 			V.append(value)
 
 		for k in range(len(self._PSU)):
-			if self._PSU[k].COMMANDSET in [ 'KORAD' , 'VOLTCRAFT' , 'BK' , 'RIDEN' , 'SALUKI' ]:
+			if self._PSU[k].COMMANDSET in [ 'KORAD' , 'VOLTCRAFT' , 'BK' , 'RIDEN' , 'SALUKI' , 'VIRTUAL' ]:
 				
 				# determine corrected voltage setpoint:
 				VV = polyval(V[k], self.V_SET_CALPOLY)
@@ -334,10 +340,10 @@ class PSU:
 		
 		# make sure we're not trying to set a value that is not resolved by the setting resolution of the PSU,
 		# which will never give a stable output at the unresolved value		
-		value = round(value/self.VRESSET) * self.VRESSET
+		value = round(value/self.IRESSET) * self.IRESSET
 
 		for k in range(len(self._PSU)):
-			if self._PSU[k].COMMANDSET in [ 'KORAD' , 'VOLTCRAFT' , 'BK' , 'RIDEN' , 'SALUKI' ]:
+			if self._PSU[k].COMMANDSET in [ 'KORAD' , 'VOLTCRAFT' , 'BK' , 'RIDEN' , 'SALUKI' , 'VIRTUAL' ]:
 							
 				# determine corrected current setpoint:
 				VV = polyval(value, self.I_SET_CALPOLY)
@@ -360,6 +366,7 @@ class PSU:
 			t0 = time.time() # start time (now)
 			while not time.time() - t0 > self.MAXSETTLETIME:
 				r = self.read()
+				delta = abs(r[1] - value)
 				if r[2] == "CV":
 					limit = limit + 1
 					if limit > limit_max:
@@ -393,7 +400,7 @@ class PSU:
 		"""
 
 		for k in range(len(self._PSU)):
-			if self._PSU[k].COMMANDSET in [ 'KORAD' , 'VOLTCRAFT' , 'BK' , 'RIDEN' , 'SALUKI' ]:
+			if self._PSU[k].COMMANDSET in [ 'KORAD' , 'VOLTCRAFT' , 'BK' , 'RIDEN' , 'SALUKI' , 'VIRTUAL' ]:
 				self._PSU[k].output(False)
 				self._PSU[k].voltage(self.VMIN)
 				self._PSU[k].current(0.0)
@@ -422,7 +429,7 @@ class PSU:
 		"""
 
 		for k in range(len(self._PSU)):
-			if self._PSU[k].COMMANDSET in [ 'KORAD' , 'VOLTCRAFT' , 'BK' , 'RIDEN' , 'SALUKI' ]:
+			if self._PSU[k].COMMANDSET in [ 'KORAD' , 'VOLTCRAFT' , 'BK' , 'RIDEN' , 'SALUKI' , 'VIRTUAL' ]:
 				self._PSU[k].output(True)
 
 			else:
@@ -467,7 +474,7 @@ class PSU:
 			
 			for k in range(len(self._PSU)):
 			
-				if self._PSU[k].COMMANDSET in [ 'KORAD' , 'VOLTCRAFT' , 'BK' , 'RIDEN' , 'SALUKI' ]:
+				if self._PSU[k].COMMANDSET in [ 'KORAD' , 'VOLTCRAFT' , 'BK' , 'RIDEN' , 'SALUKI' , 'VIRTUAL' ]:
 				    vv,ii,ll = self._PSU[k].reading()
 				    
 				    # add values to the list:

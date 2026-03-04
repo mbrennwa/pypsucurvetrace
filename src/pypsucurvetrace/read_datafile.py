@@ -37,6 +37,7 @@ class measurement_data:
 				self.rawdata = np.genfromtxt(self.datafile, comments='%') # this deals nicely with NA values (for example if the heaterblock T values are missing)
 			except Exception as e:
 				logger.error('Could not load data from file ' + self.datafile + ' (' + str(e) + ').')
+				self.rawdata = np.array([])
 			
 			# replace "-0.0" values by "0.0"	
 			self.rawdata = np.where(self.rawdata==-0.0, 0.0, self.rawdata) 	
@@ -93,10 +94,17 @@ class measurement_data:
 		try:
 			T = self.__get_column(10,exclude_CC)
 		except:
-			if exclude_CC:
-				T = np.matlib.repmat(None, len(exclude_CC))
+			if len(self.rawdata.shape) == 1:
+				n_rows = 0 if len(self.rawdata) == 0 else 1
 			else:
-				T = np.matlib.repmat(None, len(self.rawdata[:,1]))
+				n_rows = len(self.rawdata[:,1])
+			if exclude_CC:
+				cc_on = self.get_CC_on()
+				if isinstance(cc_on, tuple):
+					n_rows = len(cc_on[0])
+				else:
+					n_rows = len(cc_on)
+			T = np.full((n_rows,), None, dtype=object)
 		return T
 		
 	def add_data(self, x):

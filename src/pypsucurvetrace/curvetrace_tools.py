@@ -7,6 +7,7 @@ import sys
 import time
 import math
 import os.path
+import ast
 import logging
 import numpy as np
 
@@ -159,6 +160,19 @@ def __convert_str_tuple(x):
 	return tuple(float(s) for s in x.strip("()").split(","))
 
 
+def __parse_tuple_literal(value, what):
+	"""
+	Parse a tuple literal string safely.
+	"""
+	try:
+		parsed = ast.literal_eval(value)
+	except Exception as e:
+		raise ValueError('Could not parse ' + what + ' as tuple: ' + str(e))
+	if not isinstance(parsed, tuple):
+		raise ValueError('Expected tuple for ' + what + '.')
+	return parsed
+
+
 
 
 ###########################
@@ -185,11 +199,11 @@ def connect_PSU(configTESTER, label, logger):
 		# check if this is a single PSU unit, or a stack of serial connected PSUs:
 		num_PSU = 1 # number of PSUs
 		try:
-			x = eval(port)
+			x = __parse_tuple_literal(port, 'COMPORT')
 			if type(x) is tuple:
 				num_PSU = len(x)
 				port = x
-		except:
+		except ValueError:
 			pass
 
 		# read TYPE field (mandatory):
@@ -200,7 +214,7 @@ def connect_PSU(configTESTER, label, logger):
 			exit()
 		if num_PSU > 1:
 			try:
-				x = eval(commandset)
+				x = __parse_tuple_literal(commandset, 'TYPE')
 				if type(x) is not tuple:
 					raise ValueError
 				commandset = x
@@ -469,7 +483,7 @@ def do_idle(PSU1, PSU2, HEATER, seconds, file=None, wait_for_TEMP=False):
 				if REG.TEST_VIDLE - dUr < REG.TEST_VIDLE_MIN:
 					REG.TEST_VIDLE = REG.TEST_VIDLE_MIN
 				elif REG.TEST_VIDLE - dUr > REG.TEST_VIDLE_MAX:
-					REG.TEST_VIDLE = REG.TEST_VIDLE_MIN
+					REG.TEST_VIDLE = REG.TEST_VIDLE_MAX
 				else:
 					REG.TEST_VIDLE = REG.TEST_VIDLE - dUr
 				REG.setVoltage(REG.TEST_VIDLE,True)
@@ -528,7 +542,9 @@ def valuepairs(arg):
     # method for argparse: deal with value pairs as input arguments in the form [x,y] or [x1:x2,y1:y2,N,lin/log]
     try:
         # try if arg is formatted as [x,y]:
-        p = eval(arg)
+        p = ast.literal_eval(arg)
+        if not isinstance(p, (list, tuple)):
+            raise ValueError('Input is not a list/tuple.')
         p = [ [float(p[0]),], [float(p[1]),] ]
     except:
         # try if arg is formatted as [x1:x2,y1:y2,N] or [x1:x2,y1:y2,N,LOG]:
