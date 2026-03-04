@@ -10,8 +10,8 @@ POLARITY = 1
 
 [PSU2]
 VSTART = 0
-VEND   = 6
-VSTEP  = 1
+VEND   = 10
+VSTEP  = 2
 IMAX   = 0.01
 PMAX   = 1
 VIDLE  = 1
